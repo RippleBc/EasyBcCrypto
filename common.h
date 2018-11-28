@@ -16,5 +16,10 @@ extern void aes_decrypt(unsigned char *);
 extern void des_encrypt(unsigned char *);
 extern void des_decrypt(unsigned char *);
 
+extern unsigned char init_vector[];
+
 extern void aes_cbc_encrypt(unsigned char *);
 extern void aes_cbc_decrypt(unsigned char *);
+
+extern void aes_cfb_encrypt(unsigned char *);
+extern void aes_cfb_decrypt(unsigned char *);

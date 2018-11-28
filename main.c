@@ -17,20 +17,23 @@ int main()
     }
 
     int i;
-    for(i = 0; i < source_index; i++)
+    printf("size %d\n", strlen(source));
+    for(i = 0; i < strlen(source); i++)
     {
         printf("%c", source[i]);
     }
     printf("\n");
-    aes_cbc_encrypt(source);
-    for(i = 0; i < source_index; i++)
+    aes_cfb_encrypt(source);
+    printf("size %d\n", strlen(source));
+    for(i = 0; i < strlen(source); i++)
     {
         printf("%c", source[i]);
     }
     printf("\n");
 
-    aes_cbc_decrypt(source);
-    for(i = 0; i < source_index; i++)
+    aes_cfb_decrypt(source);
+    printf("size %d\n", strlen(source));
+    for(i = 0; i < strlen(source); i++)
     {
         printf("%c", source[i]);
     }

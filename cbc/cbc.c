@@ -7,8 +7,8 @@ unsigned char init_vector[AES_GROUP_SIZE] = {
 	0x56, 0x66, 0x76, 0x86
 };
 
-unsigned char tmp[AES_GROUP_SIZE];
-unsigned char pre_encrypted_text[AES_GROUP_SIZE];
+static unsigned char tmp[AES_GROUP_SIZE];
+static unsigned char pre_encrypted_text[AES_GROUP_SIZE];
 
 void aes_cbc_encrypt(unsigned char *source)
 {
@@ -17,20 +17,58 @@ void aes_cbc_encrypt(unsigned char *source)
 
 	for(i = 0; i < source_size; i += AES_GROUP_SIZE)
 	{
-		if(i == 0)
+		/* padding */
+		if(i + AES_GROUP_SIZE > source_size)
 		{
-			for(j = 0; j < AES_GROUP_SIZE; j++)
+			int remainder = source_size % AES_GROUP_SIZE;
+
+			if(i == 0)
 			{
-				source[i + j] ^= init_vector[j];
+				for(j = 0; j < remainder; j++)
+				{
+					source[j] ^= init_vector[j];
+				}
+
+				for(j = 0; j < AES_GROUP_SIZE - remainder; j++)
+				{
+					source[source_size++] = init_vector[remainder + j];
+				}
 			}
+			else
+			{
+				for(j = 0; j < remainder; j++)
+				{
+					source[i + j] ^= source[i - AES_GROUP_SIZE + j];
+				}
+
+				for(j = 0; j < AES_GROUP_SIZE - remainder; j++)
+				{
+					source[source_size++] = source[i - AES_GROUP_SIZE + remainder + j];
+				}
+			}
+
+			/*  */
+			source[source_size] = '\0';
 		}
 		else
 		{
-			for(j = 0; j < AES_GROUP_SIZE; j++)
+			/*  */
+			if(i == 0)
 			{
-				source[i + j] ^= source[i + j - AES_GROUP_SIZE];
+				for(j = 0; j < AES_GROUP_SIZE; j++)
+				{
+					source[i + j] ^= init_vector[j];
+				}
+			}
+			else
+			{
+				for(j = 0; j < AES_GROUP_SIZE; j++)
+				{
+					source[i + j] ^= source[i + j - AES_GROUP_SIZE];
+				}
 			}
 		}
+		
 
 		aes_encrypt(&source[i]);
 	}
