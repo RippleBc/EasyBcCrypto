@@ -1,3 +1,5 @@
+#include "../common.h"
+
 static unsigned char dictionaries[256] = {
 	0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90, 0xa0, 0xb0, 0xc0, 0xd0, 0xe0, 0xf0,
 	0x01, 0x11, 0x21, 0x31, 0x41, 0x51, 0x61, 0x71, 0x81, 0x91, 0xa1, 0xb1, 0xc1, 0xd1, 0xe1, 0xf1,
@@ -17,125 +19,80 @@ static unsigned char dictionaries[256] = {
 	0x0f, 0x1f, 0x2f, 0x3f, 0x4f, 0x5f, 0x6f, 0x7f, 0x8f, 0x9f, 0xaf, 0xbf, 0xcf, 0xdf, 0xef, 0xff
 };
 
-static unsigned char secret[16] = {
+static unsigned char secret[AES_GROUP_SIZE] = {
 	0x0d, 0x1d, 0x2d, 0x3d, 
 	0x08, 0x18, 0x28, 0x38, 
 	0x6b, 0x7b, 0x8b, 0x9b, 
 	0x56, 0x66, 0x76, 0x86
 };
 
-static unsigned char column_secret[4] = {
+static unsigned char column_secret[AES_SUB_GROUP_SIZE] = {
 	0x58, 0x68, 0x78, 0x88 
 };
 
-static unsigned char tmp[16];
+static unsigned char tmp[AES_GROUP_SIZE];
 
 void aes_encrypt(unsigned char *source)
 {
 	int i;
 	int j;
 	int index;
-
-	printf("*************************origin text*************************\n");
-	for(i = 0; i < 16; i++)
-	{
-		printf("%c", source[i]);
-	}
-	printf("\n*************************************************************\n");
-
-	/* Encrypt SubBytes	*/
-	for(i = 0; i < 16; i++)
-	{
-		index = source[i];
-		source[i] = dictionaries[index];
-	}
-	printf("*************************Encrypt SubBytes text*************************\n");
-	for(i = 0; i < 4; i++)
-	{
-		for(j = 0; j < 4; j++)
-		{
-			printf("%x ", source[i * 4 + j]);
-		}
-		printf("\n");
-	}
-	printf("***********************************************************************\n");
-
-	/* Encrypt ShiftRows */
-	for(j = 0; j < 4; j++)
-	{
-		tmp[j] = source[(j + 1) % 4];
-	}
-	for(i = 0; i < 2; i++)
-	{
-		for(j = 0; j < 4; j++)
-		{
-			tmp[4 + j] = source[4 + (j + 1) % 4];
-		}
-
-		for(j = 4; j < 8; j++)
-		{
-			source[j] = tmp[j];
-		}
-	}
-	for(i = 0; i < 3; i++)
-	{
-		for(j = 0; j < 4; j++)
-		{
-			tmp[8 + j] = source[8 + (j + 1) % 4];
-		}
-
-		for(j = 8; j < 12; j++)
-		{
-			source[j] = tmp[j];
-		}
-	}
-	printf("*************************Encrypt ShiftRows text*************************\n");
-	for(i = 0; i < 4; i++)
-	{
-		for(j = 0; j < 4; j++)
-		{
-			printf("%x ", source[i * 4 + j]);
-		}
-		printf("\n");
-	}
-	printf("*************************************************************************\n");
-
-
-	/* Encrypt MixColumns */
-	for(i = 0; i < 4; i++)
-	{
-		for(j = 0; j < 4; j++)
-		{
-			source[i] ^= column_secret[i];
-		}
-	}
-	printf("*************************Encrypt MixColumns text*************************\n");
-	for(i = 0; i < 4; i++)
-	{
-		for(j = 0; j < 4; j++)
-		{
-			printf("%x ", source[i * 4 + j]);
-		}
-		printf("\n");
-	}
-	printf("*************************************************************************\n");
-
-	/* Encrypt AddRoundKey */
-	for(i = 0; i < 16; i ++)
-	{
-		source[i] ^= secret[i];
-	}
-	printf("*************************Encrypt AddRoundKey text*************************\n");
-	for(i = 0; i < 4; i++)
-	{
-		for(j = 0; j < 4; j++)
-		{
-			printf("%x ", source[i * 4 + j]);
-		}
-		printf("\n");
-	}
-	printf("***************************************************************************\n");
+	int round_index;
 	
+	for(round_index = 0; round_index < AES_ROUND_NUM; round_index++)
+	{
+		/* Encrypt SubBytes	*/
+		for(i = 0; i < AES_GROUP_SIZE; i++)
+		{
+			index = source[i];
+			source[i] = dictionaries[index];
+		}
+
+		/* Encrypt ShiftRows */
+		for(j = 0; j < AES_SUB_GROUP_SIZE; j++)
+		{
+			tmp[j] = source[(j + 1) % AES_SUB_GROUP_SIZE];
+		}
+		for(i = 0; i < 2; i++)
+		{
+			for(j = 0; j < AES_SUB_GROUP_SIZE; j++)
+			{
+				tmp[AES_SUB_GROUP_SIZE + j] = source[AES_SUB_GROUP_SIZE + (j + 1) % AES_SUB_GROUP_SIZE];
+			}
+
+			for(j = AES_SUB_GROUP_SIZE; j < AES_SUB_GROUP_SIZE * 2; j++)
+			{
+				source[j] = tmp[j];
+			}
+		}
+		for(i = 0; i < 3; i++)
+		{
+			for(j = 0; j < AES_SUB_GROUP_SIZE; j++)
+			{
+				tmp[AES_SUB_GROUP_SIZE * 2  + j] = source[AES_SUB_GROUP_SIZE * 2 + (j + 1) % AES_SUB_GROUP_SIZE];
+			}
+
+			for(j = AES_SUB_GROUP_SIZE * 2; j < AES_SUB_GROUP_SIZE * 3; j++)
+			{
+				source[j] = tmp[j];
+			}
+		}
+
+		/* Encrypt MixColumns */
+		for(i = 0; i < AES_SUB_GROUP_SIZE; i++)
+		{
+			for(j = 0; j < AES_SUB_GROUP_SIZE; j++)
+			{
+				source[i] ^= column_secret[i];
+			}
+		}
+
+		/* Encrypt AddRoundKey */
+		for(i = 0; i < AES_GROUP_SIZE; i ++)
+		{
+			source[i] ^= secret[i];
+		}
+	}
 }
 
 void aes_decrypt(unsigned char *source)
@@ -143,97 +100,66 @@ void aes_decrypt(unsigned char *source)
 	int i;
 	int j;
 	int index;
+	int round_index;
 
-	/* Decrypt AddRoundKey */
-	for(i = 0; i < 16; i ++)
+	for(round_index = 0; round_index < AES_ROUND_NUM; round_index++)
 	{
-		source[i] ^= secret[i];
-	}
-	printf("*************************Decrypt AddRoundKey text*************************\n");
-	for(i = 0; i < 4; i++)
-	{
-		for(j = 0; j < 4; j++)
+		/* Decrypt AddRoundKey */
+		for(i = 0; i < AES_GROUP_SIZE; i ++)
 		{
-			printf("%x ", source[i * 4 + j]);
-		}
-		printf("\n");
-	}
-	printf("**************************************************************************\n");
-
-	/* Decrypt MixColumns */
-	for(i = 0; i < 4; i++)
-	{
-		for(j = 0; j < 4; j++)
-		{
-			source[i] ^= column_secret[i];
-		}
-	}
-	printf("*************************Decrypt MixColumns text*************************\n");
-	for(i = 0; i < 4; i++)
-	{
-		for(j = 0; j < 4; j++)
-		{
-			printf("%x ", source[i * 4 + j]);
-		}
-		printf("\n");
-	}
-	printf("*************************************************************************\n");
-
-	/* Decrypt InShiftRows */
-	for(j = 0; j < 4; j++)
-	{
-		tmp[(j + 1) % 4] = source[j];
-	}
-	for(i = 0; i < 2; i++)
-	{
-		for(j = 0; j < 4; j++)
-		{
-			tmp[4 + (j + 1) % 4] = source[4 + j];
+			source[i] ^= secret[i];
 		}
 
-		for(j = 4; j < 8; j++)
+		/* Decrypt MixColumns */
+		for(i = 0; i < AES_SUB_GROUP_SIZE; i++)
 		{
-			source[j] = tmp[j];
-		}
-	}
-	for(i = 0; i < 3; i++)
-	{
-		for(j = 0; j < 4; j++)
-		{
-			tmp[8 + (j + 1) % 4] = source[8 + j];
-		}
-
-		for(j = 8; j < 12; j++)
-		{
-			source[j] = tmp[j];
-		}
-	}
-	printf("*************************Decrypt InShiftRows*************************\n");
-	for(i = 0; i < 4; i++)
-	{
-		for(j = 0; j < 4; j++)
-		{
-			printf("%x ", source[i * 4 + j]);
-		}
-		printf("\n");
-	}
-	printf("*********************************************************************\n");
-
-	/* Decrypt InSubBytes */
-	for(i = 0; i < 16; i ++)
-	{
-		for(j = 0; j < 256; j++)
-		{
-			if(dictionaries[j] == source[i])
+			for(j = 0; j < AES_SUB_GROUP_SIZE; j++)
 			{
-				source[i] = j;
+				source[i] ^= column_secret[i];
+			}
+		}
+
+		/* Decrypt InShiftRows */
+		for(j = 0; j < AES_SUB_GROUP_SIZE; j++)
+		{
+			tmp[(j + 1) % AES_SUB_GROUP_SIZE] = source[j];
+		}
+		for(i = 0; i < 2; i++)
+		{
+			for(j = 0; j < AES_SUB_GROUP_SIZE; j++)
+			{
+				tmp[AES_SUB_GROUP_SIZE + (j + 1) % AES_SUB_GROUP_SIZE] = source[AES_SUB_GROUP_SIZE + j];
+			}
+
+			for(j = AES_SUB_GROUP_SIZE; j < AES_SUB_GROUP_SIZE * 2; j++)
+			{
+				source[j] = tmp[j];
+			}
+		}
+		for(i = 0; i < 3; i++)
+		{
+			for(j = 0; j < AES_SUB_GROUP_SIZE; j++)
+			{
+				tmp[AES_SUB_GROUP_SIZE * 2 + (j + 1) % AES_SUB_GROUP_SIZE] = source[AES_SUB_GROUP_SIZE * 2 + j];
+			}
+
+			for(j = AES_SUB_GROUP_SIZE * 2; j < AES_SUB_GROUP_SIZE * 3; j++)
+			{
+				source[j] = tmp[j];
+			}
+		}
+
+		/* Decrypt InSubBytes */
+		for(i = 0; i < AES_GROUP_SIZE; i ++)
+		{
+			for(j = 0; j < 256; j++)
+			{
+				if(dictionaries[j] == source[i])
+				{
+					source[i] = (unsigned char)j;
+					break;
+				}
 			}
 		}
 	}
-	printf("*************************Decrypt InSubBytes*************************\n");
-	for(i = 0; i < 16; i++)
-	{
-		printf("%c", source[i]);
-	}
-	printf("\n******************************************************************\n");
 }

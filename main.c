@@ -1,27 +1,38 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "./common.h"
 
-/* origin */
-unsigned char source[16];
+static int source_index = 0;
+static unsigned char source[MAX_STR_SIZE];
 
 int main()
 {
-    source[0] = 0x6d; 
-    source[1] = 0x69; 
-    source[2] = 0x64; 
-    source[3] = 0x6e; 
-    source[4] = 0x69; 
-    source[5] = 0x67; 
-    source[6] = 0x68; 
-    source[7] = 0x74;
-    source[8] = 0x6d; 
-    source[9] = 0x69; 
-    source[10] = 0x64; 
-    source[11] = 0x6e; 
-    source[12] = 0x69; 
-    source[13] = 0x67; 
-    source[14] = 0x68; 
-    source[15] = 0x74;
 
-    aes_encrypt(source);
-    aes_decrypt(source);
+    /*  */
+    FILE *codfp = fopen("./text", "r");
+    int c;
+    while((c = fgetc(codfp)) != EOF)
+    {
+        source[source_index++] = (unsigned char)c;
+    }
+
+    int i;
+    for(i = 0; i < source_index; i++)
+    {
+        printf("%c", source[i]);
+    }
+    printf("\n");
+    aes_cbc_encrypt(source);
+    for(i = 0; i < source_index; i++)
+    {
+        printf("%c", source[i]);
+    }
+    printf("\n");
+
+    aes_cbc_decrypt(source);
+    for(i = 0; i < source_index; i++)
+    {
+        printf("%c", source[i]);
+    }
+    printf("\n");
 }
