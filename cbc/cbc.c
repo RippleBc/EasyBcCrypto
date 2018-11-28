@@ -1,6 +1,6 @@
 #include "../common.h"
 
-unsigned char init_vector[AES_GROUP_SIZE] = {
+const unsigned char init_vector[AES_GROUP_SIZE] = {
 	0x0d, 0x1d, 0x2d, 0x3d, 
 	0x08, 0x18, 0x28, 0x38, 
 	0x6b, 0x7b, 0x8b, 0x9b, 
@@ -10,17 +10,16 @@ unsigned char init_vector[AES_GROUP_SIZE] = {
 static unsigned char tmp[AES_GROUP_SIZE];
 static unsigned char pre_encrypted_text[AES_GROUP_SIZE];
 
-void aes_cbc_encrypt(unsigned char *source)
+void aes_cbc_encrypt(unsigned char *source, int size)
 {
 	int i, j;
-	int source_size = strnlen(source, MAX_STR_SIZE);
 
-	for(i = 0; i < source_size; i += AES_GROUP_SIZE)
+	for(i = 0; i < size; i += AES_GROUP_SIZE)
 	{
 		/* padding */
-		if(i + AES_GROUP_SIZE > source_size)
+		if(i + AES_GROUP_SIZE > size)
 		{
-			int remainder = source_size % AES_GROUP_SIZE;
+			int remainder = size % AES_GROUP_SIZE;
 
 			if(i == 0)
 			{
@@ -31,7 +30,7 @@ void aes_cbc_encrypt(unsigned char *source)
 
 				for(j = 0; j < AES_GROUP_SIZE - remainder; j++)
 				{
-					source[source_size++] = init_vector[remainder + j];
+					source[size++] = init_vector[remainder + j];
 				}
 			}
 			else
@@ -43,12 +42,12 @@ void aes_cbc_encrypt(unsigned char *source)
 
 				for(j = 0; j < AES_GROUP_SIZE - remainder; j++)
 				{
-					source[source_size++] = source[i - AES_GROUP_SIZE + remainder + j];
+					source[size++] = source[i - AES_GROUP_SIZE + remainder + j];
 				}
 			}
 
 			/*  */
-			source[source_size] = '\0';
+			source[size] = '\0';
 		}
 		else
 		{
@@ -74,12 +73,11 @@ void aes_cbc_encrypt(unsigned char *source)
 	}
 }
 
-void aes_cbc_decrypt(unsigned char *source)
+void aes_cbc_decrypt(unsigned char *source, int size)
 {
 	int i, j;
-	int source_size = strnlen(source, MAX_STR_SIZE);
 
-	for(i = 0; i < source_size; i += AES_GROUP_SIZE)
+	for(i = 0; i < size; i += AES_GROUP_SIZE)
 	{
 		/*  */
 		for(j = 0; j < AES_GROUP_SIZE; j++)

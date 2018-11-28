@@ -17,23 +17,53 @@ int main()
     }
 
     int i;
-    printf("size %d\n", strlen(source));
-    for(i = 0; i < strlen(source); i++)
-    {
-        printf("%c", source[i]);
-    }
-    printf("\n");
-    aes_cfb_encrypt(source);
-    printf("size %d\n", strlen(source));
-    for(i = 0; i < strlen(source); i++)
+    int size = strlen(source);
+    for(i = 0; i < size; i++)
     {
         printf("%c", source[i]);
     }
     printf("\n");
 
-    aes_cfb_decrypt(source);
-    printf("size %d\n", strlen(source));
-    for(i = 0; i < strlen(source); i++)
+    /*  */
+    aes_cbc_encrypt(source, size);
+    for(i = 0; i < size; i++)
+    {
+        printf("%c", source[i]);
+    }
+    printf("\n");
+
+    aes_cbc_decrypt(source, size);
+    for(i = 0; i < size; i++)
+    {
+        printf("%c", source[i]);
+    }
+    printf("\n");
+
+    /*  */
+    aes_cfb_encrypt(source, size);
+    for(i = 0; i < size; i++)
+    {
+        printf("%c", source[i]);
+    }
+    printf("\n");
+
+    aes_cfb_decrypt(source, size);
+    for(i = 0; i < size; i++)
+    {
+        printf("%c", source[i]);
+    }
+    printf("\n");
+
+    /*  */
+    aes_ofb_encrypt(source, size);
+    for(i = 0; i < size; i++)
+    {
+        printf("%c", source[i]);
+    }
+    printf("\n");
+
+    aes_ofb_decrypt(source, size);
+    for(i = 0; i < size; i++)
     {
         printf("%c", source[i]);
     }
