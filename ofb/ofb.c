@@ -2,6 +2,7 @@
 
 static unsigned char tmp[AES_GROUP_SIZE];
 
+// notice, at OFB mode, encrypt twice is same to decrypt
 static void crypt(unsigned char *source, int size)
 {
 	int i, j;

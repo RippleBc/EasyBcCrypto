@@ -7,65 +7,17 @@ static unsigned char source[MAX_STR_SIZE];
 
 int main()
 {
-
     /*  */
-    FILE *codfp = fopen("./text", "r");
+    FILE *codfp = fopen("./test/text", "r");
     int c;
     while((c = fgetc(codfp)) != EOF)
     {
         source[source_index++] = (unsigned char)c;
     }
 
-    int i;
-    int size = strlen(source);
-    for(i = 0; i < size; i++)
-    {
-        printf("%c", source[i]);
-    }
-    printf("\n");
-
-    /*  */
-    aes_cbc_encrypt(source, size);
-    for(i = 0; i < size; i++)
-    {
-        printf("%c", source[i]);
-    }
-    printf("\n");
-
-    aes_cbc_decrypt(source, size);
-    for(i = 0; i < size; i++)
-    {
-        printf("%c", source[i]);
-    }
-    printf("\n");
-
-    /*  */
-    aes_cfb_encrypt(source, size);
-    for(i = 0; i < size; i++)
-    {
-        printf("%c", source[i]);
-    }
-    printf("\n");
-
-    aes_cfb_decrypt(source, size);
-    for(i = 0; i < size; i++)
-    {
-        printf("%c", source[i]);
-    }
-    printf("\n");
-
-    /*  */
-    aes_ofb_encrypt(source, size);
-    for(i = 0; i < size; i++)
-    {
-        printf("%c", source[i]);
-    }
-    printf("\n");
-
-    aes_ofb_decrypt(source, size);
-    for(i = 0; i < size; i++)
-    {
-        printf("%c", source[i]);
-    }
-    printf("\n");
+    int i, j;
+    int size = source_index;
+    
+    unsigned char random[128];
+    get_specified_size_random(source, random, 128);
 }
