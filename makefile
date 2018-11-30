@@ -1,8 +1,8 @@
 CC=gcc
-CFLAGS=-g -Wall
+CFLAGS=-g -Wall -lm
 
 #
-SUB_DIRS=aes des cbc cfb  ofb ctr random
+SUB_DIRS=aes des cbc cfb  ofb ctr random rsa
 
 #记住当前工程的根目录路径
 ROOT_DIR=$(shell pwd)
