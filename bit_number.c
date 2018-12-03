@@ -56,11 +56,13 @@ static char* ChangeStringRadix(char *str, int srcBase, int dstBase, char *result
     if(srcBase != 2 && srcBase != 8 && srcBase != 10 && srcBase != 16)
     {
         printf("ChangeStringRadix, srcBase only support 2, 8, 10, 16 system, %d\n", srcBase);
+        exit(1);
     }
 
     if(dstBase != 2 && dstBase != 8 && dstBase != 10 && dstBase != 16)
     {
         printf("ChangeStringRadix, dstBase only support 2, 8, 10, 16 system, %d\n", dstBase);
+        exit(1);
     }
 
     if(srcBase < dstBase)
@@ -110,6 +112,12 @@ static char* ChangeStringRadix(char *str, int srcBase, int dstBase, char *result
 
                 /*  */
                 t = t % dstBase;
+            }
+
+            if(resultNum.len >= NUMBER_BIT_LEN)
+            {
+                printf("ChangeStringRadix, str num is too big %s\n", str);
+                exit(1);
             }
 
             /* 保存一轮的结果, 即一位余数 */
@@ -191,7 +199,7 @@ static BigInt* ToOppositeNumberComplement(BigInt *src, BigInt *dst)
     /* notice, if big num is 10000...000 = 2 ^ (BIG_INT_BIT_LEN - 1), it has no opposite big int */
     if(i == SIGN_BIT)
     {
-        printf("min bit int has no opposite bit int");
+        printf("min bit int has no opposite bit int\n");
         exit(1);
     }
 
@@ -209,6 +217,21 @@ static BigInt* ToOppositeNumberComplement(BigInt *src, BigInt *dst)
 
 static BigInt* BinNumToBigInt(Number *binNum, BigInt *a)
 {
+    if(binNum->len > SIGN_BIT)
+    {
+        char s_decimal[NUMBER_BIT_LEN];
+        char s_binNum[NUMBER_BIT_LEN];
+
+        /*  */
+        NumberToStr(binNum, s_binNum);
+
+        ChangeStringRadix(s_binNum, 2, 10, s_decimal);
+
+        /*  */
+        printf("BinNumToBigInt, number is too big, %s\n", s_decimal);
+        exit(1);
+    }
+
     int i;
 
     memset(a->bit, 0, BIG_INT_BIT_LEN);
@@ -225,6 +248,7 @@ static BigInt* BinNumToBigInt(Number *binNum, BigInt *a)
     }
 
     a->bit[SIGN_BIT] = NEGATIVE;
+
     return ToComplement(a, a);
 }
 
@@ -447,7 +471,7 @@ BigInt* DoDiv(BigInt* a, BigInt* b, BigInt* result, BigInt* remainder)
 
     low = 0;
     high = GetMaxLeftShiftLen(b);
-
+ 
     memset(t.bit, 0, BIG_INT_BIT_LEN);
     CopyBigInt(a, &c);
 
@@ -467,6 +491,7 @@ BigInt* DoDiv(BigInt* a, BigInt* b, BigInt* result, BigInt* remainder)
                 /*  */
                 DoSub(&c, &d, &e);
 
+                /* enough to sub */
                 if(d.bit[SIGN_BIT] == e.bit[SIGN_BIT] || IsZero(&e))
                 {
                     low = mid + 1;
@@ -477,12 +502,12 @@ BigInt* DoDiv(BigInt* a, BigInt* b, BigInt* result, BigInt* remainder)
                 }
             }
 
-
+            /* enough to sub */
             if(high != -1)
             {
                 t.bit[high] = 1;
 
-                /* 这里统一操作了，可改进 */
+                /* sub */
                 ShiftArithmeticLeft(b, high, &d);
                 DoSub(&c, &d, &c);
                 
@@ -491,6 +516,7 @@ BigInt* DoDiv(BigInt* a, BigInt* b, BigInt* result, BigInt* remainder)
             }
             else
             {
+                /* not enough to sub */
                 CopyBigInt(&c, remainder);
                 break;
             }
@@ -584,19 +610,24 @@ char* Div(char* s1, char* s2, char* result, char* remainder)
     return BigIntToStr(&c, result);
 }
 
-// 比较两个BigInt的大小
 int DoCompare(BigInt* a, BigInt* b)
 {
     BigInt c;
 
     DoSub(a, b, &c);
 
-    if (IsZero(&c))
+    if(IsZero(&c))
+    {
         return 0;
-    if (c.bit[SIGN_BIT] == POSITIVE)
+    }
+    if(c.bit[SIGN_BIT] == POSITIVE)
+    {
         return 1;
+    }
     else
+    {
         return -1;
+    }
 }
 
 int Compare(char* s1, char* s2)
@@ -609,7 +640,6 @@ int Compare(char* s1, char* s2)
     return DoCompare(&a, &b);
 }
 
-// 求模实现
 BigInt* DoMod(BigInt* a, BigInt* b, BigInt* remainder)
 {
     BigInt c;
@@ -630,8 +660,7 @@ char* Mod(char* s1, char* s2, char* remainder)
     return BigIntToStr(&c, remainder);
 }
 
-
-// 幂运算(二进制实现) 不能求负幂
+/* Notice, do not support negative pow operation */
 BigInt* DoPow(BigInt* a, BigInt* b, BigInt* result)
 {
     int i, len;
@@ -639,15 +668,16 @@ BigInt* DoPow(BigInt* a, BigInt* b, BigInt* result)
 
     CopyBigInt(a, &buf);
     StrToBigInt("1", &t);
-    len = GetTrueValueLen(b);  // 获取BigInt真值的位长度
+    len = GetTrueValueLen(b);
 
-    for (i = 0; i < len; i++)
+    for(i = 0; i < len; i++)
     {
-        if (b->bit[i] == 1)
-            DoMul(&t, &buf, &t);  // t = t * buf
+        if(b->bit[i] == 1)
+        {
+            DoMul(&t, &buf, &t);
+        }
 
-        // 这里最后多做了一次
-        DoMul(&buf, &buf, &buf);  // buf = buf * buf
+        DoMul(&buf, &buf, &buf);
     }
     
     return CopyBigInt(&t, result);
@@ -664,33 +694,32 @@ char* Pow(char* s1, char* s2, char* result)
     return BigIntToStr(&c, result);
 }
 
-// 模幂运算(二进制实现)
+/* base on formula: (a * b) mod c = (a mod c) * (b mod c) mod c */
 BigInt* DoPowMod(BigInt* a, BigInt* b, BigInt* c, BigInt* result)
 {
     int i, len;
     unsigned long t1, t2;
     BigInt t, buf;
 
-    printf("    doing PowMod...\n");
+    printf("doing PowMod...\n");
     t1 = time(0);
     CopyBigInt(a, &buf);
     StrToBigInt("1", &t);
-    len = GetTrueValueLen(b);  // 获取BigInt真值的位长度
+    len = GetTrueValueLen(b);
 
-    for (i = 0; i < len; i++)
+    for(i = 0; i < len; i++)
     {
-        if (b->bit[i] == 1)
+        if(b->bit[i] == 1)
         {
-            DoMul(&t, &buf, &t);  // t = t * buf
-            DoMod(&t, c, &t);     // t = t % c;
+            DoMul(&t, &buf, &t);
+            DoMod(&t, c, &t);
         }
 
-        // 这里最后多做了一次
-        DoMul(&buf, &buf, &buf);  // buf = buf * buf
-        DoMod(&buf, c, &buf);     // buf = buf % c
+        DoMul(&buf, &buf, &buf);
+        DoMod(&buf, c, &buf);
     }
     t2 = time(0);
-    printf("    finish PowMod (t=%lds)\n", t2 - t1);
+    printf("finish PowMod (t=%lds)\n", t2 - t1);
 
     return CopyBigInt(&t, result);
 }
@@ -715,11 +744,9 @@ Number* StrToNumber(char *str, Number *n)
     {
         /*  */
         n->len = strlen(str) - 1;
-
-        /*  */
         if(n->len > NUMBER_BIT_LEN)
         {
-            printf("StrToNumber, number size is overflow");
+            printf("StrToNumber, str is too long %s\n", str);
             exit(1);
         }
 
@@ -733,7 +760,7 @@ Number* StrToNumber(char *str, Number *n)
                 n->value[i] = str[j] - 'a' + 10;
                 if(str[j] > 'f')
                 {
-                    printf("StrToNumber invalid char, %c", str[j]);
+                    printf("StrToNumber invalid char, %c\n", str[j]);
                     exit(1);
                 }
             }
@@ -758,7 +785,7 @@ Number* StrToNumber(char *str, Number *n)
                 n->value[i] = str[j] - 'a' + 10;
                 if(str[j] > 'f')
                 {
-                    printf("StrToNumber invalid char, %c", str[j]);
+                    printf("StrToNumber invalid char, %c\n", str[j]);
                     exit(1);
                 }
             }
@@ -788,7 +815,7 @@ char* NumberToStr(Number *n, char *str)
         {
             if(n->value[i] > ('f' - '0'))
             {
-                printf("NumberToStr invalid number, %d", n->value[i]);
+                printf("NumberToStr invalid number, %d\n", n->value[i]);
                 exit(1);
             }
 
@@ -845,7 +872,7 @@ void PrintBigInt(BigInt *a)
     printf("\n");
 }
 
-void PrintBigIntTureForm(BigInt* a)
+void PrintBigIntTrueForm(BigInt* a)
 {
     int i;
     BigInt t;

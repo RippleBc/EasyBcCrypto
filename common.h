@@ -33,7 +33,7 @@ extern void aes_ofb_decrypt(unsigned char *, int);
 void get_specified_size_random(unsigned char *, unsigned char *, int);
 
 
-#define BIG_INT_BIT_LEN 2048
+#define BIG_INT_BIT_LEN 8
 #define SIGN_BIT BIG_INT_BIT_LEN - 1
 #define NUMBER_BIT_LEN BIG_INT_BIT_LEN
 #define BUFFER_SIZE BIG_INT_BIT_LEN
@@ -69,7 +69,7 @@ extern char* Sub(char*, char*, char*);
 extern char* Mul(char*, char*, char*);
 extern char* Div(char*, char*, char*, char*);
 extern int DoCompare(BigInt*, BigInt*);
-extern int Compare(char*, char*);
+extern int Compare(char*, char*); 
 extern BigInt* DoMod(BigInt*, BigInt*, BigInt*);
 extern char* Mod(char*, char*, char*);
 extern BigInt* DoPow(BigInt*, BigInt*, BigInt*);
@@ -81,5 +81,5 @@ extern char* NumberToStr(Number*, char*);
 extern BigInt* StrToBigInt(char*, BigInt*);
 extern char* BigIntToStr(BigInt*, char*);
 extern void PrintBigInt(BigInt*);
-extern void PrintBigIntTureForm(BigInt*);
+extern void PrintBigIntTrueForm(BigInt*);
 extern void PrintNumber(Number*);

@@ -22,10 +22,11 @@ int main()
     // get_specified_size_random(source, random, 128);
 
 
-    unsigned char str[BIG_INT_BIT_LEN];
+    // unsigned char str[BIG_INT_BIT_LEN];
 
     Number n;
-    BigInt bi;
+    BigInt bi1;
+    BigInt bi2;
     BigInt result;
     int i;
 
@@ -56,22 +57,26 @@ int main()
     // }
     // printf("\n");
 
-    StrToBigInt("-8", &bi);
-    // PrintBigInt(&bi);
+    // StrToBigInt("-1", &bi1);
+    StrToBigInt("-256", &bi2);
+    // DoAdd(&bi1, &bi2, &result);
+    // PrintBigInt(&result);
+    // PrintBigIntTrueForm(&result);
+    // PrintBigIntTrueForm(&bi2);
 
     // DoMul(&bi, &bi, &result);
     // StrToNumber("-8", &n);
     // PrintNumber(&n);
 
     // DoAdd(&bi, &bi, &result);
-    // PrintBigIntTureForm(&result);
+    // PrintBigIntTrueForm(&result);
 
     // DoMul(&bi, &bi, &result);
-    // PrintBigIntTureForm(&result);
+    // PrintBigIntTrueForm(&result);
 
-    BigInt remainder;
-    DoDiv(&bi, &bi, &result, &remainder);
-    PrintBigIntTureForm(&result);
+    // BigInt remainder;
+    // DoDiv(&bi, &bi, &result, &remainder);
+    // PrintBigIntTrueForm(&result);
 
     return 0;
 }
