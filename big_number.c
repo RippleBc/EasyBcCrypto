@@ -51,95 +51,6 @@ static char* BinStrToHexStr(char* binStr, char* hexStr)
     return NumberToStr(&hexNum, hexStr);
 }
 
-static char* ChangeStringRadix(char *str, int srcBase, int dstBase, char *resultStr)
-{
-    if(srcBase != 2 && srcBase != 8 && srcBase != 10 && srcBase != 16)
-    {
-        printf("ChangeStringRadix, srcBase only support 2, 8, 10, 16 system, %d\n", srcBase);
-        exit(1);
-    }
-
-    if(dstBase != 2 && dstBase != 8 && dstBase != 10 && dstBase != 16)
-    {
-        printf("ChangeStringRadix, dstBase only support 2, 8, 10, 16 system, %d\n", dstBase);
-        exit(1);
-    }
-
-    if(srcBase < dstBase)
-    {
-        char hexStr[BUFFER_SIZE];
-
-        /* translate to binary format */
-        ChangeStringRadix(str, srcBase, 2, resultStr);
-
-        /* translate from binary str to hex str */
-        BinStrToHexStr(resultStr, hexStr);
-
-        /* translate from hex str to dstBase str */
-        return ChangeStringRadix(hexStr, 16, dstBase, resultStr);
-    }
-
-    if(srcBase == dstBase)
-    {
-        return strcpy(resultStr, str);
-    }
-
-    else
-    {
-        int i, t;
-        Number dividend; /* 被除数 */
-        Number quotient; /* 商 */
-        Number resultNum; /* 结果 */
-
-        /*  */
-        StrToNumber(str, &dividend);
-
-        resultNum.len = 0;
-        resultNum.sign = dividend.sign;
-
-        while(dividend.len > 0)
-        {
-            quotient.len = dividend.len;
-
-            /* 模拟人做除法的方式, 即一轮(求一位余数)的过程 */
-            for(t = 0, i = dividend.len - 1; i >= 0; i--)
-            {
-                /* translate to decimal */
-                t = t * srcBase + dividend.value[i];
-
-                /*  */
-                quotient.value[i] = t / dstBase;
-
-                /*  */
-                t = t % dstBase;
-            }
-
-            if(resultNum.len >= NUMBER_BIT_LEN)
-            {
-                printf("ChangeStringRadix, str num is too big %s\n", str);
-                exit(1);
-            }
-
-            /* 保存一轮的结果, 即一位余数 */
-            resultNum.value[resultNum.len++] = t;
-
-            /* filter the zero at front of the quotient */
-            for(i = quotient.len - 1; i >= 0 && quotient.value[i] == 0; i--)
-                ;
-
-            dividend.len = i + 1;
-
-            /* 把商作为下一轮的被除数 */
-            for(i = 0; i < dividend.len; i++)
-            {
-                dividend.value[i] = quotient.value[i];
-            }
-        }
-
-        return NumberToStr(&resultNum, resultStr);
-    }
-}
-
 static BigInt* ToComplement(BigInt *src, BigInt *dst)
 {
     int i;
@@ -303,6 +214,95 @@ static int GetTrueValueLen(BigInt* a)
         ;
 
     return i + 1;
+}
+
+char* ChangeStringRadix(char *str, int srcBase, int dstBase, char *resultStr)
+{
+    if(srcBase != 2 && srcBase != 8 && srcBase != 10 && srcBase != 16)
+    {
+        printf("ChangeStringRadix, srcBase only support 2, 8, 10, 16 system, %d\n", srcBase);
+        exit(1);
+    }
+
+    if(dstBase != 2 && dstBase != 8 && dstBase != 10 && dstBase != 16)
+    {
+        printf("ChangeStringRadix, dstBase only support 2, 8, 10, 16 system, %d\n", dstBase);
+        exit(1);
+    }
+
+    if(srcBase < dstBase)
+    {
+        char hexStr[BUFFER_SIZE];
+
+        /* translate to binary format */
+        ChangeStringRadix(str, srcBase, 2, resultStr);
+
+        /* translate from binary str to hex str */
+        BinStrToHexStr(resultStr, hexStr);
+
+        /* translate from hex str to dstBase str */
+        return ChangeStringRadix(hexStr, 16, dstBase, resultStr);
+    }
+
+    if(srcBase == dstBase)
+    {
+        return strcpy(resultStr, str);
+    }
+
+    else
+    {
+        int i, t;
+        Number dividend; /* 被除数 */
+        Number quotient; /* 商 */
+        Number resultNum; /* 结果 */
+
+        /*  */
+        StrToNumber(str, &dividend);
+
+        resultNum.len = 0;
+        resultNum.sign = dividend.sign;
+
+        while(dividend.len > 0)
+        {
+            quotient.len = dividend.len;
+
+            /* 模拟人做除法的方式, 即一轮(求一位余数)的过程 */
+            for(t = 0, i = dividend.len - 1; i >= 0; i--)
+            {
+                /* translate to decimal */
+                t = t * srcBase + dividend.value[i];
+
+                /*  */
+                quotient.value[i] = t / dstBase;
+
+                /*  */
+                t = t % dstBase;
+            }
+
+            if(resultNum.len >= NUMBER_BIT_LEN)
+            {
+                printf("ChangeStringRadix, str num is too big %s\n", str);
+                exit(1);
+            }
+
+            /* 保存一轮的结果, 即一位余数 */
+            resultNum.value[resultNum.len++] = t;
+
+            /* filter the zero at front of the quotient */
+            for(i = quotient.len - 1; i >= 0 && quotient.value[i] == 0; i--)
+                ;
+
+            dividend.len = i + 1;
+
+            /* 把商作为下一轮的被除数 */
+            for(i = 0; i < dividend.len; i++)
+            {
+                dividend.value[i] = quotient.value[i];
+            }
+        }
+
+        return NumberToStr(&resultNum, resultStr);
+    }
 }
 
 BigInt* CopyBigInt(BigInt *src, BigInt *dst)
@@ -813,9 +813,9 @@ char* NumberToStr(Number *n, char *str)
     {
         if(n->value[j] > 9)
         {
-            if(n->value[j] > 'f' - '0')
+            if(n->value[j] > 0x0f)
             {
-                printf("NumberToStr invalid number, max val is %d, index %d, %d\n", 'f' - '0', j, n->value[j]);
+                printf("NumberToStr invalid number, index %d, val %d\n", j, n->value[j]);
                 exit(1);
             }
 
@@ -860,6 +860,32 @@ char* BigIntToStr(BigInt *a, char *s)
 
     /*  */
     return ChangeStringRadix(buf, 2, 10, s);
+}
+
+BigInt* byteSequenceToBinBigInt(unsigned char *source, int size, BigInt *bigint)
+{
+    int i;
+    unsigned char tmp;
+    for(i = 0; i < size; i++)
+    {
+        bigint->bit[i * BYTE_SIZE] = (source[i] & 0x80) > 0x00 ? 1 : 0;
+
+        bigint->bit[i * BYTE_SIZE + 1] = (source[i] & 0x40) > 0x00 ? 1 : 0;
+
+        bigint->bit[i * BYTE_SIZE + 2] = (source[i] & 0x20) > 0x00 ? 1 : 0;
+
+        bigint->bit[i * BYTE_SIZE + 3] = (source[i] & 0x10) > 0x00 ? 1 : 0;
+
+        bigint->bit[i * BYTE_SIZE + 4] = (source[i] & 0x08) > 0x00 ? 1 : 0;
+
+        bigint->bit[i * BYTE_SIZE + 5] = (source[i] & 0x04) > 0x00 ? 1 : 0;
+
+        bigint->bit[i * BYTE_SIZE + 6] = (source[i] & 0x02) > 0x00 ? 1 : 0;
+
+        bigint->bit[i * BYTE_SIZE + 7] = (source[i] & 0x01) > 0x00 ? 1 : 0;
+    }
+
+    return bigint;
 }
 
 void PrintBigInt(BigInt *a)

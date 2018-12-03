@@ -1,35 +1,48 @@
 #include "../common.h"
 
-// 获取指定位数的奇数BigInt
-BigInt* DoGetOddRandBigInt(int bitLen, BigInt* result)
+#define BYTE_LEN 8
+
+BigInt* DoGetOddRandBigInt(int byteLen, BigInt* result)
 {
     int i;
-    static unsigned long seed = 0;
-
     memset(result->bit, 0, BIG_INT_BIT_LEN);
-    result->bit[0] = 1;
+    
+    /*  */
+    unsigned char random_byte_sequence[byteLen];
 
-    srand(time(0) + seed++);
-    for (i = 1; i < bitLen - 1; i++)
+    /*  */
+    get_specified_size_random(random_byte_sequence, byteLen);
+
+    if(RANDOM_DEBUG)
     {
-        result->bit[i] = rand() % 2;
+        printf("hex random result begin\n");
+        for(i = 0; i < byteLen; i ++)
+        {
+            printf("%x ", random_byte_sequence[i]);
+        }
+        printf("\nhex random result end\n\n");
     }
 
-    result->bit[i] = 1;
+    /*  */
+    byteSequenceToBinBigInt(random_byte_sequence, byteLen, result);
+
+    /* convert to odd positive integer */
+    result->bit[0] = 1;
+    result->bit[SIGN_BIT] = 0;
 
     return result;
 }
 
-char* GetOddRandBigInt(int bitLen, char* result)
+char* GetOddRandBigInt(int byteLen, char* result)
 {
     BigInt a;
 
-    DoGetOddRandBigInt(bitLen, &a);
+    DoGetOddRandBigInt(byteLen, &a);
 
     return BigIntToStr(&a, result);
 }
 
-// 随机获取小于n的正整数
+/*  */
 BigInt* DoGetRand(BigInt* n, BigInt* result)
 {
     int i;
@@ -48,16 +61,6 @@ BigInt* DoGetRand(BigInt* n, BigInt* result)
         DoGetRand(n, &t);
 
     return CopyBigInt(&t, result);
-}
-
-char* GetRand(char* s, char* result)
-{
-    BigInt a, b;
-
-    StrToBigInt(s, &a);
-    DoGetRand(&a, &b);
-
-    return BigIntToStr(&b, result);
 }
 
 int DoMillerRabin(BigInt* n, int times)
