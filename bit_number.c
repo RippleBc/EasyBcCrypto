@@ -813,9 +813,9 @@ char* NumberToStr(Number *n, char *str)
     {
         if(n->value[j] > 9)
         {
-            if(n->value[i] > ('f' - '0'))
+            if(n->value[j] > 'f' - '0')
             {
-                printf("NumberToStr invalid number, %d\n", n->value[i]);
+                printf("NumberToStr invalid number, max val is %d, index %d, %d\n", 'f' - '0', j, n->value[j]);
                 exit(1);
             }
 

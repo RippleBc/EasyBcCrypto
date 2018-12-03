@@ -58,7 +58,7 @@ int main()
     // printf("\n");
 
     // StrToBigInt("-1", &bi1);
-    StrToBigInt("-256", &bi2);
+    StrToBigInt("-255", &bi2);
     // DoAdd(&bi1, &bi2, &result);
     // PrintBigInt(&result);
     // PrintBigIntTrueForm(&result);
