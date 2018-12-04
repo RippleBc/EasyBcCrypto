@@ -34,8 +34,11 @@ int main()
 		// }
 		// printf("\n");
 		
+		// BigInt a, b;
+		// StrToBigInt("5", &a);
+		// DoGetRand(&a, &b);
+		// PrintBigIntTrueForm(&b);
 
-		
 		char prime_num[MAX_STR_SIZE];
 		DoGenPrime(1, 5, prime_num);
 

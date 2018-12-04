@@ -698,11 +698,8 @@ char* Pow(char* s1, char* s2, char* result)
 BigInt* DoPowMod(BigInt* a, BigInt* b, BigInt* c, BigInt* result)
 {
     int i, len;
-    unsigned long t1, t2;
     BigInt t, buf;
 
-    printf("doing PowMod...\n");
-    t1 = time(0);
     CopyBigInt(a, &buf);
     StrToBigInt("1", &t);
     len = GetTrueValueLen(b);
@@ -718,8 +715,6 @@ BigInt* DoPowMod(BigInt* a, BigInt* b, BigInt* c, BigInt* result)
         DoMul(&buf, &buf, &buf);
         DoMod(&buf, c, &buf);
     }
-    t2 = time(0);
-    printf("finish PowMod (t=%lds)\n", t2 - t1);
 
     return CopyBigInt(&t, result);
 }

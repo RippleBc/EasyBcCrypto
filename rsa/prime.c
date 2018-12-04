@@ -42,8 +42,18 @@ char* GetOddRandBigInt(int byteLen, char* result)
 
 BigInt* DoGetRand(BigInt *n, BigInt *result)
 {
+    /*  */
+    BigInt one;
+    StrToBigInt("1", &one);
+    if(DoCompare(&one, n) == 0)
+    {
+        printf("DoGetRand, and thing mod 1 is zero\n");
+        exit(1);
+    }
+
+    /*  */
     int i;
-    BigInt t;
+    BigInt t, n_tmp;
     int random_byte_sequence_size = floor(BIG_INT_BIT_LEN / BYTE_SIZE);
     memset(result->bit, 0, random_byte_sequence_size);
     
@@ -70,10 +80,12 @@ BigInt* DoGetRand(BigInt *n, BigInt *result)
     t.bit[SIGN_BIT] = 0;
 
     /*  */
-    DoMod(&t, n, &result);
-    if (IsZero(&result))
+    CopyBigInt(n, &n_tmp);
+    DoMod(&t, n, result);
+   
+    if (IsZero(result))
     {
-        DoGetRand(n, &result);
+        DoGetRand(&n_tmp, result);
     }
 
     return result;
@@ -96,25 +108,49 @@ static int DoMillerRabin(BigInt *p, int times)
     BigInt a, t, x;
     BigInt one, two, nMinusOne;
 
+    char tmp_decimal_big_int[BIG_INT_BIT_LEN];
+
     StrToBigInt("1", &one);
     StrToBigInt("2", &two);
     DoSub(p, &one, &nMinusOne);
 
-    /*  */
-    s = GetMaxRightShiftLen(&nMinusOne);
-    ShiftArithmeticRight(&nMinusOne, s, &t);
+    if(MILLER_RABIN)
+    {
+        printf("\nDoMillerRabin p begin\n");
+        BigIntToStr(p, tmp_decimal_big_int);
+        for(j = 0; j < strlen(tmp_decimal_big_int); j++)
+        {
+            printf("%c", tmp_decimal_big_int[j]);
+        }
+        printf("\nDoMillerRabin p end\n");
+    }
+    
 
     /* do {times} test, {times} is bigger, more accuracy */
+    printf("DoMillerRabin x begin\n");
     for(i = 0; i < times; i++)
     {
         DoGetRand(p, &x);
+
+        if(MILLER_RABIN)
+        {
+            
+            BigIntToStr(&x, tmp_decimal_big_int);
+            for(j = 0; j < strlen(tmp_decimal_big_int); j++)
+            {
+                printf("%c", tmp_decimal_big_int[j]);
+            }
+            
+        }
+
         DoPowMod(&x, &t, p, &a); /* a = x ^ (p - 1) % p */
 
-        if (DoCompare(&a, &one) == 1)
+        if (DoCompare(&a, &one) == 0)
         {
             continue;
         }
 
+        printf("\nDoMillerRabin x end\n\n");
         return 0;
         // for (j = 0; j < s; j++)
         // {
@@ -129,16 +165,8 @@ static int DoMillerRabin(BigInt *p, int times)
         // LOOP:;
     }
 
+    printf("\nDoMillerRabin x end\n\n");
     return 1;
-}
-
-int MillerRabin(char *s, int times)
-{
-    BigInt n;
-
-    StrToBigInt(s, &n);
-    
-    return DoMillerRabin(&n, times);
 }
 
 BigInt* DoGenPrime(int byteLen, int times, BigInt *result)
@@ -168,9 +196,8 @@ BigInt* DoGenPrime(int byteLen, int times, BigInt *result)
     a = time(0);
 
     /*  */
-    while (1)
+    while(1)
     {
-
         BigIntToStr(result, str_test_num);
         printf("testing number[%s]...\n", str_test_num);
         
