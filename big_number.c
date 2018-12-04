@@ -862,11 +862,17 @@ char* BigIntToStr(BigInt *a, char *s)
     return ChangeStringRadix(buf, 2, 10, s);
 }
 
-BigInt* byteSequenceToBinBigInt(unsigned char *source, int size, BigInt *bigint)
+BigInt* byteSequenceToBinBigInt(unsigned char *source, int size_byte, BigInt *bigint)
 {
+    if(size_byte * BYTE_SIZE > NUMBER_BIT_LEN)
+    {
+        printf("byteSequenceToBinBigInt, size_byte is too big %d\n", size_byte);
+        exit(1);
+    }
+
     int i;
     unsigned char tmp;
-    for(i = 0; i < size; i++)
+    for(i = 0; i < size_byte; i++)
     {
         bigint->bit[i * BYTE_SIZE] = (source[i] & 0x80) > 0x00 ? 1 : 0;
 

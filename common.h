@@ -10,11 +10,11 @@
 
 #define MAX_STR_SIZE 1024 * 10
 
+#define BYTE_SIZE 8
+
 #define AES_DEBUG (0)
 
-#define RANDOM_DEBUG (1)
-
-#define BYTE_SIZE 8
+#define RANDOM_DEBUG (0)
 
 extern void aes_encrypt(unsigned char *);
 extern void aes_decrypt(unsigned char *);
@@ -36,7 +36,7 @@ extern void aes_ofb_decrypt(unsigned char *, int);
 void get_specified_size_random(unsigned char *, int);
 
 
-#define BIG_INT_BIT_LEN 8
+#define BIG_INT_BIT_LEN 4096
 #define SIGN_BIT BIG_INT_BIT_LEN - 1
 #define NUMBER_BIT_LEN BIG_INT_BIT_LEN
 #define BUFFER_SIZE BIG_INT_BIT_LEN

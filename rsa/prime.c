@@ -1,7 +1,5 @@
 #include "../common.h"
 
-#define BYTE_LEN 8
-
 BigInt* DoGetOddRandBigInt(int byteLen, BigInt* result)
 {
     int i;
@@ -15,12 +13,12 @@ BigInt* DoGetOddRandBigInt(int byteLen, BigInt* result)
 
     if(RANDOM_DEBUG)
     {
-        printf("hex random result begin\n");
+        printf("hex odd random result begin\n");
         for(i = 0; i < byteLen; i ++)
         {
             printf("%x ", random_byte_sequence[i]);
         }
-        printf("\nhex random result end\n\n");
+        printf("\nhex odd random result end\n\n");
     }
 
     /*  */
@@ -42,79 +40,99 @@ char* GetOddRandBigInt(int byteLen, char* result)
     return BigIntToStr(&a, result);
 }
 
-/*  */
-BigInt* DoGetRand(BigInt* n, BigInt* result)
+BigInt* DoGetRand(BigInt *n, BigInt *result)
 {
     int i;
-    static unsigned seed = 0;
     BigInt t;
+    int random_byte_sequence_size = floor(BIG_INT_BIT_LEN / BYTE_SIZE);
+    memset(result->bit, 0, random_byte_sequence_size);
+    
+    /*  */
+    unsigned char random_byte_sequence[random_byte_sequence_size];
 
-    srand(time(0) + seed++);
+    /*  */
+    get_specified_size_random(random_byte_sequence, random_byte_sequence_size);
 
-    for (i = 0; i < SIGN_BIT; i++)
-        t.bit[i] = rand() % 2;
+    if(RANDOM_DEBUG)
+    {
+        printf("hex random result begin\n");
+        for(i = 0; i < random_byte_sequence_size; i ++)
+        {
+            printf("%x ", random_byte_sequence[i]);
+        }
+        printf("\nhex random result end\n\n");
+    }
 
+    /*  */
+    byteSequenceToBinBigInt(random_byte_sequence, random_byte_sequence_size, &t);
+
+    /* convert to positive integer */
     t.bit[SIGN_BIT] = 0;
 
-    DoMod(&t, n, &t);
-    if (IsZero(&t))
-        DoGetRand(n, &t);
+    /*  */
+    DoMod(&t, n, &result);
+    if (IsZero(&result))
+    {
+        DoGetRand(n, &result);
+    }
 
-    return CopyBigInt(&t, result);
+    return result;
 }
 
-int DoMillerRabin(BigInt* n, int times)
+/*
+
+费马小定理：对于素数p和任意整数a，有a^p ≡ a (mod p)（同余）。反过来，满足a^p = a (mod p)，p也几乎一定是素数。
+
+伪素数：如果n是一个正整数，如果存在和p互素的正整数a满足a ^ (p-1) = 1 (mod p)，我们说n是基于a的伪素数。如果一个数是伪素数，那么它几乎肯定是素数。
+
+Miller-Rabin测试：不断选取不超过p-1的基b(s次)，计算是否每次都有b ^ (p-1) = 1 (mod p)，若每次都成立则p是素数，否则为合数。　 
+
+如果p是素数，x是小于p的正整数，且 x^2 = 1(mod p)，那么要么x=1，要么x=p-1;
+
+*/
+static int DoMillerRabin(BigInt *p, int times)
 {
     int i, j, s;
     BigInt a, t, x;
     BigInt one, two, nMinusOne;
 
-    StrToBigInt("1", &one);      // one = 1
+    StrToBigInt("1", &one);
     StrToBigInt("2", &two);
-    DoSub(n, &one, &nMinusOne);  // nMinusOne = n - 1
+    DoSub(p, &one, &nMinusOne);
 
-    s = GetMaxRightShiftLen(&nMinusOne);      // 获取最大的右移长度
-    ShiftArithmeticRight(&nMinusOne, s, &t);  // 右移并保存到t中
+    /*  */
+    s = GetMaxRightShiftLen(&nMinusOne);
+    ShiftArithmeticRight(&nMinusOne, s, &t);
 
-    for (i = 0; i < times; i++)    // 做times次测试
+    /* do {times} test, {times} is bigger, more accuracy */
+    for(i = 0; i < times; i++)
     {
-        DoGetRand(n, &x);         // 获取小于n的随机数
-        DoPowMod(&x, &t, n, &a);  // a = x^t % n, 这里时间用得长
+        DoGetRand(p, &x);
+        DoPowMod(&x, &t, p, &a); /* a = x ^ (p - 1) % p */
 
-        if (DoCompare(&a, &one) == 0)
-            continue;
-
-        for (j = 0; j < s; j++)
+        if (DoCompare(&a, &one) == 1)
         {
-            if (DoCompare(&a, &nMinusOne) == 0)
-                goto LOOP;
-
-            DoPowMod(&a, &two, n, &a);  // a = a^2 % n
-        }
-
-        /* 第二种写法
-        if (DoCompare(&a, &one) == 0 || DoCompare(&a, &nMinusOne) == 0)
             continue;
-
-        for (j = 0; j < s - 1; j++)
-        {
-            DoPowMod(&a, &two, n, &a);  // a = a^2 % n
-
-            if (DoCompare(&a, &nMinusOne) == 0)
-                goto LOOP;
         }
-        */
 
         return 0;
+        // for (j = 0; j < s; j++)
+        // {
+        //     if (DoCompare(&a, &nMinusOne) == 0)
+        //         goto LOOP;
 
-        LOOP:;
+        //     DoPowMod(&a, &two, p, &a); /* a = a^2 % n */
+        // }
+
+        // return 0;
+
+        // LOOP:;
     }
 
-    // 返回n可能是素数
     return 1;
 }
 
-int MillerRabin(char* s, int times)
+int MillerRabin(char *s, int times)
 {
     BigInt n;
 
@@ -123,46 +141,59 @@ int MillerRabin(char* s, int times)
     return DoMillerRabin(&n, times);
 }
 
-// 生成指定位数和MillerRabin测试次数的"素数"
-BigInt* DoGenPrime(int bitLen, int times, BigInt* result)
+BigInt* DoGenPrime(int byteLen, int times, BigInt *result)
 {
-    int i;
-    unsigned long n = 1;
-    unsigned long a, b;
-    BigInt minusTwo;
-
-    StrToBigInt("-2", &minusTwo);
-    memset(result->bit, 0, BIG_INT_BIT_LEN);
-    for (i = 0; i < bitLen; i++)
-        result->bit[i] = 1;
-
-    while (1)
+    if(byteLen * BYTE_SIZE > BIG_INT_BIT_LEN)
     {
-        printf("testing number[%ld]...\n", n);
-        a = time(0);
-
-        if (DoMillerRabin(result, times))
-        {
-            b = time(0);
-            break;
-        }
-
-        b = time(0);
-        printf("finish test number %ld (t=%lds)\n\n", n++, b - a);
-
-        DoAdd(result, &minusTwo, result);
+        printf("DoGenPrime, prime is too big %d\n", byteLen);
+        exit(1);
     }
 
-    printf("finish test number[%ld] (t=%lds)\n\n", n, b - a);
+    int i;
+    unsigned long a, b;
+    char str_test_num[MAX_STR_SIZE];
+
+    /*  */
+    BigInt minusTwo;
+    StrToBigInt("-2", &minusTwo);
+
+    /* max num of {byteLen}'s bytes length */
+    memset(result->bit, 0, BIG_INT_BIT_LEN);
+    for (i = 0; i < byteLen * BYTE_SIZE; i++)
+    {
+        result->bit[i] = 1;
+    }
+
+    /*  */
+    a = time(0);
+
+    /*  */
+    while (1)
+    {
+
+        BigIntToStr(result, str_test_num);
+        printf("testing number[%s]...\n", str_test_num);
+        
+
+        if(DoMillerRabin(result, times))
+        {
+            /*  */
+            b = time(0);
+            printf("****************************finish test number[%s] (t=%lds)\n\n", str_test_num, b - a);
+        }
+
+        /*  */
+        DoAdd(result, &minusTwo, result);
+    }
 
     return result;
 }
 
-char* GenPrime(int bitLen, int times, char* result)
+char* GenPrime(int byteLen, int times, char *result)
 {
     BigInt n;
 
-    DoGenPrime(bitLen, times, &n);
+    DoGenPrime(byteLen, times, &n);
 
     return BigIntToStr(&n, result);
 }
