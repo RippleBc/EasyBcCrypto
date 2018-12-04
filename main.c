@@ -8,7 +8,7 @@ static unsigned char source[MAX_STR_SIZE];
 int main()
 {
 
-    int i;
+    int i, j;
     // char random[BIG_INT_BIT_LEN];
 
     // GetOddRandBigInt(BIG_INT_BIT_LEN / 8, random);
@@ -34,10 +34,20 @@ int main()
 		// }
 		// printf("\n");
 		
+		// char result[MAX_STR_SIZE];
 		// BigInt a, b;
-		// StrToBigInt("5", &a);
-		// DoGetRand(&a, &b);
-		// PrintBigIntTrueForm(&b);
+		// StrToBigInt("15", &a);
+		// for(i = 0; i < 10; i++)
+		// {
+		// 	DoGetRand(&a, &b);
+		// 	BigIntToStr(&b, result);
+		// 	for(j = 0; j < strlen(result); j++)
+		// 	{
+		// 		printf("%c", result[j]);
+		// 	}
+		// 	printf("\n");
+		// }
+		
 
 		char prime_num[MAX_STR_SIZE];
 		DoGenPrime(1, 5, prime_num);

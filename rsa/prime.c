@@ -105,7 +105,7 @@ Miller-Rabin测试：不断选取不超过p-1的基b(s次)，计算是否每次�
 static int DoMillerRabin(BigInt *p, int times)
 {
     int i, j, s;
-    BigInt a, t, x;
+    BigInt a, x;
     BigInt one, two, nMinusOne;
 
     char tmp_decimal_big_int[BIG_INT_BIT_LEN];
@@ -116,41 +116,40 @@ static int DoMillerRabin(BigInt *p, int times)
 
     if(MILLER_RABIN)
     {
-        printf("\nDoMillerRabin p begin\n");
+        printf("\np: ");
         BigIntToStr(p, tmp_decimal_big_int);
         for(j = 0; j < strlen(tmp_decimal_big_int); j++)
         {
             printf("%c", tmp_decimal_big_int[j]);
         }
-        printf("\nDoMillerRabin p end\n");
+        printf("\n");
     }
     
 
     /* do {times} test, {times} is bigger, more accuracy */
-    printf("DoMillerRabin x begin\n");
     for(i = 0; i < times; i++)
     {
         DoGetRand(p, &x);
-
+        // PrintBigIntTrueForm(&x);
         if(MILLER_RABIN)
         {
-            
+            printf("x: ");
             BigIntToStr(&x, tmp_decimal_big_int);
             for(j = 0; j < strlen(tmp_decimal_big_int); j++)
             {
                 printf("%c", tmp_decimal_big_int[j]);
             }
-            
+            printf("\n");
         }
 
-        DoPowMod(&x, &t, p, &a); /* a = x ^ (p - 1) % p */
+        DoPowMod(&x, &nMinusOne, p, &a); /* a = x ^ (p - 1) % p */
 
         if (DoCompare(&a, &one) == 0)
         {
             continue;
         }
 
-        printf("\nDoMillerRabin x end\n\n");
+        printf("\n\n");
         return 0;
         // for (j = 0; j < s; j++)
         // {
@@ -165,7 +164,7 @@ static int DoMillerRabin(BigInt *p, int times)
         // LOOP:;
     }
 
-    printf("\nDoMillerRabin x end\n\n");
+    printf("\n\n");
     return 1;
 }
 
@@ -206,7 +205,7 @@ BigInt* DoGenPrime(int byteLen, int times, BigInt *result)
         {
             /*  */
             b = time(0);
-            printf("****************************finish test number[%s] (t=%lds)\n\n", str_test_num, b - a);
+            printf("****************************finish test number[%s] (t=%lds)****************************\n\n", str_test_num, b - a);
         }
 
         /*  */
