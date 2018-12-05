@@ -709,8 +709,15 @@ BigInt* DoPowMod(BigInt* a, BigInt* b, BigInt* c, BigInt* result)
     StrToBigInt("1", &t);
     len = GetTrueValueLen(b);
 
+    if(DO_POW_MOD_DEBUG)
+    {
+        printf("DoPowMod ...");
+    }
+
     for(i = 0; i < len; i++)
     {
+        printf(".");
+        fflush(stdout);
         if(b->bit[i] == 1)
         {
             DoMul(&t, &buf, &t);
@@ -721,6 +728,8 @@ BigInt* DoPowMod(BigInt* a, BigInt* b, BigInt* c, BigInt* result)
         DoMod(&buf, c, &buf);
     }
 
+    printf("\n");
+    
     return CopyBigInt(&t, result);
 }
 

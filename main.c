@@ -57,7 +57,7 @@ int main()
 		// 	printf("%c", prime_num[i]);
 		// }
 
-    DoGenerateRsaKey();
+    DoGenerateRsaKey(16);
 
     return 0;
 }

@@ -1,6 +1,8 @@
 #include "../common.h"
 
-void DoGenerateRsaKey()
+#define MILLER_RABIN_TEST_TIMES 5
+
+void DoGenerateRsaKey(int byteLen)
 {
 	printf("generating rsa key ...\n");
 
@@ -8,7 +10,7 @@ void DoGenerateRsaKey()
 	int i;
 	char s_result[MAX_STR_SIZE];
 
-	DoGenRandomPrime(16, 5, &p);
+	DoGenRandomPrime(byteLen, MILLER_RABIN_TEST_TIMES, &p);
 
 	BigIntToStr(&p, s_result);
 	for(i = 0; i < strlen(s_result); i++)
@@ -18,7 +20,7 @@ void DoGenerateRsaKey()
 	printf("\n");
 
 
-	DoGenRandomPrime(16, 5, &q);  
+	DoGenRandomPrime(byteLen, MILLER_RABIN_TEST_TIMES, &q);  
 
 	BigIntToStr(&q, s_result);
 	for(i = 0; i < strlen(s_result); i++)
