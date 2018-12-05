@@ -16,7 +16,7 @@
 
 #define RANDOM_DEBUG (0)
 
-#define MILLER_RABIN (1)
+#define MILLER_RABIN_DEBUG (1)
 
 extern void aes_encrypt(unsigned char *);
 extern void aes_decrypt(unsigned char *);

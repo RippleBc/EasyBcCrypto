@@ -128,7 +128,7 @@ int DoMillerRabin(BigInt *p, int times)
     miller_rabin_max_test_time = GetMaxRightShiftLen(&pMinusOne);
 
     /*  */
-    if(MILLER_RABIN)
+    if(MILLER_RABIN_DEBUG)
     {
         printf("\np: ");
         BigIntToStr(p, tmp_decimal_big_int);
@@ -144,7 +144,7 @@ int DoMillerRabin(BigInt *p, int times)
     for(i = 0; i < times; i++)
     {
         DoGetRand(p, &base);
-        if(MILLER_RABIN)
+        if(MILLER_RABIN_DEBUG)
         {
             printf("base: ");
             BigIntToStr(&base, tmp_decimal_big_int);
@@ -172,7 +172,7 @@ int DoMillerRabin(BigInt *p, int times)
 
             DoPowMod(&base, &tmp_pMinusOne, p, &result);
 
-            if(MILLER_RABIN)
+            if(MILLER_RABIN_DEBUG)
             {
                 printf("x: ");
                 BigIntToStr(&tmp_pMinusOne, tmp_decimal_big_int);
@@ -287,7 +287,11 @@ char* DoGenRandomPrime(int byteLen, int times, BigInt *result)
         DoGetOddRandBigInt(byteLen, result);
 
         BigIntToStr(result, str_test_num);
-        printf("testing number[%s]...\n", str_test_num);
+
+        if(MILLER_RABIN_DEBUG)
+        {
+            printf("testing number[%s]...\n", str_test_num);
+        }
         
         if(DoMillerRabin(result, times))
         {

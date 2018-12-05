@@ -57,15 +57,7 @@ int main()
 		// 	printf("%c", prime_num[i]);
 		// }
 
-    BigInt result;
-    char s_result[MAX_STR_SIZE];
-    DoGenRandomPrime(8, 5, &result);
-  	BigIntToStr(&result, s_result);
-		for(j = 0; j < strlen(s_result); j++)
-		{
-			printf("%c", s_result[j]);
-		}
-		printf("\n");
+    DoGenerateRsaKey();
 
     return 0;
 }
