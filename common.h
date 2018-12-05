@@ -20,6 +20,8 @@
 
 #define DO_POW_MOD_DEBUG (1)
 
+#define RSA_DEBUG (1)
+
 extern void aes_encrypt(unsigned char *);
 extern void aes_decrypt(unsigned char *);
 

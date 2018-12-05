@@ -729,7 +729,7 @@ BigInt* DoPowMod(BigInt* a, BigInt* b, BigInt* c, BigInt* result)
     }
 
     printf("\n");
-    
+
     return CopyBigInt(&t, result);
 }
 
@@ -743,6 +743,79 @@ char* PowMod(char* s1, char* s2, char* s3, char* result)
     DoPowMod(&a, &b, &c, &d);
 
     return BigIntToStr(&d, result);
+}
+
+/*
+
+Euclidean algorithm
+
+integer a and b(a≥b), gcd(a, b)
+when a mod b == 0, gcd(a, b) = b;
+then gcd(a, b) = gcd(b, a mod b)
+
+*/
+BigInt *DoGcd(BigInt *a, BigInt *b, BigInt *result)
+{
+    BigInt t_a, t_b, remainder, zero;
+
+    memset(zero.bit, 0, BIG_INT_BIT_LEN);
+
+    if(DoCompare(a, b) > 0)
+    {
+        CopyBigInt(a, &t_a);
+        CopyBigInt(b, &t_b);
+    }
+    else
+    {
+        CopyBigInt(b, &t_a);
+        CopyBigInt(a, &t_b);
+    }
+
+    do
+    {
+        DoMod(&t_a, &t_b, &remainder);
+
+        CopyBigInt(&t_b, &t_a);
+        CopyBigInt(&remainder, &t_b);
+    }
+    while(DoCompare(&remainder, &zero) != 0);
+
+    return CopyBigInt(&t_a, result);
+}
+
+char *Gcd(char *s1, char *s2, char *result)
+{
+    BigInt a, b, c;
+
+    StrToBigInt(s1, &a);
+    StrToBigInt(s2, &b);
+
+    DoGcd(&a, &b, &c);
+
+    return BigIntToStr(&c, result);
+}
+
+BigInt *DoLcm(BigInt *a, BigInt *b, BigInt *result)
+{
+    BigInt gcd, remainder;
+
+    DoGcd(a, b, &gcd);
+
+    DoMul(a, b, result);
+
+    return DoDiv(result, &gcd, result, &remainder);
+}
+
+char *Lcm(char *s1, char *s2, char *result)
+{
+    BigInt a, b, c;
+
+    StrToBigInt(s1, &a);
+    StrToBigInt(s2, &b);
+
+    DoLcm(&a, &b, &c);
+
+    return BigIntToStr(&c, result);
 }
 
 Number* StrToNumber(char *str, Number *n)
