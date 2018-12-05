@@ -12,9 +12,39 @@ int main()
    
    	BigInt e, d, n;
 
-    DoGenerateRsaKey(&e, &d, &n, 3);
+   	// StrToBigInt("5", &e);
+   	// StrToBigInt("144", &n);
 
-    
+   	// GeneD(&e, &d, &n);
+   	// printf("result: \n");
+   	// unsigned char dest[MAX_STR_SIZE];
+   	// BigIntToStr(&d, dest);
+   	// for(i = 0; i < strlen(dest); i++)
+   	// {
+   	// 	printf("%c", dest[i]);
+   	// }
+   	// printf("\n");
 
+    // DoGenerateRsaKey(&e, &d, &n, 1);
+
+   	StrToBigInt("1217", &e);
+   	StrToBigInt("8323", &d);
+   	StrToBigInt("34189", &n);
+
+   	unsigned char dest[MAX_STR_SIZE];
+
+   	RsaEncrypt("56", dest, &d, &n);
+   	for(i = 0; i < strlen(dest); i++)
+   	{
+   		printf("%c", dest[i]);
+   	}
+   	printf("\n");
+
+   	RsaDecrypt(dest, source, &e, &n);
+   	for(i = 0; i < strlen(source); i++)
+   	{
+   		printf("%c", source[i]);
+   	}
+   	printf("\n");
     return 0;
 }
