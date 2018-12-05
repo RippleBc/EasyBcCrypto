@@ -694,7 +694,12 @@ char* Pow(char* s1, char* s2, char* result)
     return BigIntToStr(&c, result);
 }
 
-/* base on formula: (a * b) mod c = (a mod c) * (b mod c) mod c */
+/* 
+
+蒙哥马利幂模运算 
+base on formula: (a * b) mod c = (a mod c) * (b mod c) mod c 
+
+*/
 BigInt* DoPowMod(BigInt* a, BigInt* b, BigInt* c, BigInt* result)
 {
     int i, len;

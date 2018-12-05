@@ -112,9 +112,9 @@ Miller-Rabin测试：不断选取不超过p-1的基a(s次)，计算是否每次�
 (a * c) ≡ (b * d) (%p)，(a / c) ≡ (b / d) (%p)； 
 
 */
-static int DoMillerRabin(BigInt *p, int times)
+int DoMillerRabin(BigInt *p, int times)
 {
-    int i, j, miller_rabin_max_test_time;
+    int i, j, z, miller_rabin_max_test_time;
     BigInt result, base;
     BigInt one, two, pMinusOne, tmp_pMinusOne, remainder;
 
@@ -158,7 +158,7 @@ static int DoMillerRabin(BigInt *p, int times)
         /* Fermat test */
         DoPowMod(&base, &pMinusOne, p, &result); /* result = base ^ (p - 1) % p */
 
-        if (DoCompare(&result, &one) != 0)
+        if(DoCompare(&result, &one) != 0)
         {
             /* not prime */
             return 0;
@@ -166,32 +166,36 @@ static int DoMillerRabin(BigInt *p, int times)
        
         /* Miller-Rabin test */
         CopyBigInt(&pMinusOne, &tmp_pMinusOne);
-        for (j = 0; j < miller_rabin_max_test_time; j++)
+        for(j = 0; j < miller_rabin_max_test_time; j++)
         {
             DoDiv(&tmp_pMinusOne, &two, &tmp_pMinusOne, &remainder);
+
+            DoPowMod(&base, &tmp_pMinusOne, p, &result);
 
             if(MILLER_RABIN)
             {
                 printf("x: ");
                 BigIntToStr(&tmp_pMinusOne, tmp_decimal_big_int);
-                for(j = 0; j < strlen(tmp_decimal_big_int); j++)
+                for(z = 0; z < strlen(tmp_decimal_big_int); z++)
                 {
-                    printf("%c", tmp_decimal_big_int[j]);
+                    printf("%c", tmp_decimal_big_int[z]);
+                }
+                printf("\n");
+
+                printf("result: ");
+                BigIntToStr(&result, tmp_decimal_big_int);
+                for(z = 0; z < strlen(tmp_decimal_big_int); z++)
+                {
+                    printf("%c", tmp_decimal_big_int[z]);
                 }
                 printf("\n");
             }
 
-            DoPowMod(&base, &tmp_pMinusOne, p, &result);
-
-            if (DoCompare(&result, &pMinusOne) != 0 && DoCompare(&result, &one) != 0)
+            if(DoCompare(&result, &pMinusOne) != 0 && DoCompare(&result, &one) != 0)
             {
                 /* not prime */
                 return 0;
             }
-        }
-        if(j >= miller_rabin_max_test_time)
-        {
-            continue;
         }
     }
 
@@ -209,7 +213,7 @@ int MillerRabin(char *source, int times)
 
 BigInt* DoGenPrime(int byteLen, int times, BigInt *result)
 {
-    if(byteLen * BYTE_SIZE > BIG_INT_BIT_LEN)
+    if(byteLen * BYTE_SIZE *2 > BIG_INT_BIT_LEN)
     {
         printf("DoGenPrime, prime is too big %d\n", byteLen);
         exit(1);
@@ -217,7 +221,7 @@ BigInt* DoGenPrime(int byteLen, int times, BigInt *result)
 
     int i;
     unsigned long a, b;
-    char str_test_num[MAX_STR_SIZE];
+    char str_test_num[BIG_INT_BIT_LEN];
 
     /*  */
     BigInt minusTwo;
@@ -261,4 +265,39 @@ char* GenPrime(int byteLen, int times, char *result)
     DoGenPrime(byteLen, times, &n);
 
     return BigIntToStr(&n, result);
+}
+
+char* DoGenRandomPrime(int byteLen, int times, BigInt *result)
+{
+    if(byteLen * BYTE_SIZE * 2 > BIG_INT_BIT_LEN)
+    {
+        printf("DoGenRandomPrime, prime is too big %d\n", byteLen);
+        exit(1);
+    }
+
+    unsigned long a, b;
+    char str_test_num[BIG_INT_BIT_LEN];
+
+    /*  */
+    a = time(0);
+
+    /*  */
+    while(1)
+    {
+        DoGetOddRandBigInt(byteLen, result);
+
+        BigIntToStr(result, str_test_num);
+        printf("testing number[%s]...\n", str_test_num);
+        
+        if(DoMillerRabin(result, times))
+        {
+            break;
+        }
+    }
+
+    /*  */
+    b = time(0);
+    printf("consume %d seconds\n", b - 1);
+
+    return result;
 }
