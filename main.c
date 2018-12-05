@@ -49,13 +49,17 @@ int main()
 		// }
 		
 
-		char prime_num[MAX_STR_SIZE];
-		DoGenPrime(1, 5, prime_num);
+		// char prime_num[MAX_STR_SIZE];
+		// DoGenPrime(1, 5, prime_num);
 
-		for(int i = 0; i < strlen(prime_num); i++)
-		{
-			printf("%c", prime_num[i]);
-		}
+		// for(int i = 0; i < strlen(prime_num); i++)
+		// {
+		// 	printf("%c", prime_num[i]);
+		// }
+
+    char prime_num[MAX_STR_SIZE] = {'3', '4', '1'};
+
+    printf("%d\n", MillerRabin(prime_num, 5));
 
     return 0;
 }

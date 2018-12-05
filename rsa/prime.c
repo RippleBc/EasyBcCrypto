@@ -93,27 +93,41 @@ BigInt* DoGetRand(BigInt *n, BigInt *result)
 
 /*
 
-费马小定理：对于素数p和任意整数a，有a^p ≡ a (mod p)（同余）。反过来，满足a^p = a (mod p)，p也几乎一定是素数。
+费马小定理：对于素数p和任意整数a，有a ^ (p-1) = 1 (mod p)（同余）。反过来，满足a ^ (p-1) = 1 (mod p)，p也几乎一定是素数。
 
 伪素数：如果n是一个正整数，如果存在和p互素的正整数a满足a ^ (p-1) = 1 (mod p)，我们说n是基于a的伪素数。如果一个数是伪素数，那么它几乎肯定是素数。
 
-Miller-Rabin测试：不断选取不超过p-1的基b(s次)，计算是否每次都有b ^ (p-1) = 1 (mod p)，若每次都成立则p是素数，否则为合数。　 
+Miller-Rabin测试：不断选取不超过p-1的基a(s次)，计算是否每次都有a ^ (p-1) = 1 (mod p)，若每次都成立则p是素数，否则为合数。如果p是素数，x是小于p的正整数，且 x^2 = 1(mod p)，那么要么x=1，要么x=p-1;
 
-如果p是素数，x是小于p的正整数，且 x^2 = 1(mod p)，那么要么x=1，要么x=p-1;
+模运算与基本四则运算有些相似，但是除法例外。其规则如下：
+(a + b) % p = (a % p + b % p) % p
+(a - b) % p = (a % p - b % p) % p
+(a * b) % p = (a % p * b % p) % p
+(a^b) % p = ((a % p)^b) % p
+
+推论：
+若a≡b (% p)，则对于任意的c，都有(a + c) ≡ (b + c) (%p)；
+若a≡b (% p)，则对于任意的c，都有(a * c) ≡ (b * c) (%p)；
+若a≡b (% p)，c≡d (% p)，则 (a + c) ≡ (b + d) (%p)，(a - c) ≡ (b - d) (%p)，
+(a * c) ≡ (b * d) (%p)，(a / c) ≡ (b / d) (%p)； 
 
 */
 static int DoMillerRabin(BigInt *p, int times)
 {
-    int i, j, s;
-    BigInt a, x;
-    BigInt one, two, nMinusOne;
+    int i, j, miller_rabin_max_test_time;
+    BigInt result, base;
+    BigInt one, two, pMinusOne, tmp_pMinusOne, remainder;
 
     char tmp_decimal_big_int[BIG_INT_BIT_LEN];
 
     StrToBigInt("1", &one);
     StrToBigInt("2", &two);
-    DoSub(p, &one, &nMinusOne);
+    DoSub(p, &one, &pMinusOne);
 
+    /* Get Max Miller-Rabin test times */
+    miller_rabin_max_test_time = GetMaxRightShiftLen(&pMinusOne);
+
+    /*  */
     if(MILLER_RABIN)
     {
         printf("\np: ");
@@ -129,12 +143,11 @@ static int DoMillerRabin(BigInt *p, int times)
     /* do {times} test, {times} is bigger, more accuracy */
     for(i = 0; i < times; i++)
     {
-        DoGetRand(p, &x);
-        // PrintBigIntTrueForm(&x);
+        DoGetRand(p, &base);
         if(MILLER_RABIN)
         {
-            printf("x: ");
-            BigIntToStr(&x, tmp_decimal_big_int);
+            printf("base: ");
+            BigIntToStr(&base, tmp_decimal_big_int);
             for(j = 0; j < strlen(tmp_decimal_big_int); j++)
             {
                 printf("%c", tmp_decimal_big_int[j]);
@@ -142,30 +155,56 @@ static int DoMillerRabin(BigInt *p, int times)
             printf("\n");
         }
 
-        DoPowMod(&x, &nMinusOne, p, &a); /* a = x ^ (p - 1) % p */
+        /* Fermat test */
+        DoPowMod(&base, &pMinusOne, p, &result); /* result = base ^ (p - 1) % p */
 
-        if (DoCompare(&a, &one) == 0)
+        if (DoCompare(&result, &one) != 0)
+        {
+            /* not prime */
+            return 0;
+        }
+       
+        /* Miller-Rabin test */
+        CopyBigInt(&pMinusOne, &tmp_pMinusOne);
+        for (j = 0; j < miller_rabin_max_test_time; j++)
+        {
+            DoDiv(&tmp_pMinusOne, &two, &tmp_pMinusOne, &remainder);
+
+            if(MILLER_RABIN)
+            {
+                printf("x: ");
+                BigIntToStr(&tmp_pMinusOne, tmp_decimal_big_int);
+                for(j = 0; j < strlen(tmp_decimal_big_int); j++)
+                {
+                    printf("%c", tmp_decimal_big_int[j]);
+                }
+                printf("\n");
+            }
+
+            DoPowMod(&base, &tmp_pMinusOne, p, &result);
+
+            if (DoCompare(&result, &pMinusOne) != 0 && DoCompare(&result, &one) != 0)
+            {
+                /* not prime */
+                return 0;
+            }
+        }
+        if(j >= miller_rabin_max_test_time)
         {
             continue;
         }
-
-        printf("\n\n");
-        return 0;
-        // for (j = 0; j < s; j++)
-        // {
-        //     if (DoCompare(&a, &nMinusOne) == 0)
-        //         goto LOOP;
-
-        //     DoPowMod(&a, &two, p, &a); /* a = a^2 % n */
-        // }
-
-        // return 0;
-
-        // LOOP:;
     }
 
     printf("\n\n");
     return 1;
+}
+
+int MillerRabin(char *source, int times)
+{
+    BigInt bi;
+    StrToBigInt(source, &bi);
+
+    return DoMillerRabin(&bi, times);
 }
 
 BigInt* DoGenPrime(int byteLen, int times, BigInt *result)
