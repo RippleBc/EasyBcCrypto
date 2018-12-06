@@ -1,3 +1,6 @@
+#define NAME_LEN 218
+#define FILE_NAME_LEN 218
+
 #define AES_GROUP_SIZE 16
 #define AES_SUB_GROUP_SIZE 4
 
@@ -13,16 +16,12 @@
 #define BYTE_SIZE 8
 
 #define AES_DEBUG (0)
-
 #define RANDOM_DEBUG (0)
+#define MILLER_RABIN_DEBUG (0)
+#define DO_POW_MOD_DEBUG (0)
+#define RSA_DEBUG (0)
+#define GENE_D_DEBUG (0)
 
-#define MILLER_RABIN_DEBUG (1)
-
-#define DO_POW_MOD_DEBUG (1)
-
-#define RSA_DEBUG (1)
-
-#define GENE_D_DEBUG (1)
 extern void aes_encrypt(unsigned char *);
 extern void aes_decrypt(unsigned char *);
 

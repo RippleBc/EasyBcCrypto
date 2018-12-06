@@ -1,6 +1,12 @@
 #include "../common.h"
+#include <stdio.h>
 
-BigInt* DoGetOddRandBigInt(int byteLen, BigInt* result)
+#define COMMON_PRIME_SIZE 8
+static common_prime[COMMON_PRIME_SIZE] = {
+    2, 3, 5, 7, 11, 13, 17, 19
+};
+
+BigInt* DoGetPositiveOddRandBigInt(int byteLen, BigInt* result)
 {
     int i;
     memset(result->bit, 0, BIG_INT_BIT_LEN);
@@ -14,7 +20,7 @@ BigInt* DoGetOddRandBigInt(int byteLen, BigInt* result)
     if(RANDOM_DEBUG)
     {
         printf("hex odd random result begin\n");
-        for(i = 0; i < byteLen; i ++)
+        for(i = 0; i < byteLen; i++)
         {
             printf("%x ", random_byte_sequence[i]);
         }
@@ -28,34 +34,22 @@ BigInt* DoGetOddRandBigInt(int byteLen, BigInt* result)
     result->bit[0] = 1;
     result->bit[SIGN_BIT] = 0;
 
+    /*  */
     return result;
 }
 
-char* GetOddRandBigInt(int byteLen, char* result)
+BigInt* DoGetPositiveRand(BigInt *n, BigInt *result)
 {
-    BigInt a;
-
-    DoGetOddRandBigInt(byteLen, &a);
-
-    return BigIntToStr(&a, result);
-}
-
-BigInt* DoGetRand(BigInt *n, BigInt *result)
-{
-    /*  */
-    BigInt one;
-    StrToBigInt("1", &one);
-    if(DoCompare(&one, n) == 0)
-    {
-        printf("DoGetRand, and thing mod 1 is zero\n");
-        exit(1);
-    }
-
     /*  */
     int i;
-    BigInt t, n_tmp;
+    BigInt tmp;
+
+    /*  */
+    memset(result->bit, 0, BIG_INT_BIT_LEN);
+
+    /*  */
     int random_byte_sequence_size = floor(BIG_INT_BIT_LEN / BYTE_SIZE);
-    memset(result->bit, 0, random_byte_sequence_size);
+    
     
     /*  */
     unsigned char random_byte_sequence[random_byte_sequence_size];
@@ -74,21 +68,13 @@ BigInt* DoGetRand(BigInt *n, BigInt *result)
     }
 
     /*  */
-    byteSequenceToBinBigInt(random_byte_sequence, random_byte_sequence_size, &t);
+    byteSequenceToBinBigInt(random_byte_sequence, random_byte_sequence_size, &tmp);
 
     /* convert to positive integer */
-    t.bit[SIGN_BIT] = 0;
+    tmp.bit[SIGN_BIT] = 0;
 
     /*  */
-    CopyBigInt(n, &n_tmp);
-    DoMod(&t, n, result);
-   
-    if (IsZero(result))
-    {
-        DoGetRand(&n_tmp, result);
-    }
-
-    return result;
+    return DoMod(&tmp, n, result);
 }
 
 /*
@@ -143,7 +129,12 @@ int DoMillerRabin(BigInt *p, int times)
     /* do {times} test, {times} is bigger, more accuracy */
     for(i = 0; i < times; i++)
     {
-        DoGetRand(p, &base);
+        do
+        {
+            DoGetPositiveRand(p, &base);
+        }
+        while(DoCompare(&base, &two) < 0);
+        
         if(MILLER_RABIN_DEBUG)
         {
             printf("base: ");
@@ -199,7 +190,11 @@ int DoMillerRabin(BigInt *p, int times)
         }
     }
 
-    printf("\n\n");
+    if(MILLER_RABIN_DEBUG)
+    {
+        printf("\n\n");
+    }
+
     return 1;
 }
 
@@ -211,60 +206,68 @@ int MillerRabin(char *source, int times)
     return DoMillerRabin(&bi, times);
 }
 
-BigInt* DoGenPrime(int byteLen, int times, BigInt *result)
+void DoGenPrime(int byteLen, int times, char *file_name)
 {
-    if(byteLen * BYTE_SIZE *2 > BIG_INT_BIT_LEN)
+    if(byteLen * BYTE_SIZE * 2 > BIG_INT_BIT_LEN)
     {
         printf("DoGenPrime, prime is too big %d\n", byteLen);
         exit(1);
     }
 
+    printf("DoGenPrime begin ...\n");
+
     int i;
-    unsigned long a, b;
     char str_test_num[BIG_INT_BIT_LEN];
 
     /*  */
-    BigInt minusTwo;
-    StrToBigInt("-2", &minusTwo);
-
-    /* max num of {byteLen}'s bytes length */
-    memset(result->bit, 0, BIG_INT_BIT_LEN);
-    for (i = 0; i < byteLen * BYTE_SIZE; i++)
+    char prime_file_name[FILE_NAME_LEN];
+    snprintf(prime_file_name, FILE_NAME_LEN, "%s.prime",  file_name);
+    FILE *p_prime_file;
+    p_prime_file = fopen(prime_file_name, "wt");
+    if(p_prime_file == NULL)
     {
-        result->bit[i] = 1;
+        printf("DoGenPrime, open file %s err\n", prime_file_name);
+        exit(1);
     }
 
     /*  */
-    a = time(0);
+    BigInt minusTwo, result;
+    StrToBigInt("-2", &minusTwo);
+
+    /* max num of {byteLen}'s bytes length */
+    memset(result.bit, 0, BIG_INT_BIT_LEN);
+    for (i = 0; i < byteLen * BYTE_SIZE; i++)
+    {
+        result.bit[i] = 1;
+    }
+    result.bit[SIGN_BIT] = 0;
 
     /*  */
     while(1)
     {
-        BigIntToStr(result, str_test_num);
-        printf("testing number[%s]...\n", str_test_num);
-        
+        BigIntToStr(&result, str_test_num);
+        printf("testing number %s ...\n", str_test_num);
 
-        if(DoMillerRabin(result, times))
+        if(DoMillerRabin(&result, times))
         {
+            
             /*  */
-            b = time(0);
-            printf("****************************finish test number[%s] (t=%lds)****************************\n\n", str_test_num, b - a);
+            printf("detect prime %s\n", str_test_num);
+
+            /*  */
+            if(EOF == fputs(str_test_num, p_prime_file) || EOF == fputc(',', p_prime_file))
+            {
+                printf("DoGenPrime, write prime to file err\n");
+                exit(1);
+            }
         }
 
         /*  */
-        DoAdd(result, &minusTwo, result);
+        DoAdd(&result, &minusTwo, &result);
     }
-
-    return result;
-}
-
-char* GenPrime(int byteLen, int times, char *result)
-{
-    BigInt n;
-
-    DoGenPrime(byteLen, times, &n);
-
-    return BigIntToStr(&n, result);
+    
+    /*  */
+    fclose(p_prime_file);
 }
 
 char* DoGenRandomPrime(int byteLen, int times, BigInt *result)
@@ -284,7 +287,7 @@ char* DoGenRandomPrime(int byteLen, int times, BigInt *result)
     /*  */
     while(1)
     {
-        DoGetOddRandBigInt(byteLen, result);
+        DoGetPositiveOddRandBigInt(byteLen, result);
 
         BigIntToStr(result, str_test_num);
 
@@ -301,7 +304,7 @@ char* DoGenRandomPrime(int byteLen, int times, BigInt *result)
 
     /*  */
     b = time(0);
-    printf("consume %d seconds\n", b - 1);
+    printf("consume %d seconds\n", b - a);
 
     return result;
 }
