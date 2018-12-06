@@ -2,8 +2,8 @@
 #include <stdio.h>
 
 #define COMMON_PRIME_SIZE 8
-static char common_prime[COMMON_PRIME_SIZE][10] = {
-    "2", "3", "5", "7", "11", "13", "17", "19"
+static int common_prime[COMMON_PRIME_SIZE] = {
+    2, 3, 5, 7, 11, 13, 17, 19
 };
 
 BigInt* DoGetPositiveOddRandBigInt(int byteLen, BigInt* result)
@@ -104,12 +104,14 @@ int DoMillerRabin(BigInt *p, int times)
     BigInt result, base;
     BigInt one, two, pMinusOne, tmp_pMinusOne, remainder;
     char s_p[BIG_INT_BIT_LEN];
+    char s_prime[BIG_INT_BIT_LEN];
 
     /*  */
     BigIntToStr(p, s_p);
     for(i = 0; i < COMMON_PRIME_SIZE; i++)
     {
-        if(strcmp(s_p, common_prime[i] == 0))
+        snprintf(s_prime, BIG_INT_BIT_LEN, "%d", common_prime[i]);
+        if(strcmp(s_p, s_prime) == 0)
         {
             return 1;
         }
