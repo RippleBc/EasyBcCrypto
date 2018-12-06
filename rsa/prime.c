@@ -2,8 +2,8 @@
 #include <stdio.h>
 
 #define COMMON_PRIME_SIZE 8
-static common_prime[COMMON_PRIME_SIZE] = {
-    2, 3, 5, 7, 11, 13, 17, 19
+static char common_prime[COMMON_PRIME_SIZE][10] = {
+    "2", "3", "5", "7", "11", "13", "17", "19"
 };
 
 BigInt* DoGetPositiveOddRandBigInt(int byteLen, BigInt* result)
@@ -103,6 +103,17 @@ int DoMillerRabin(BigInt *p, int times)
     int i, j, z, miller_rabin_max_test_time;
     BigInt result, base;
     BigInt one, two, pMinusOne, tmp_pMinusOne, remainder;
+    char s_p[BIG_INT_BIT_LEN];
+
+    /*  */
+    BigIntToStr(p, s_p);
+    for(i = 0; i < COMMON_PRIME_SIZE; i++)
+    {
+        if(strcmp(s_p, common_prime[i] == 0))
+        {
+            return 1;
+        }
+    }   
 
     char tmp_decimal_big_int[BIG_INT_BIT_LEN];
 
@@ -218,6 +229,8 @@ void DoGenPrime(int byteLen, int times, char *file_name)
 
     int i;
     char str_test_num[BIG_INT_BIT_LEN];
+    BigInt one;
+    StrToBigInt("1", &one);
 
     /*  */
     char prime_file_name[FILE_NAME_LEN];
@@ -243,14 +256,13 @@ void DoGenPrime(int byteLen, int times, char *file_name)
     result.bit[SIGN_BIT] = 0;
 
     /*  */
-    while(1)
+    while(DoCompare(&result, &one) > 0)
     {
         BigIntToStr(&result, str_test_num);
         printf("testing number %s ...\n", str_test_num);
 
         if(DoMillerRabin(&result, times))
         {
-            
             /*  */
             printf("detect prime %s\n", str_test_num);
 
