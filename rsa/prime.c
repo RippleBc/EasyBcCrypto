@@ -1,9 +1,13 @@
 #include "../common.h"
 #include <stdio.h>
 
-#define COMMON_PRIME_SIZE 8
+#define COMMON_PRIME_SIZE 34
 static int common_prime[COMMON_PRIME_SIZE] = {
-    2, 3, 5, 7, 11, 13, 17, 19
+    251, 239, 227, 223, 211, 199, 191, 179, 
+    173, 167, 163, 151, 139, 131, 127, 107, 
+    103, 83, 79, 71, 67, 59, 47, 43, 
+    31, 23, 19, 17, 13, 11, 7, 5, 
+    3, 2
 };
 
 BigInt* DoGetPositiveOddRandBigInt(int byteLen, BigInt* result)
