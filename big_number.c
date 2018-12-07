@@ -846,7 +846,6 @@ BigInt *DoExGcd(BigInt *a, BigInt *b, BigInt *x, BigInt *y, BigInt *result)
     if(DoCompare(b, &zero) == 0)
     {
         StrToBigInt("1", x);
-
         /* result = gcd(a, b) */
         return CopyBigInt(a, result);
     }

@@ -3,146 +3,54 @@
 
 #define MILLER_RABIN_TEST_TIMES 5
 
-// #define STACK_SIZE 1024
-// static stack_index = STACK_SIZE;
-// static BigInt stack[STACK_SIZE];
-// static void push_stack(BigInt *bi)
-// {
-// 	if(GENE_D_DEBUG)
-// 	{
-// 		unsigned char dest[MAX_STR_SIZE];
-// 		BigIntToStr(bi, dest);
-// 		printf("push: ");
-// 		for(int i = 0; i < strlen(dest); i++)
-// 		{
-// 			printf("%c", dest[i]);
-// 		}
-// 		printf("\n");
-// 	}
-
-
-// 	CopyBigInt(bi, &stack[--stack_index]);
-// }
-// static void pop_stack(BigInt *bi)
-// {
-// 	if(stack_index >= STACK_SIZE)
-// 	{
-// 		StrToBigInt("0", bi);
-// 		return;
-// 	}
-// 	CopyBigInt(&stack[stack_index++], bi);
-
-// 	if(GENE_D_DEBUG)
-// 	{
-// 		unsigned char dest[MAX_STR_SIZE];
-// 	 	BigIntToStr(bi, dest);
-// 	 	printf("pop: ");
-// 	 	for(int i = 0; i < strlen(dest); i++)
-// 	 	{
-// 	 		printf("%c", dest[i]);
-// 	 	}
-// 	 	printf("\n");
-// 	}
-// }
-
-// BigInt *GeneD(BigInt *e, BigInt *d, BigInt *l)
-// {
-// 	/* e * d - l * k = 1 */
-// 	BigInt t_e, t_l, k, one, zero, t_a, remainder;
-
-// 	StrToBigInt("1", &one);
-// 	StrToBigInt("0", &zero);
-
-// 	CopyBigInt(e, &t_e);
-// 	CopyBigInt(l, &t_l);
-
-// 	push_stack(&t_l);
-// 	push_stack(&t_e);
-	
-
-// 	int i = 0;
-// 	while(DoCompare(&t_e, &one) != 0 && DoCompare(&t_l, &one) != 0)
-// 	{
-// 		if(i % 2 == 0)
-// 		{
-// 			DoMod(&t_l, &t_e, &t_l);
-// 		}
-// 		else
-// 		{
-// 			DoMod(&t_e, &t_l, &t_e);
-// 		}
-
-// 		push_stack(&t_l);
-// 		push_stack(&t_e);
-
-// 		i++;
-// 	}
-
-// 	pop_stack(&t_e);
-// 	pop_stack(&t_l);
-
-// 	pop_stack(&t_e);
-// 	pop_stack(&t_l);
-
-// 	StrToBigInt("1", e);
-// 	StrToBigInt("1", d);
-// 	while(1)
-// 	{
-// 		if(i % 2 == 0)
-// 		{
-// 			DoMul(&t_e, d, &t_a);
-// 			DoSub(&t_a, &one, &t_a);
-// 			DoDiv(&t_a, &t_l, &k, &remainder);
-
-// 			if(GENE_D_DEBUG)
-// 			{
-// 				unsigned char dest[MAX_STR_SIZE];
-// 			 	BigIntToStr(&k, dest);
-// 			 	printf("k: ");
-// 			 	for(int i = 0; i < strlen(dest); i++)
-// 			 	{
-// 			 		printf("%c", dest[i]);
-// 			 	}
-// 			 	printf("\n");
-// 			}
-// 		}
-// 		else
-// 		{
-// 			DoMul(&t_l, &k, &t_a);
-// 			DoAdd(&t_a, &one, &t_a);
-// 			DoDiv(&t_a, &t_e, d, &remainder);
-
-// 			if(GENE_D_DEBUG)
-// 			{
-// 				unsigned char dest[MAX_STR_SIZE];
-// 			 	BigIntToStr(d, dest);
-// 			 	printf("d: ");
-// 			 	for(int i = 0; i < strlen(dest); i++)
-// 			 	{
-// 			 		printf("%c", dest[i]);
-// 			 	}
-// 			 	printf("\n");
-// 			}
-// 		}
-
-// 		pop_stack(&t_e);
-// 		if(DoCompare(&t_e, &zero) == 0)
-// 		{
-// 			break;
-// 		}
-// 		pop_stack(&t_l);
-
-// 		i++;
-// 	}
-
-// 	return d;
-// }
-
 BigInt *GeneD(BigInt *e, BigInt *d, BigInt *l)
 {
-	BigInt k, result;
-	DoExGcd(l, e, &k, d, &result);
+	BigInt k, result, zero, one, y, neg_y;
+	char s_d[BIG_INT_BIT_LEN];
 
+	StrToBigInt("0", &zero);
+	StrToBigInt("1", &one);
+
+	StrToBigInt("0", &y);
+
+
+	
+	while(1)
+	{
+			CopyBigInt(&y, d);
+			BigIntToStr(d, s_d);
+			printf("GeneD, d %s\n", s_d);
+			DoExGcd(l, e, &k, d, &result);
+			if(DoCompare(d, &zero) > 0)
+			{
+				break;
+			}
+
+			
+
+			if(DoCompare(&y, &zero) == 0)
+			{
+				DoAdd(&y, &one, &y);
+				continue;
+			}
+			
+			DoSub(&zero, &y, &neg_y);
+			CopyBigInt(&neg_y, d);
+			BigIntToStr(d, s_d);
+			printf("GeneD, d %s\n", s_d);
+			DoExGcd(l, e, &k, d, &result);
+			if(DoCompare(d, &zero) > 0)
+			{
+				break;
+			}
+
+
+			DoAdd(&y, &one, &y);
+
+			
+
+	}
+	
 	return d;
 }
 
@@ -306,6 +214,7 @@ char *RsaEncrypt(unsigned char *source, unsigned char *dest, char *key_pair_file
 	BigInt e, n;
 	char c;
 	int mark = 0;
+	
 	while((fgets(buffer, BIG_INT_BIT_LEN, p_public_file)) != NULL)
 	{
 		if(mark == 0)
@@ -316,6 +225,8 @@ char *RsaEncrypt(unsigned char *source, unsigned char *dest, char *key_pair_file
 		{
 			StrToBigInt(buffer, &n);
 		}
+
+		mark++;
 	}
 	if(!feof(p_public_file))
 	{
@@ -345,6 +256,7 @@ char *RsaDecrypt(unsigned char *source, unsigned char *dest, char *key_pair_file
 	BigInt d, n;
 	char c;
 	int mark = 0;
+	
 	while((fgets(buffer, BIG_INT_BIT_LEN, p_private_file)) != NULL)
 	{
 		if(mark == 0)
@@ -355,6 +267,8 @@ char *RsaDecrypt(unsigned char *source, unsigned char *dest, char *key_pair_file
 		{
 			StrToBigInt(buffer, &n);
 		}
+
+		mark++;
 	}
 	if(!feof(p_private_file))
 	{

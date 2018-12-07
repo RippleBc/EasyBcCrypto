@@ -36,20 +36,20 @@ int main()
     // }
     // printf("\n");
 
-   	// unsigned char dest[MAX_STR_SIZE];
+   	unsigned char dest[MAX_STR_SIZE];
 
-   	// RsaEncrypt("56", dest, &d, &n);
-   	// for(i = 0; i < strlen(dest); i++)
-   	// {
-   	// 	printf("%c", dest[i]);
-   	// }
-   	// printf("\n");
+   	RsaEncrypt("56", dest, "key_pair");
+   	for(i = 0; i < strlen(dest); i++)
+   	{
+   		printf("%c", dest[i]);
+   	}
+   	printf("\n");
 
-   	// RsaDecrypt(dest, source, &e, &n);
-   	// for(i = 0; i < strlen(source); i++)
-   	// {
-   	// 	printf("%c", source[i]);
-   	// }
-   	// printf("\n");
+   	RsaDecrypt(dest, source, "key_pair");
+   	for(i = 0; i < strlen(source); i++)
+   	{
+   		printf("%c", source[i]);
+   	}
+   	printf("\n");
     return 0;
 }
