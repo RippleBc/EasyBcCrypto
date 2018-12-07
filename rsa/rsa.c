@@ -6,7 +6,6 @@
 BigInt *GeneD(BigInt *e, BigInt *d, BigInt *l)
 {
 	BigInt k, result, zero, one, y, neg_y;
-	char s_d[BIG_INT_BIT_LEN];
 
 	StrToBigInt("0", &zero);
 	StrToBigInt("1", &one);
@@ -18,8 +17,6 @@ BigInt *GeneD(BigInt *e, BigInt *d, BigInt *l)
 	while(1)
 	{
 			CopyBigInt(&y, d);
-			BigIntToStr(d, s_d);
-			printf("GeneD, d %s\n", s_d);
 			DoExGcd(l, e, &k, d, &result);
 			if(DoCompare(d, &zero) > 0)
 			{
@@ -36,8 +33,6 @@ BigInt *GeneD(BigInt *e, BigInt *d, BigInt *l)
 			
 			DoSub(&zero, &y, &neg_y);
 			CopyBigInt(&neg_y, d);
-			BigIntToStr(d, s_d);
-			printf("GeneD, d %s\n", s_d);
 			DoExGcd(l, e, &k, d, &result);
 			if(DoCompare(d, &zero) > 0)
 			{
@@ -46,9 +41,6 @@ BigInt *GeneD(BigInt *e, BigInt *d, BigInt *l)
 
 
 			DoAdd(&y, &one, &y);
-
-			
-
 	}
 	
 	return d;

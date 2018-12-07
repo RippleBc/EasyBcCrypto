@@ -40,7 +40,7 @@ BigInt* DoGetPositiveOddRandBigInt(int if_fix_len, int byteLen, BigInt* result)
     /* fix min prime len */
     if(if_fix_len)
     {
-        result->bit[SIGN_BIT - 1] = 1;
+        result->bit[byteLen * BYTE_SIZE - 1] = 1;
     }
 
     /*  */  
