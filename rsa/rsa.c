@@ -219,6 +219,9 @@ char *RsaEncrypt(unsigned char *source, unsigned char *dest, char *key_pair_file
 	{
 		if(mark == 0)
 		{
+			int real_size = strnlen(buffer, BIG_INT_BIT_LEN) - SLASH_N_SIZE;
+			buffer[real_size] = '\0';
+
 			StrToBigInt(buffer, &e);
 		}
 		else
@@ -261,6 +264,9 @@ char *RsaDecrypt(unsigned char *source, unsigned char *dest, char *key_pair_file
 	{
 		if(mark == 0)
 		{
+			int real_size = strnlen(buffer, BIG_INT_BIT_LEN) - SLASH_N_SIZE;
+			buffer[real_size] = '\0';
+
 			StrToBigInt(buffer, &d);
 		}
 		else

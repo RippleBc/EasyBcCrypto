@@ -15,6 +15,8 @@
 
 #define BYTE_SIZE 8
 
+#define SLASH_N_SIZE 1
+
 #define AES_DEBUG (0)
 #define RANDOM_DEBUG (0)
 #define MILLER_RABIN_DEBUG (0)
