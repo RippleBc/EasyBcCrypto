@@ -23,8 +23,6 @@ BigInt *GeneD(BigInt *e, BigInt *d, BigInt *l)
 				break;
 			}
 
-			
-
 			if(DoCompare(&y, &zero) == 0)
 			{
 				DoAdd(&y, &one, &y);
