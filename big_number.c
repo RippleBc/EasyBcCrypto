@@ -702,8 +702,17 @@ base on formula: (a * b) mod c = (a mod c) * (b mod c) mod c
 */
 BigInt* DoPowMod(BigInt* a, BigInt* b, BigInt* c, BigInt* result)
 {
+
+
     int i, len;
-    BigInt t, buf;
+    BigInt t, buf, zero;
+
+    StrToBigInt("0", &zero);
+    if(DoCompare(b, &zero) < 0)
+    {
+        printf("DoPowMod, not support negative pow\n");
+        exit(0);
+    }
 
     CopyBigInt(a, &buf);
     StrToBigInt("1", &t);
@@ -799,6 +808,116 @@ char *Gcd(char *s1, char *s2, char *result)
     DoGcd(&a, &b, &c);
 
     return BigIntToStr(&c, result);
+}
+
+/* notice, a must bigger than b */
+BigInt *DoExGcd(BigInt *a, BigInt *b, BigInt *x, BigInt *y, BigInt *result)
+{
+    if(DoCompare(a, b) < 0)
+    {
+        printf("DoExGcd, arg a must bigger than b\n");
+        exit(1);
+    }
+
+    if(GENE_D_DEBUG)
+    {
+        unsigned char dest[MAX_STR_SIZE];
+
+        BigIntToStr(a, dest);
+        printf("DoExGcd, a: ");
+        for(int i = 0; i < strlen(dest); i++)
+        {
+         printf("%c", dest[i]);
+        }
+
+        BigIntToStr(b, dest);
+        printf(", b: ");
+        for(int i = 0; i < strlen(dest); i++)
+        {
+         printf("%c", dest[i]);
+        }
+        printf("\n");
+    }
+
+    BigInt zero, a_mod_b, pre_x, pre_y, tmp, remainder;
+    StrToBigInt("0", &zero);
+
+    /*  */
+    if(DoCompare(b, &zero) == 0)
+    {
+        StrToBigInt("1", x);
+
+        /* result = gcd(a, b) */
+        return CopyBigInt(a, result);
+    }
+
+    /*  */
+    DoMod(a, b, &a_mod_b);
+    DoExGcd(b, &a_mod_b, x, y, result);
+
+    /*  */
+    CopyBigInt(x, &pre_x);
+    CopyBigInt(y, &pre_y);
+
+    CopyBigInt(&pre_y, x);
+
+    /*  */
+    DoDiv(a, b, &tmp, &remainder);
+    DoMul(&tmp, &pre_y, &tmp);
+    DoSub(&pre_x, &tmp, &tmp);
+    
+    CopyBigInt(&tmp, y);
+
+    if(GENE_D_DEBUG)
+    {
+        unsigned char dest[MAX_STR_SIZE];
+
+        BigIntToStr(a, dest);
+        printf("DoExGcd return, a: ");
+        for(int i = 0; i < strlen(dest); i++)
+        {
+         printf("%c", dest[i]);
+        }
+
+        BigIntToStr(x, dest);
+        printf(", x: ");
+        for(int i = 0; i < strlen(dest); i++)
+        {
+         printf("%c", dest[i]);
+        }
+
+        BigIntToStr(b, dest);
+        printf(", b: ");
+        for(int i = 0; i < strlen(dest); i++)
+        {
+         printf("%c", dest[i]);
+        }
+
+        BigIntToStr(y, dest);
+        printf(", y: ");
+        for(int i = 0; i < strlen(dest); i++)
+        {
+         printf("%c", dest[i]);
+        }
+        printf("\n");
+    }
+
+    return result;
+}
+
+char *ExGcd(char *s_a, char *s_b, char *s_x, char *s_y, char *s_result)
+{
+    BigInt a, b, x, y, result;
+
+    StrToBigInt(s_a, &a);
+    StrToBigInt(s_b, &b);
+    StrToBigInt(s_x, &x);
+    StrToBigInt(s_y, &y);
+    StrToBigInt(s_result, &result);
+
+    DoExGcd(&a, &b, &x, &y, &result);
+
+    return BigIntToStr(&result, s_result);
 }
 
 BigInt *DoLcm(BigInt *a, BigInt *b, BigInt *result)

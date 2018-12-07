@@ -12,7 +12,7 @@ int main()
    
    	BigInt e, d, n;
 
-   	DoGenPrime(1, 5, "255");
+   	// DoGenPrime(1, 5, "255");
 
    	// StrToBigInt("5", &e);
    	// StrToBigInt("144", &n);
@@ -26,11 +26,15 @@ int main()
    	// }
    	// printf("\n");
 
-    // DoGenerateRsaKey(1, "key_pair");
+    DoGenerateRsaKey(1, "key_pair");
 
-   	// StrToBigInt("1217", &e);
-   	// StrToBigInt("8323", &d);
-   	// StrToBigInt("34189", &n);
+    // char result[MAX_STR_SIZE];
+    // Mul("-10", "1", result);
+    // for(i = 0; i < strlen(result); i++)
+    // {
+    //   printf("%c", result[i]);
+    // }
+    // printf("\n");
 
    	// unsigned char dest[MAX_STR_SIZE];
 
