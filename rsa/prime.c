@@ -10,7 +10,7 @@ static int common_prime[COMMON_PRIME_SIZE] = {
     3, 2
 };
 
-BigInt* DoGetPositiveOddRandBigInt(int byteLen, BigInt* result)
+BigInt* DoGetPositiveOddRandBigInt(int if_fix_len, int byteLen, BigInt* result)
 {
     int i;
     memset(result->bit, 0, BIG_INT_BIT_LEN);
@@ -37,8 +37,13 @@ BigInt* DoGetPositiveOddRandBigInt(int byteLen, BigInt* result)
     /* convert to odd positive integer */
     result->bit[0] = 1;
     result->bit[SIGN_BIT] = 0;
+    /* fix min prime len */
+    if(if_fix_len)
+    {
+        result->bit[SIGN_BIT - 1] = 1;
+    }
 
-    /*  */
+    /*  */  
     return result;
 }
 
@@ -288,7 +293,7 @@ void DoGenPrime(int byteLen, int times, char *file_name)
     fclose(p_prime_file);
 }
 
-char* DoGenRandomPrime(int byteLen, int times, BigInt *result)
+char* DoGenRandomPrime(int if_fix_len, int byteLen, int times, BigInt *result)
 {
     if(byteLen * BYTE_SIZE * 2 > BIG_INT_BIT_LEN)
     {
@@ -305,7 +310,7 @@ char* DoGenRandomPrime(int byteLen, int times, BigInt *result)
     /*  */
     while(1)
     {
-        DoGetPositiveOddRandBigInt(byteLen, result);
+        DoGetPositiveOddRandBigInt(if_fix_len, byteLen, result);
 
         BigIntToStr(result, str_test_num);
 

@@ -59,6 +59,7 @@ void DoGenerateRsaKey(int byteLen, char *key_pair_file)
 	printf("generating rsa key ...\n");
 
 	int i;
+	int fix_len = 1;
 	BigInt p, q, e, d, n, pMinusOne, qMinusOne, l, gcd;
 	BigInt one;
 	char s_result[MAX_STR_SIZE], s_e[MAX_STR_SIZE], s_d[MAX_STR_SIZE], s_n[MAX_STR_SIZE];
@@ -66,11 +67,11 @@ void DoGenerateRsaKey(int byteLen, char *key_pair_file)
 	/*  */
 	StrToBigInt("1", &one);
 
-	DoGenRandomPrime(byteLen, MILLER_RABIN_TEST_TIMES, &p);	
+	DoGenRandomPrime(fix_len, byteLen, MILLER_RABIN_TEST_TIMES, &p);	
 
 	do
 	{
-		DoGenRandomPrime(byteLen, MILLER_RABIN_TEST_TIMES, &q);
+		DoGenRandomPrime(fix_len, byteLen, MILLER_RABIN_TEST_TIMES, &q);
 	}
 	while(DoCompare(&p, &q) == 0);
 
