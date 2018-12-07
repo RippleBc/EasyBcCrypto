@@ -12,7 +12,7 @@ int main()
    
    	BigInt e, d, n;
 
-    DoGenerateRsaKey(1, "key_pair");
+    // DoGenerateRsaKey(1, "key_pair");
 
    	unsigned char dest[MAX_STR_SIZE];
 
@@ -29,5 +29,21 @@ int main()
    		printf("%c", source[i]);
    	}
    	printf("\n");
+
+
+    RsaSign("56", dest, "key_pair");
+    for(i = 0; i < strlen(dest); i++)
+    {
+      printf("%c", dest[i]);
+    }
+    printf("\n");
+
+    RsaVerifySign(dest, source, "key_pair");
+    for(i = 0; i < strlen(source); i++)
+    {
+      printf("%c", source[i]);
+    }
+    printf("\n");
+
     return 0;
 }

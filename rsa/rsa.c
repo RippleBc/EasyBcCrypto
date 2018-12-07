@@ -276,3 +276,93 @@ char *RsaDecrypt(unsigned char *source, unsigned char *dest, char *key_pair_file
 
 	return Crypt(source, dest, &d, &n);
 }
+
+char *RsaSign(unsigned char *source, unsigned char *dest, char *key_pair_file)
+{
+	/*  */
+	char private_file_name[FILE_NAME_LEN];
+	snprintf(private_file_name, FILE_NAME_LEN, "%s_private.rsa",  key_pair_file);
+	FILE *p_private_file;
+	p_private_file = fopen(private_file_name, "rt");
+	if(p_private_file == NULL)
+	{
+		printf("RsaEncrypt, open file %s err\n", private_file_name);
+		exit(1);
+	}
+
+	/*  */
+	char buffer[BIG_INT_BIT_LEN];
+	BigInt d, n;
+	char c;
+	int mark = 0;
+	
+	while((fgets(buffer, BIG_INT_BIT_LEN, p_private_file)) != NULL)
+	{
+		if(mark == 0)
+		{
+			int real_size = strnlen(buffer, BIG_INT_BIT_LEN) - SLASH_N_SIZE;
+			buffer[real_size] = '\0';
+
+			StrToBigInt(buffer, &d);
+		}
+		else
+		{
+			StrToBigInt(buffer, &n);
+		}
+
+		mark++;
+	}
+	if(!feof(p_private_file))
+	{
+		printf("RsaEncrypt, fgets err %s\n", private_file_name);
+		exit(1);
+	}
+	fclose(p_private_file);
+
+	return Crypt(source, dest, &d, &n);
+}
+
+char *RsaVerifySign(unsigned char *source, unsigned char *dest, char *key_pair_file)
+{
+	/*  */
+	char public_file_name[FILE_NAME_LEN];
+	snprintf(public_file_name, FILE_NAME_LEN, "%s_public.rsa",  key_pair_file);
+	FILE *p_public_file;
+	p_public_file = fopen(public_file_name, "rt");
+	if(p_public_file == NULL)
+	{
+		printf("RsaEncrypt, open file %s err\n", public_file_name);
+		exit(1);
+	}
+
+	/*  */
+	char buffer[BIG_INT_BIT_LEN];
+	BigInt e, n;
+	char c;
+	int mark = 0;
+	
+	while((fgets(buffer, BIG_INT_BIT_LEN, p_public_file)) != NULL)
+	{
+		if(mark == 0)
+		{
+			int real_size = strnlen(buffer, BIG_INT_BIT_LEN) - SLASH_N_SIZE;
+			buffer[real_size] = '\0';
+
+			StrToBigInt(buffer, &e);
+		}
+		else
+		{
+			StrToBigInt(buffer, &n);
+		}
+
+		mark++;
+	}
+	if(!feof(p_public_file))
+	{
+		printf("RsaEncrypt, fgets err %s\n", public_file_name);
+		exit(1);
+	}
+	fclose(p_public_file);
+
+	return Crypt(source, dest, &e, &n);
+}
