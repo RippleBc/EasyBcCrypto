@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-g -Wall -lm
 
 #
-SUB_DIRS=cypher mode random rsa
+SUB_DIRS=cypher mode random
 
 #记住当前工程的根目录路径
 ROOT_DIR=$(shell pwd)
