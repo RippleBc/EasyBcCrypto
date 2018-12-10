@@ -7,43 +7,53 @@ static unsigned char source[MAX_STR_SIZE];
 
 int main()
 {
+  // rsa();
 
-    int i, j;
-   
-   	BigInt e, d, n;
+  ecc();
 
-    // DoGenerateRsaKey(1, "key_pair");
+  return 0;
+}
 
-   	unsigned char dest[MAX_STR_SIZE];
+void rsa()
+{
+  int i;
+  
+  // DoGenerateRsaKey(1, "key_pair");
 
-   	RsaEncrypt("56", dest, "key_pair");
-   	for(i = 0; i < strlen(dest); i++)
-   	{
-   		printf("%c", dest[i]);
-   	}
-   	printf("\n");
+  unsigned char dest[MAX_STR_SIZE];
 
-   	RsaDecrypt(dest, source, "key_pair");
-   	for(i = 0; i < strlen(source); i++)
-   	{
-   		printf("%c", source[i]);
-   	}
-   	printf("\n");
+  RsaEncrypt("56", dest, "key_pair");
+  for(i = 0; i < strlen(dest); i++)
+  {
+   printf("%c", dest[i]);
+  }
+  printf("\n");
+
+  RsaDecrypt(dest, source, "key_pair");
+  for(i = 0; i < strlen(source); i++)
+  {
+   printf("%c", source[i]);
+  }
+  printf("\n");
 
 
-    RsaSign("56", dest, "key_pair");
-    for(i = 0; i < strlen(dest); i++)
-    {
-      printf("%c", dest[i]);
-    }
-    printf("\n");
+  RsaSign("56", dest, "key_pair");
+  for(i = 0; i < strlen(dest); i++)
+  {
+    printf("%c", dest[i]);
+  }
+  printf("\n");
 
-    RsaVerifySign(dest, source, "key_pair");
-    for(i = 0; i < strlen(source); i++)
-    {
-      printf("%c", source[i]);
-    }
-    printf("\n");
+  RsaVerifySign(dest, source, "key_pair");
+  for(i = 0; i < strlen(source); i++)
+  {
+    printf("%c", source[i]);
+  }
+  printf("\n");
+}
 
-    return 0;
+void ecc()
+{
+  init_domain_parameters();
+  generate_ecc_key("key_pair");
 }

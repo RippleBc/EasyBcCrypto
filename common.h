@@ -24,6 +24,8 @@
 #define RSA_DEBUG (0)
 #define GENE_D_DEBUG (0)
 
+#define ECC_DEBUG (1)
+
 extern void aes_encrypt(unsigned char *);
 extern void aes_decrypt(unsigned char *);
 

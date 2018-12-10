@@ -11,8 +11,6 @@ BigInt *GeneD(BigInt *e, BigInt *d, BigInt *l)
 	StrToBigInt("1", &one);
 
 	StrToBigInt("0", &y);
-
-
 	
 	while(1)
 	{
