@@ -19,6 +19,8 @@ static const BigInt H; /* n * h = N, n * ( h * p) = 0, G = h * p (p is a random 
 void init_domain_parameters()
 {
 	char s_decimal_p[BIG_INT_BIT_LEN];
+	char s_tmp_1[BIG_INT_BIT_LEN];
+	char s_tmp_2[BIG_INT_BIT_LEN];
 	ChangeStringRadix("fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f", 16, 10, s_decimal_p);
 	StrToBigInt(s_decimal_p, &P);
 
@@ -101,13 +103,13 @@ void generate_ecc_key(char *key_pair_file)
 
 	if(ECC_DEBUG)
 	{
-		BigIntToStr(&X_G, s_tmp_1);
-		BigIntToStr(&Y_G, s_tmp_2);
+		BigIntToStr(&p_x, s_tmp_1);
+		BigIntToStr(&p_y, s_tmp_2);
 		printf("origin p_x: %s\norigin p_y: %s\n\n", s_tmp_1, s_tmp_2);
 
 		printf("private_key: %s\n\n", s_private_key);
 	}
-
+	
 	while(DoCompare(&i, &private_key) < 0)
 	{
 		/* compute slope m */

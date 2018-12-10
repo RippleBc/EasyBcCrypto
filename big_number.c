@@ -642,7 +642,20 @@ int Compare(char* s1, char* s2)
 
 BigInt* DoMod(BigInt* a, BigInt* b, BigInt* remainder)
 {
-    BigInt c;
+    BigInt c, zero;
+
+    StrToBigInt("0", &zero);
+
+    if(DoCompare(b, &zero) < 0)
+    {
+        DoSub(&zero, b, b);
+    }
+
+    /* clock arithmetic */
+    while(DoCompare(a, &zero) < 0)
+    {
+        DoAdd(a, b, a);
+    }
 
     DoDiv(a, b, &c, remainder);
 
