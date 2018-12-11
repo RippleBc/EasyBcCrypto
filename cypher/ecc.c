@@ -8,13 +8,15 @@ y^2 = (x ^ 3 + a * x + b) mod p (p  is a prime)
 #include "../common.h"
 #include <stdio.h>
 
-static const BigInt P;
-static const BigInt A;
-static const BigInt B;
-static const BigInt X_G;
-static const BigInt Y_G;
-static const BigInt N; /* the order of discrete ellipse curve, N * p = 0 (p is a random point which at descrete ellipse curve) */
-static const BigInt H; /* n * h = N, n * ( h * p) = 0, G = h * p (p is a random point which at descrete ellipse curve) */
+static BigInt P;
+static BigInt A;
+static BigInt B;
+static BigInt X_G;
+static BigInt Y_G;
+static BigInt N; /* the order of discrete ellipse curve, N * p = 0 (p is a random point which at descrete ellipse curve) */
+static BigInt H; /* n * h = N, n * ( h * p) = 0, G = h * p (p is a random point which at descrete ellipse curve) */
+
+#define RANDOM_CUSTOM_PARAMETER (0)
 
 void init_domain_parameters()
 {

@@ -18,13 +18,15 @@
 #define SLASH_N_SIZE 1
 
 #define AES_DEBUG (0)
-#define RANDOM_DEBUG (0)
-#define MILLER_RABIN_DEBUG (0)
-#define DO_POW_MOD_DEBUG (0)
-#define RSA_DEBUG (0)
-#define GENE_D_DEBUG (0)
+#define RANDOM_DEBUG (1)
+#define MILLER_RABIN_DEBUG (1)
+#define DO_POW_MOD_DEBUG (1)
+#define RSA_DEBUG (1)
+#define GENE_D_DEBUG (1)
 
 #define ECC_DEBUG (1)
+
+#define MILLER_RABIN_TEST_TIMES 5
 
 extern void aes_encrypt(unsigned char *);
 extern void aes_decrypt(unsigned char *);

@@ -1,8 +1,6 @@
 #include "../common.h"
 #include <stdio.h>
 
-#define MILLER_RABIN_TEST_TIMES 5
-
 BigInt *GeneD(BigInt *e, BigInt *d, BigInt *l)
 {
 	BigInt k, result, zero, one, y, neg_y;
@@ -34,7 +32,6 @@ BigInt *GeneD(BigInt *e, BigInt *d, BigInt *l)
 			{
 				break;
 			}
-
 
 			DoAdd(&y, &one, &y);
 	}
@@ -119,6 +116,11 @@ void DoGenerateRsaKey(int byteLen, char *key_pair_file)
  	}
  	while(DoCompare(&gcd, &one) != 0);
 	BigIntToStr(&e, s_e);
+
+	if(DoCompare(&l, &e) < 0)
+	{
+		printf("a\n");
+	}
 
  	/* generate d */
  	GeneD(&e, &d, &l);

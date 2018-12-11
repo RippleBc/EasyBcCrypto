@@ -10,82 +10,6 @@ static int common_prime[COMMON_PRIME_SIZE] = {
     3, 2
 };
 
-BigInt* DoGetPositiveOddRandBigInt(int if_fix_len, int byteLen, BigInt* result)
-{
-    int i;
-    memset(result->bit, 0, BIG_INT_BIT_LEN);
-    
-    /*  */
-    unsigned char random_byte_sequence[byteLen];
-
-    /*  */
-    get_specified_size_random(random_byte_sequence, byteLen);
-
-    if(RANDOM_DEBUG)
-    {
-        printf("hex odd random result begin\n");
-        for(i = 0; i < byteLen; i++)
-        {
-            printf("%x ", random_byte_sequence[i]);
-        }
-        printf("\nhex odd random result end\n\n");
-    }
-
-    /*  */
-    byteSequenceToBinBigInt(random_byte_sequence, byteLen, result);
-
-    /* convert to odd positive integer */
-    result->bit[0] = 1;
-    result->bit[SIGN_BIT] = 0;
-    /* fix min prime len */
-    if(if_fix_len)
-    {
-        result->bit[byteLen * BYTE_SIZE - 1] = 1;
-    }
-
-    /*  */  
-    return result;
-}
-
-BigInt* DoGetPositiveRand(BigInt *n, BigInt *result)
-{
-    /*  */
-    int i;
-    BigInt tmp;
-
-    /*  */
-    memset(result->bit, 0, BIG_INT_BIT_LEN);
-
-    /*  */
-    int random_byte_sequence_size = floor(BIG_INT_BIT_LEN / BYTE_SIZE);
-    
-    
-    /*  */
-    unsigned char random_byte_sequence[random_byte_sequence_size];
-
-    /*  */
-    get_specified_size_random(random_byte_sequence, random_byte_sequence_size);
-
-    if(RANDOM_DEBUG)
-    {
-        printf("hex random result begin\n");
-        for(i = 0; i < random_byte_sequence_size; i ++)
-        {
-            printf("%x ", random_byte_sequence[i]);
-        }
-        printf("\nhex random result end\n\n");
-    }
-
-    /*  */
-    byteSequenceToBinBigInt(random_byte_sequence, random_byte_sequence_size, &tmp);
-
-    /* convert to positive integer */
-    tmp.bit[SIGN_BIT] = 0;
-
-    /*  */
-    return DoMod(&tmp, n, result);
-}
-
 /*
 
 费马小定理：对于素数p和任意整数a，有a ^ (p-1) = 1 (mod p)（同余）。反过来，满足a ^ (p-1) = 1 (mod p)，p也几乎一定是素数。
@@ -138,7 +62,7 @@ int DoMillerRabin(BigInt *p, int times)
     /*  */
     if(MILLER_RABIN_DEBUG)
     {
-        printf("\np: ");
+        printf("\nDoMillerRabin, p: ");
         BigIntToStr(p, tmp_decimal_big_int);
         for(j = 0; j < strlen(tmp_decimal_big_int); j++)
         {
@@ -146,7 +70,6 @@ int DoMillerRabin(BigInt *p, int times)
         }
         printf("\n");
     }
-    
 
     /* do {times} test, {times} is bigger, more accuracy */
     for(i = 0; i < times; i++)
@@ -159,7 +82,7 @@ int DoMillerRabin(BigInt *p, int times)
         
         if(MILLER_RABIN_DEBUG)
         {
-            printf("base: ");
+            printf("DoMillerRabin, base: ");
             BigIntToStr(&base, tmp_decimal_big_int);
             for(j = 0; j < strlen(tmp_decimal_big_int); j++)
             {
@@ -187,7 +110,7 @@ int DoMillerRabin(BigInt *p, int times)
 
             if(MILLER_RABIN_DEBUG)
             {
-                printf("x: ");
+                printf("DoMillerRabin, x: ");
                 BigIntToStr(&tmp_pMinusOne, tmp_decimal_big_int);
                 for(z = 0; z < strlen(tmp_decimal_big_int); z++)
                 {
@@ -195,7 +118,7 @@ int DoMillerRabin(BigInt *p, int times)
                 }
                 printf("\n");
 
-                printf("result: ");
+                printf("DoMillerRabin, result: ");
                 BigIntToStr(&result, tmp_decimal_big_int);
                 for(z = 0; z < strlen(tmp_decimal_big_int); z++)
                 {

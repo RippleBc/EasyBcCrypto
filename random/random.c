@@ -136,3 +136,84 @@ void get_specified_size_random(unsigned char *random, int size)
 		}
 	}
 }
+
+BigInt* DoGetPositiveOddRandBigInt(int if_fix_len, int byteLen, BigInt* result)
+{
+    int i;
+    memset(result->bit, 0, BIG_INT_BIT_LEN);
+    
+    /*  */
+    unsigned char random_byte_sequence[byteLen];
+
+    /*  */
+    get_specified_size_random(random_byte_sequence, byteLen);
+
+    if(RANDOM_DEBUG)
+    {
+        printf("hex odd random result begin\n");
+        for(i = 0; i < byteLen; i++)
+        {
+            printf("%x ", random_byte_sequence[i]);
+        }
+        printf("\nhex odd random result end\n\n");
+    }
+
+    /*  */
+    byteSequenceToBinBigInt(random_byte_sequence, byteLen, result);
+
+    /* convert to odd positive integer */
+    result->bit[0] = 1;
+    result->bit[SIGN_BIT] = 0;
+    /* fix min prime len */
+    if(if_fix_len)
+    {
+        result->bit[byteLen * BYTE_SIZE - 1] = 1;
+    }
+
+    /*  */  
+    return result;
+}
+
+BigInt* DoGetRand(BigInt *n, BigInt *result)
+{
+	 /*  */
+  int i;
+  BigInt tmp;
+
+  /*  */
+  memset(result->bit, 0, BIG_INT_BIT_LEN);
+
+  /*  */
+  int random_byte_sequence_size = floor(BIG_INT_BIT_LEN / BYTE_SIZE);
+  
+  
+  /*  */
+  unsigned char random_byte_sequence[random_byte_sequence_size];
+
+  /*  */
+  get_specified_size_random(random_byte_sequence, random_byte_sequence_size);
+
+  if(RANDOM_DEBUG)
+  {
+      printf("hex random result begin\n");
+      for(i = 0; i < random_byte_sequence_size; i ++)
+      {
+          printf("%x ", random_byte_sequence[i]);
+      }
+      printf("\nhex random result end\n\n");
+  }
+
+  /*  */
+  byteSequenceToBinBigInt(random_byte_sequence, random_byte_sequence_size, &tmp);
+
+  /*  */
+  return DoMod(&tmp, n, result);
+}
+
+BigInt* DoGetPositiveRand(BigInt *n, BigInt *result)
+{
+	DoGetRand(n, result);
+
+	/* convert to positive integer */
+  result->bit[SIGN_BIT] = 0;
+}

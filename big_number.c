@@ -642,22 +642,32 @@ int Compare(char* s1, char* s2)
 
 BigInt* DoMod(BigInt* a, BigInt* b, BigInt* remainder)
 {
-    BigInt c, zero;
+    BigInt result, zero, left, right;
 
     StrToBigInt("0", &zero);
 
-    if(DoCompare(b, &zero) < 0)
+    CopyBigInt(a, &left);
+    CopyBigInt(b, &right);
+
+    /* check b */
+    if(DoCompare(&right, &zero) == 0)
     {
-        DoSub(&zero, b, b);
+        printf("DoMod, b can not be zero\n");
+        exit(1);
     }
+
+    if(DoCompare(&right, &zero) < 0)
+    {
+        DoSub(&zero, &right, &right);
+    }
+
+    DoDiv(&left, &right, &result, remainder);
 
     /* clock arithmetic */
-    while(DoCompare(a, &zero) < 0)
+    if(DoCompare(&remainder, &zero) < 0)
     {
-        DoAdd(a, b, a);
+        DoAdd(&remainder, &right, &remainder);
     }
-
-    DoDiv(a, b, &c, remainder);
 
     return remainder;
 }
@@ -828,6 +838,16 @@ BigInt *DoExGcd(BigInt *a, BigInt *b, BigInt *x, BigInt *y, BigInt *result)
 {
     if(DoCompare(a, b) < 0)
     {
+        /*  */
+        char tmp[BIG_INT_BIT_LEN];
+        BigIntToStr(a, tmp);
+        printf("DoExGcd, a: %s\n", tmp);
+
+        /*  */
+        BigIntToStr(b, tmp);
+        printf("DoExGcd, b: %s\n", tmp);
+
+        /*  */
         printf("DoExGcd, arg a must bigger than b\n");
         exit(1);
     }

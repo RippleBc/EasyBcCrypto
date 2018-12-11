@@ -7,9 +7,9 @@ static unsigned char source[MAX_STR_SIZE];
 
 int main()
 {
-  // rsa();
+  rsa();
 
-  ecc();
+  // ecc();
 
   return 0;
 }
@@ -18,7 +18,7 @@ void rsa()
 {
   int i;
   
-  // DoGenerateRsaKey(1, "key_pair");
+  DoGenerateRsaKey(1, "key_pair");
 
   unsigned char dest[MAX_STR_SIZE];
 
