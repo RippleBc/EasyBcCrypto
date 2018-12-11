@@ -9,7 +9,7 @@ BigInt *GeneD(BigInt *e, BigInt *d, BigInt *l)
 	StrToBigInt("1", &one);
 
 	StrToBigInt("0", &y);
-	
+
 	while(1)
 	{
 			CopyBigInt(&y, d);
@@ -24,7 +24,7 @@ BigInt *GeneD(BigInt *e, BigInt *d, BigInt *l)
 				DoAdd(&y, &one, &y);
 				continue;
 			}
-			
+
 			DoSub(&zero, &y, &neg_y);
 			CopyBigInt(&neg_y, d);
 			DoExGcd(l, e, &k, d, &result);
@@ -104,7 +104,7 @@ void DoGenerateRsaKey(int byteLen, char *key_pair_file)
 	}
 
  	/* generate e */
- 	do{
+	do{
  		/*  */
  		do
  		{
@@ -116,12 +116,7 @@ void DoGenerateRsaKey(int byteLen, char *key_pair_file)
  	}
  	while(DoCompare(&gcd, &one) != 0);
 	BigIntToStr(&e, s_e);
-
-	if(DoCompare(&l, &e) < 0)
-	{
-		printf("a\n");
-	}
-
+ 	
  	/* generate d */
  	GeneD(&e, &d, &l);
  	BigIntToStr(&d, s_d);
