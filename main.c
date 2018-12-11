@@ -11,7 +11,7 @@ int main()
 {
   // rsa_test();
 
-  // ecc_test();
+  ecc_test();
 
   // sha256_test();
 
@@ -93,5 +93,36 @@ void rsa_test()
 
 void ecc_test()
 {
-  generate_ecc_key(1, "key_pair");
+  /*  */
+  char text[BIG_INT_BIT_LEN] = "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2sy";
+  char r[BIG_INT_BIT_LEN];
+  char s[BIG_INT_BIT_LEN];
+
+  /* sha256 */
+  uint8_t hash[SHA256_BYTES];
+  int i;
+  sha256(text, strnlen(text, BIG_INT_BIT_LEN), hash);
+  printf("text: ");
+  for(i = 0; i < SHA256_BYTES; i++)
+  {
+    printf("%02x ", hash[i]);
+  }
+  printf("\n\n");
+
+  /*  */
+  // GenerateEccKey(1, "key_pair");
+
+  EccSign(1, hash, "key_pair", r, s);
+  printf("r: ");
+  for(i = 0; i < strnlen(r, BIG_INT_BIT_LEN); i++)
+  {
+    printf("%02x ", r[i]);
+  }
+  printf("\n");
+  printf("s: ");
+  for(i = 0; i < strnlen(s, BIG_INT_BIT_LEN); i++)
+  {
+    printf("%02x ", s[i]);
+  }
+  printf("\n\n");
 }
