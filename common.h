@@ -1,3 +1,6 @@
+#ifndef _COMMON_H_
+#define _COMMON_H_
+
 #define NAME_LEN 218
 #define FILE_NAME_LEN 218
 
@@ -100,3 +103,5 @@ extern BigInt* byteSequenceToBinBigInt(unsigned char *, int, BigInt *);
 extern void PrintBigInt(BigInt*);
 extern void PrintBigIntTrueForm(BigInt *);
 extern void PrintNumber(Number *);
+
+#endif

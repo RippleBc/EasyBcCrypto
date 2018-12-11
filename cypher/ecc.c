@@ -106,7 +106,8 @@ void generate_ecc_key(int byteLen, char *key_pair_file)
 	StrToBigInt("0", &i);
 
 	/* init private key */
-	DoGetPositiveRand(&P, &private_key);
+	DoGetPositiveRandBigInt(byteLen, &private_key);
+	DoMod(&private_key, &P, &private_key);
 	BigIntToStr(&private_key, &s_private_key);
 
 	if(ECC_DEBUG)
@@ -223,11 +224,11 @@ void generate_ecc_key(int byteLen, char *key_pair_file)
 	fclose(p_public_file);
 }
 
-void ecc_encrypt(char *key_pair_file)
+void ecc_sign(char *key_pair_file)
 {
 	/*  */
 	char public_file_name[FILE_NAME_LEN];
-	snprintf(public_file_name, FILE_NAME_LEN, "%s_public.rsa",  key_pair_file);
+	snprintf(public_file_name, FILE_NAME_LEN, "%s_public.ecc",  key_pair_file);
 	FILE *p_public_file;
 	p_public_file = fopen(public_file_name, "rt");
 	if(p_public_file == NULL)

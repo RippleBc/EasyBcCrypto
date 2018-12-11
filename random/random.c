@@ -161,6 +161,9 @@ BigInt* DoGetPositiveRandBigInt(int byteLen, BigInt* result)
     /*  */
     byteSequenceToBinBigInt(random_byte_sequence, byteLen, result);
 
+    /* convert to positive integer */
+    result->bit[SIGN_BIT] = 0;
+
     /*  */  
     return result;
 }
@@ -169,9 +172,9 @@ BigInt* DoGetPositiveOddRandBigInt(int if_fix_len, int byteLen, BigInt* result)
 {
     DoGetPositiveRandBigInt(byteLen, result);
 
-    /* convert to odd positive integer */
+    /* convert to odd integer */
     result->bit[0] = 1;
-    result->bit[SIGN_BIT] = 0;
+    
     /* fix min prime len */
     if(if_fix_len)
     {
