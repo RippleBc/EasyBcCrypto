@@ -7,7 +7,7 @@ static unsigned char source[MAX_STR_SIZE];
 
 int main()
 {
-  // rsa();
+  rsa();
 
   ecc();
 

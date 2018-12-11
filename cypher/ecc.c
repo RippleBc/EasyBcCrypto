@@ -1,5 +1,5 @@
 /*
-
+secp256k1
 The curve I've chosen is secp256k1, from SECG (the "Standards for Efficient Cryptography Group", founded by Certicom). This same curve is also used by Bitcoin for digital signatures. 
 y^2 = (x ^ 3 + a * x + b) mod p (p  is a prime)
 
@@ -82,7 +82,7 @@ BigInt *GeneMulReverse(BigInt *a, BigInt *b, BigInt *x, BigInt *mul_reverse)
 	return mul_reverse;
 }
 
-void generate_ecc_key(char *key_pair_file)
+void generate_ecc_key(int byteLen, char *key_pair_file)
 {
 	printf("begin to generate ecc key ...\n");
 
@@ -106,9 +106,7 @@ void generate_ecc_key(char *key_pair_file)
 	StrToBigInt("0", &i);
 
 	/* init private key */
-	// DoGetPositiveRand(&P, &private_key);
-	/* debug */
-	StrToBigInt("5", &private_key);
+	DoGetPositiveRand(&P, &private_key);
 	BigIntToStr(&private_key, &s_private_key);
 
 	if(ECC_DEBUG)
@@ -225,3 +223,45 @@ void generate_ecc_key(char *key_pair_file)
 	fclose(p_public_file);
 }
 
+void ecc_encrypt(char *key_pair_file)
+{
+	/*  */
+	char public_file_name[FILE_NAME_LEN];
+	snprintf(public_file_name, FILE_NAME_LEN, "%s_public.rsa",  key_pair_file);
+	FILE *p_public_file;
+	p_public_file = fopen(public_file_name, "rt");
+	if(p_public_file == NULL)
+	{
+		printf("RsaEncrypt, open file %s err\n", public_file_name);
+		exit(1);
+	}
+
+	/*  */
+	char buffer[BIG_INT_BIT_LEN];
+	BigInt e, n;
+	char c;
+	int mark = 0;
+	
+	while((fgets(buffer, BIG_INT_BIT_LEN, p_public_file)) != NULL)
+	{
+		if(mark == 0)
+		{
+			int real_size = strnlen(buffer, BIG_INT_BIT_LEN) - SLASH_N_SIZE;
+			buffer[real_size] = '\0';
+
+			StrToBigInt(buffer, &e);
+		}
+		else
+		{
+			StrToBigInt(buffer, &n);
+		}
+
+		mark++;
+	}
+	if(!feof(p_public_file))
+	{
+		printf("RsaEncrypt, fgets err %s\n", public_file_name);
+		exit(1);
+	}
+	fclose(p_public_file);
+}

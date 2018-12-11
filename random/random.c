@@ -137,7 +137,7 @@ void get_specified_size_random(unsigned char *random, int size)
 	}
 }
 
-BigInt* DoGetPositiveOddRandBigInt(int if_fix_len, int byteLen, BigInt* result)
+BigInt* DoGetPositiveRandBigInt(int byteLen, BigInt* result)
 {
     int i;
     memset(result->bit, 0, BIG_INT_BIT_LEN);
@@ -160,6 +160,14 @@ BigInt* DoGetPositiveOddRandBigInt(int if_fix_len, int byteLen, BigInt* result)
 
     /*  */
     byteSequenceToBinBigInt(random_byte_sequence, byteLen, result);
+
+    /*  */  
+    return result;
+}
+
+BigInt* DoGetPositiveOddRandBigInt(int if_fix_len, int byteLen, BigInt* result)
+{
+    DoGetPositiveRandBigInt(byteLen, result);
 
     /* convert to odd positive integer */
     result->bit[0] = 1;
