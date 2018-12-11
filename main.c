@@ -7,9 +7,9 @@ static unsigned char source[MAX_STR_SIZE];
 
 int main()
 {
-  rsa();
+  // rsa();
 
-  // ecc();
+  ecc();
 
   return 0;
 }
@@ -54,6 +54,5 @@ void rsa()
 
 void ecc()
 {
-  init_domain_parameters();
   generate_ecc_key("key_pair");
 }

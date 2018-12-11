@@ -16,8 +16,6 @@ static BigInt Y_G;
 static BigInt N; /* the order of discrete ellipse curve, N * p = 0 (p is a random point which at descrete ellipse curve) */
 static BigInt H; /* n * h = N, n * ( h * p) = 0, G = h * p (p is a random point which at descrete ellipse curve) */
 
-#define RANDOM_CUSTOM_PARAMETER (0)
-
 void init_domain_parameters()
 {
 	char s_decimal_p[BIG_INT_BIT_LEN];
@@ -88,21 +86,29 @@ void generate_ecc_key(char *key_pair_file)
 {
 	printf("begin to generate ecc key ...\n");
 
+	init_domain_parameters();
+
 	BigInt tmp_1, tmp_2, m, two, three, p_x, p_y, r_x, r_y, mul_reverse, private_key, x;
-	BigInt i, zero;
+	BigInt i, zero, one;
 
 	StrToBigInt("0", &zero);
+	StrToBigInt("1", &one);
+	StrToBigInt("2", &two);
+	StrToBigInt("3", &three);
 
 	char s_private_key[BIG_INT_BIT_LEN], s_public_key_x[BIG_INT_BIT_LEN], s_public_key_y[BIG_INT_BIT_LEN], s_g_x[BIG_INT_BIT_LEN], s_g_y[BIG_INT_BIT_LEN];
 	char s_tmp_1[BIG_INT_BIT_LEN];
 	char s_tmp_2[BIG_INT_BIT_LEN];
 
-	/*  */
+	/* init origin point */
 	CopyBigInt(&X_G, &p_x);
 	CopyBigInt(&Y_G, &p_y);
 	StrToBigInt("0", &i);
 
-	DoGetPositiveRand(&P, &private_key);
+	/* init private key */
+	// DoGetPositiveRand(&P, &private_key);
+	/* debug */
+	StrToBigInt("5", &private_key);
 	BigIntToStr(&private_key, &s_private_key);
 
 	if(ECC_DEBUG)
@@ -117,15 +123,11 @@ void generate_ecc_key(char *key_pair_file)
 	while(DoCompare(&i, &private_key) < 0)
 	{
 		/* compute slope m */
-		StrToBigInt("2", &two);
-		StrToBigInt("3", &three);
-		/*  */
 		DoPow(&p_x, &two, &tmp_1);
 		DoMul(&three, &tmp_1, &tmp_1);
 		DoAdd(&tmp_1, &A, &tmp_1);
 		/*  */
 		DoMul(&p_y, &two, &tmp_2);
-
 		if(DoCompare(&P, &tmp_2) > 0)
 		{
 			GeneMulReverse(&P, &tmp_2, &x, &mul_reverse);
@@ -134,9 +136,8 @@ void generate_ecc_key(char *key_pair_file)
 		{
 			GeneMulReverse(&tmp_2, &P, &mul_reverse, &x);
 		}
-		
 		/*  */
-		DoMul(&tmp_1, &tmp_2, &tmp_1);
+		DoMul(&tmp_1, &mul_reverse, &tmp_1);
 		DoMod(&tmp_1, &P, &m);
 		if(DoCompare(&m, &zero) < 0)
 		{
@@ -174,6 +175,9 @@ void generate_ecc_key(char *key_pair_file)
 
 			printf("r_x: %s\nr_y: %s\n\n", s_tmp_1, s_tmp_2);
 		}
+
+		/*  */
+		DoAdd(&i, &one, &i);
 	}
 
 	/*  */
@@ -220,3 +224,4 @@ void generate_ecc_key(char *key_pair_file)
 	fclose(p_private_file);
 	fclose(p_public_file);
 }
+
