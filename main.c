@@ -102,7 +102,7 @@ void ecc_test()
   uint8_t hash[SHA256_BYTES];
   int i;
   sha256(text, strnlen(text, BIG_INT_BIT_LEN), hash);
-  printf("text: ");
+  printf("hash: ");
   for(i = 0; i < SHA256_BYTES; i++)
   {
     printf("%02x ", hash[i]);
@@ -112,7 +112,7 @@ void ecc_test()
   /*  */
   // GenerateEccKey(1, "key_pair");
 
-  EccSign(1, hash, "key_pair", r, s);
+  EccSign(1, hash, SHA256_BYTES, "key_pair", r, s);
   printf("r: ");
   for(i = 0; i < strnlen(r, BIG_INT_BIT_LEN); i++)
   {
@@ -125,4 +125,6 @@ void ecc_test()
     printf("%02x ", s[i]);
   }
   printf("\n\n");
+
+  printf("VerifySign: %d\n", EccVerifySign(hash, SHA256_BYTES, "key_pair", r, s));
 }
