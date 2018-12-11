@@ -642,32 +642,18 @@ int Compare(char* s1, char* s2)
 
 BigInt* DoMod(BigInt* a, BigInt* b, BigInt* remainder)
 {
-    BigInt result, zero, left, right;
+    BigInt result, zero;
 
     StrToBigInt("0", &zero);
 
-    CopyBigInt(a, &left);
-    CopyBigInt(b, &right);
-
     /* check b */
-    if(DoCompare(&right, &zero) == 0)
+    if(DoCompare(b, &zero) == 0)
     {
         printf("DoMod, b can not be zero\n");
         exit(1);
     }
 
-    if(DoCompare(&right, &zero) < 0)
-    {
-        DoSub(&zero, &right, &right);
-    }
-
-    DoDiv(&left, &right, &result, remainder);
-
-    /* clock arithmetic */
-    if(DoCompare(&remainder, &zero) < 0)
-    {
-        DoAdd(&remainder, &right, &remainder);
-    }
+    DoDiv(a, b, &result, remainder);
 
     return remainder;
 }

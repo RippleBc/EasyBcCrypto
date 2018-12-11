@@ -89,7 +89,9 @@ void generate_ecc_key(char *key_pair_file)
 	printf("begin to generate ecc key ...\n");
 
 	BigInt tmp_1, tmp_2, m, two, three, p_x, p_y, r_x, r_y, mul_reverse, private_key, x;
-	BigInt i;
+	BigInt i, zero;
+
+	StrToBigInt("0", &zero);
 
 	char s_private_key[BIG_INT_BIT_LEN], s_public_key_x[BIG_INT_BIT_LEN], s_public_key_y[BIG_INT_BIT_LEN], s_g_x[BIG_INT_BIT_LEN], s_g_y[BIG_INT_BIT_LEN];
 	char s_tmp_1[BIG_INT_BIT_LEN];
@@ -136,18 +138,30 @@ void generate_ecc_key(char *key_pair_file)
 		/*  */
 		DoMul(&tmp_1, &tmp_2, &tmp_1);
 		DoMod(&tmp_1, &P, &m);
+		if(DoCompare(&m, &zero) < 0)
+		{
+			DoAdd(&m, &P, &m);
+		}
 
 		/* compute x */
 		DoPow(&m, &two, &tmp_1);
 		DoMul(&p_x, &two, &tmp_2);
 		DoSub(&tmp_1, &tmp_2, &tmp_1);
 		DoMod(&tmp_1, &P, &r_x);
+		if(DoCompare(&r_x, &zero) < 0)
+		{
+			DoAdd(&r_x, &P, &r_x);
+		}
 
 		/* compute y */
 		DoSub(&r_x, &p_x, &tmp_1);
 		DoMul(&tmp_1, &m, &tmp_1);
 		DoAdd(&tmp_1, &p_y, &tmp_1);
 		DoMod(&tmp_1, &P, &r_y);
+		if(DoCompare(&r_y, &zero) < 0)
+		{
+			DoAdd(&r_y, &P, &r_y);
+		}
 
 		/*  */
 		CopyBigInt(&r_x, &p_x);

@@ -212,8 +212,17 @@ BigInt* DoGetRand(BigInt *n, BigInt *result)
 
 BigInt* DoGetPositiveRand(BigInt *n, BigInt *result)
 {
+	BigInt zero;
+
+	StrToBigInt("0", &zero);
+
 	DoGetRand(n, result);
 
 	/* convert to positive integer */
-  result->bit[SIGN_BIT] = 0;
+  if(DoCompare(result, &zero) < 0)
+  {
+  	DoSub(&zero, result, result);
+  }
+
+  return result;
 }
