@@ -7,6 +7,7 @@ y^2 = (x ^ 3 + a * x + b) mod p (p  is a prime)
 
 #include "../common.h"
 #include <stdio.h>
+#include "../hash/sha256.h"
 
 static BigInt P;
 static BigInt A;
@@ -366,8 +367,7 @@ void EccSign(int byteLen, char *s_source, int s_source_len, char *key_pair_file,
 	/* sign */
 	BigInt source, tmp, p_x, p_y, zero, left, right, k, r, s, truncated_hash;
 
-	ChangeStringRadix(s_source, 16, 10, s_source);
-	StrToBigInt(s_source, &source);
+	byteSequenceToBinBigInt(s_source, SHA256_BYTES, &source);
 	StrToBigInt("0", &zero);
 
 	/* compute truncated_hash */
@@ -474,8 +474,7 @@ int EccVerifySign(char *s_source, int s_source_len, char *key_pair_file, char *s
 	/* verify */
 	BigInt source, tmp, truncated_hash, s, r, s_reverse, v1, v2, x_p, y_p, x_q, y_q, result_x, result_y;
 
-	ChangeStringRadix(s_source, 16, 10, s_source);
-	StrToBigInt(s_source, &source);
+	byteSequenceToBinBigInt(s_source, SHA256_BYTES, &source);
 	StrToBigInt(s_s, &s);
 	StrToBigInt(s_r, &r);
 
