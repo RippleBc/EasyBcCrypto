@@ -53,6 +53,12 @@ BigInt *GeneMulReverse(BigInt *a, BigInt *b, BigInt *x, BigInt *mul_reverse)
 
 	StrToBigInt("0", &y);
 	
+	if(DoCompare(a, &zero) <= 0 || DoCompare(b, &zero) <= 0)
+	{
+		printf("GeneMulReverse, a and b must bigger than zero\n");
+		exit(1);
+	}
+
 	while(1)
 	{
 			CopyBigInt(&y, mul_reverse);
