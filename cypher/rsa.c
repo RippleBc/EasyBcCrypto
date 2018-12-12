@@ -1,45 +1,44 @@
 #include "../common.h"
 #include <stdio.h>
 
-BigInt *GeneD(BigInt *e, BigInt *d, BigInt *l)
+BigInt *GeneD(const BigInt *const e, BigInt *d, const BigInt *const l)
 {
-	BigInt k, result, zero, one, y, neg_y;
+	BigInt tmp, i, neg_i, zero, one, result;
 
 	StrToBigInt("0", &zero);
 	StrToBigInt("1", &one);
-
-	StrToBigInt("0", &y);
+	StrToBigInt("0", &i);
 
 	while(1)
 	{
-			CopyBigInt(&y, d);
-			DoExGcd(l, e, &k, d, &result);
+			CopyBigInt(&i, d);
+			DoExGcd(l, e, &tmp, d, &result);
 			if(DoCompare(d, &zero) > 0)
 			{
 				break;
 			}
 
-			if(DoCompare(&y, &zero) == 0)
+			if(DoCompare(&i, &zero) == 0)
 			{
-				DoAdd(&y, &one, &y);
+				DoAdd(&i, &one, &i);
 				continue;
 			}
 
-			DoSub(&zero, &y, &neg_y);
-			CopyBigInt(&neg_y, d);
-			DoExGcd(l, e, &k, d, &result);
+			DoSub(&zero, &i, &neg_i);
+			CopyBigInt(&neg_i, d);
+			DoExGcd(l, e, &tmp, d, &result);
 			if(DoCompare(d, &zero) > 0)
 			{
 				break;
 			}
 
-			DoAdd(&y, &one, &y);
+			DoAdd(&i, &one, &i);
 	}
 	
 	return d;
 }
 
-void DoGenerateRsaKey(int byteLen, char *key_pair_file)
+void DoGenerateRsaKey(const int byteLen, const char *const key_pair_file)
 {
 	printf("generating rsa key ...\n");
 
@@ -171,7 +170,7 @@ void DoGenerateRsaKey(int byteLen, char *key_pair_file)
 	fclose(p_public_file);
 }
 
-static char *Crypt(unsigned char *source, unsigned char *dest, BigInt *key, BigInt *n)
+static char *Crypt(const unsigned char *const source, unsigned char *dest, const BigInt *const key, const BigInt *const n)
 {
 	BigInt s, d;
 
@@ -182,7 +181,7 @@ static char *Crypt(unsigned char *source, unsigned char *dest, BigInt *key, BigI
 	return BigIntToStr(&d, dest);
 }
 
-char *RsaEncrypt(unsigned char *source, unsigned char *dest, char *key_pair_file)
+char *RsaEncrypt(const unsigned char *const source, unsigned char *dest, const char *const key_pair_file)
 {
 	/*  */
 	char public_file_name[FILE_NAME_LEN];
@@ -227,7 +226,7 @@ char *RsaEncrypt(unsigned char *source, unsigned char *dest, char *key_pair_file
 	return Crypt(source, dest, &e, &n);
 }
 
-char *RsaDecrypt(unsigned char *source, unsigned char *dest, char *key_pair_file)
+char *RsaDecrypt(const unsigned char *const source, unsigned char *dest, const char *const key_pair_file)
 {
 	/*  */
 	char private_file_name[FILE_NAME_LEN];
@@ -272,7 +271,7 @@ char *RsaDecrypt(unsigned char *source, unsigned char *dest, char *key_pair_file
 	return Crypt(source, dest, &d, &n);
 }
 
-char *RsaSign(unsigned char *source, unsigned char *dest, char *key_pair_file)
+char *RsaSign(const unsigned char *const source, unsigned char *dest, const char *const key_pair_file)
 {
 	/*  */
 	char private_file_name[FILE_NAME_LEN];
@@ -317,7 +316,7 @@ char *RsaSign(unsigned char *source, unsigned char *dest, char *key_pair_file)
 	return Crypt(source, dest, &d, &n);
 }
 
-char *RsaVerifySign(unsigned char *source, unsigned char *dest, char *key_pair_file)
+char *RsaVerifySign(const unsigned char *const source, unsigned char *dest, const char *const key_pair_file)
 {
 	/*  */
 	char public_file_name[FILE_NAME_LEN];

@@ -9,11 +9,11 @@ static unsigned char source[MAX_STR_SIZE];
 
 int main()
 {
-  // rsa_test();
+  rsa_test();
 
-  ecc_test();
+  // ecc_test();
 
-  // sha256_test();
+  sha256_test();
 
   return 0;
 }

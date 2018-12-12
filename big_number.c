@@ -5,7 +5,7 @@
 #include <math.h>
 #include <time.h>
 
-static char* BinStrToHexStr(char* binStr, char* hexStr)
+static char* BinStrToHexStr(const char *const binStr, char* hexStr)
 {
     int i, j, t;
     Number binNum;
@@ -51,7 +51,7 @@ static char* BinStrToHexStr(char* binStr, char* hexStr)
     return NumberToStr(&hexNum, hexStr);
 }
 
-static BigInt* ToComplement(BigInt *src, BigInt *dst)
+static BigInt* ToComplement(const BigInt *const src, BigInt *dst)
 {
     int i;
 
@@ -93,12 +93,12 @@ static BigInt* ToComplement(BigInt *src, BigInt *dst)
     return dst;
 }
 
-static BigInt* ToTrueForm(BigInt* src, BigInt* dst)
+static BigInt* ToTrueForm(const BigInt *const src, BigInt* dst)
 {
     return ToComplement(src, dst);
 }
 
-static BigInt* ToOppositeNumberComplement(BigInt *src, BigInt *dst)
+static BigInt* ToOppositeNumberComplement(const BigInt *const src, BigInt *dst)
 {
     int i;
 
@@ -126,7 +126,7 @@ static BigInt* ToOppositeNumberComplement(BigInt *src, BigInt *dst)
     return dst;
 }
 
-static BigInt* BinNumToBigInt(Number *binNum, BigInt *a)
+static BigInt* BinNumToBigInt(const Number *const binNum, BigInt *a)
 {
     if(binNum->len > SIGN_BIT)
     {
@@ -163,7 +163,7 @@ static BigInt* BinNumToBigInt(Number *binNum, BigInt *a)
     return ToComplement(a, a);
 }
 
-static Number* BigIntToBinNum(BigInt *a, Number *binNum)
+static Number* BigIntToBinNum(const BigInt *const a, Number *binNum)
 {
     int i;
     BigInt t;
@@ -203,7 +203,7 @@ static Number* BigIntToBinNum(BigInt *a, Number *binNum)
     return binNum;
 }
 
-static int GetTrueValueLen(BigInt* a)
+static int GetTrueValueLen(const BigInt *const a)
 {
     int i;
     BigInt t;
@@ -216,7 +216,7 @@ static int GetTrueValueLen(BigInt* a)
     return i + 1;
 }
 
-char* ChangeStringRadix(char *str, int srcBase, int dstBase, char *resultStr)
+char* ChangeStringRadix(const char *const str, const int srcBase, const int dstBase, char *resultStr)
 {
     if(srcBase != 2 && srcBase != 8 && srcBase != 10 && srcBase != 16)
     {
@@ -305,7 +305,7 @@ char* ChangeStringRadix(char *str, int srcBase, int dstBase, char *resultStr)
     }
 }
 
-BigInt* CopyBigInt(BigInt *src, BigInt *dst)
+BigInt* CopyBigInt(const BigInt *const src, BigInt *dst)
 {
     int i;
     for(i = 0; i < BIG_INT_BIT_LEN; i++)
@@ -315,7 +315,7 @@ BigInt* CopyBigInt(BigInt *src, BigInt *dst)
     return dst;
 }
 
-BigInt* ShiftArithmeticLeft(BigInt *src, int indent, BigInt *dst)
+BigInt* ShiftArithmeticLeft(const BigInt *const src, const int indent, BigInt *dst)
 {
     int i, j;
 
@@ -334,7 +334,7 @@ BigInt* ShiftArithmeticLeft(BigInt *src, int indent, BigInt *dst)
     return dst;
 }
 
-BigInt* ShiftArithmeticRight(BigInt* src, int indent, BigInt* dst)
+BigInt* ShiftArithmeticRight(const BigInt *const src, const int indent, BigInt *dst)
 {
     int i, j;
 
@@ -354,7 +354,7 @@ BigInt* ShiftArithmeticRight(BigInt* src, int indent, BigInt* dst)
     return dst;
 }
 
-BigInt* DoAdd(BigInt* a, BigInt* b, BigInt* result)
+BigInt* DoAdd(const BigInt *const a, const BigInt *const b, BigInt *result)
 {
     int i, t, carryFlag;
 
@@ -382,7 +382,7 @@ BigInt* DoAdd(BigInt* a, BigInt* b, BigInt* result)
     return result;
 }
 
-BigInt* DoSub(BigInt* a, BigInt* b, BigInt* result)
+BigInt* DoSub(const BigInt *const a, const BigInt *const b, BigInt *result)
 {
     BigInt t;
 
@@ -393,7 +393,7 @@ BigInt* DoSub(BigInt* a, BigInt* b, BigInt* result)
 }
 
 /* Booth algorithm */
-BigInt* DoMul(BigInt* a, BigInt* b, BigInt* result)
+BigInt* DoMul(const BigInt *const a, const BigInt const* b, BigInt *result)
 {
     int i;
     BigInt c, t;
@@ -428,7 +428,7 @@ BigInt* DoMul(BigInt* a, BigInt* b, BigInt* result)
     return CopyBigInt(&t, result);
 }
 
-int GetMaxLeftShiftLen(BigInt* a)
+int GetMaxLeftShiftLen(const BigInt *const a)
 {
     int i, k;
     BigInt t;
@@ -441,7 +441,7 @@ int GetMaxLeftShiftLen(BigInt* a)
     return k;
 }
 
-int GetMaxRightShiftLen(BigInt* a)
+int GetMaxRightShiftLen(const BigInt *const a)
 {
     int i;
 
@@ -451,7 +451,7 @@ int GetMaxRightShiftLen(BigInt* a)
     return i;
 }
 
-int IsZero(BigInt* a)
+int IsZero(const BigInt *const a)
 {
     int i;
     for(i = 0; i < BIG_INT_BIT_LEN; i++)
@@ -464,7 +464,7 @@ int IsZero(BigInt* a)
     return 1;
 }
 
-BigInt* DoDiv(BigInt* a, BigInt* b, BigInt* result, BigInt* remainder)
+BigInt* DoDiv(const BigInt *const a, const BigInt *const b, BigInt *result, BigInt *remainder)
 {
     int low, high, mid;
     BigInt c, d, e, t;
@@ -565,7 +565,7 @@ BigInt* DoDiv(BigInt* a, BigInt* b, BigInt* result, BigInt* remainder)
     return ToComplement(&t, result);
 }
 
-char* Add(char* s1, char* s2, char* result)
+char* Add(const char *const s1, const char *const s2, char *result)
 {
     BigInt a, b, c;
     
@@ -576,7 +576,7 @@ char* Add(char* s1, char* s2, char* result)
     return BigIntToStr(&c, result);
 }
 
-char* Sub(char* s1, char* s2, char* result)
+char* Sub(const char *const s1, const char *const s2, char *result)
 {
     BigInt a, b, c;
 
@@ -587,7 +587,7 @@ char* Sub(char* s1, char* s2, char* result)
     return BigIntToStr(&c, result);
 }
 
-char* Mul(char* s1, char* s2, char* result)
+char* Mul(const char *const s1, const char *const s2, char* result)
 {
     BigInt a, b, c;
 
@@ -598,7 +598,7 @@ char* Mul(char* s1, char* s2, char* result)
     return BigIntToStr(&c, result);
 }
 
-char* Div(char* s1, char* s2, char* result, char* remainder)
+char* Div(const char *const s1, const char *const s2, const char *const result, char* remainder)
 {
     BigInt a, b, c, d;
 
@@ -610,7 +610,7 @@ char* Div(char* s1, char* s2, char* result, char* remainder)
     return BigIntToStr(&c, result);
 }
 
-int DoCompare(BigInt* a, BigInt* b)
+int DoCompare(const BigInt *const a, const BigInt *const b)
 {
     BigInt c;
 
@@ -630,7 +630,7 @@ int DoCompare(BigInt* a, BigInt* b)
     }
 }
 
-int Compare(char* s1, char* s2)
+int Compare(const char *const s1, const char *const s2)
 {
     BigInt a, b;
 
@@ -640,7 +640,7 @@ int Compare(char* s1, char* s2)
     return DoCompare(&a, &b);
 }
 
-BigInt* DoMod(BigInt* a, BigInt* b, BigInt* remainder)
+BigInt* DoMod(const BigInt *const a, const BigInt *const b, BigInt* remainder)
 {
     BigInt result, zero;
 
@@ -658,7 +658,7 @@ BigInt* DoMod(BigInt* a, BigInt* b, BigInt* remainder)
     return remainder;
 }
 
-char* Mod(char* s1, char* s2, char* remainder)
+char* Mod(const char *const s1, const char *const s2, char* remainder)
 {
     BigInt a, b, c;
 
@@ -670,7 +670,7 @@ char* Mod(char* s1, char* s2, char* remainder)
 }
 
 /* Notice, do not support negative pow operation */
-BigInt* DoPow(BigInt* a, BigInt* b, BigInt* result)
+BigInt* DoPow(const BigInt *const a, const BigInt *const b, BigInt* result)
 {
     int i, len;
     BigInt t, buf;
@@ -692,7 +692,7 @@ BigInt* DoPow(BigInt* a, BigInt* b, BigInt* result)
     return CopyBigInt(&t, result);
 }
 
-char* Pow(char* s1, char* s2, char* result)
+char* Pow(const char *const s1, const char *const s2, char* result)
 {
     BigInt a, b, c;
 
@@ -709,7 +709,7 @@ char* Pow(char* s1, char* s2, char* result)
 base on formula: (a * b) mod c = (a mod c) * (b mod c) mod c 
 
 */
-BigInt* DoPowMod(BigInt* a, BigInt* b, BigInt* c, BigInt* result)
+BigInt* DoPowMod(const BigInt *const a, const BigInt *const b, const BigInt *const c, BigInt* result)
 {
 
 
@@ -757,7 +757,7 @@ BigInt* DoPowMod(BigInt* a, BigInt* b, BigInt* c, BigInt* result)
     return CopyBigInt(&t, result);
 }
 
-char* PowMod(char* s1, char* s2, char* s3, char* result)
+char* PowMod(const char *const s1, const char *const s2, const char *const s3, char* result)
 {
     BigInt a, b, c, d;
 
@@ -778,7 +778,7 @@ when a mod b == 0, gcd(a, b) = b;
 then gcd(a, b) = gcd(b, a mod b)
 
 */
-BigInt *DoGcd(BigInt *a, BigInt *b, BigInt *result)
+BigInt *DoGcd(const BigInt *const a, const BigInt *const b, BigInt *result)
 {
     BigInt t_a, t_b, remainder, zero;
 
@@ -807,7 +807,7 @@ BigInt *DoGcd(BigInt *a, BigInt *b, BigInt *result)
     return CopyBigInt(&t_a, result);
 }
 
-char *Gcd(char *s1, char *s2, char *result)
+char *Gcd(const char *const s1, const char *const s2, char *result)
 {
     BigInt a, b, c;
 
@@ -820,7 +820,7 @@ char *Gcd(char *s1, char *s2, char *result)
 }
 
 /* notice, a must bigger than b */
-BigInt *DoExGcd(BigInt *a, BigInt *b, BigInt *x, BigInt *y, BigInt *result)
+BigInt *DoExGcd(const BigInt *const a, const BigInt *const b, const BigInt *const x, const BigInt *const y, BigInt *result)
 {
     if(DoCompare(a, b) < 0)
     {
@@ -923,7 +923,7 @@ BigInt *DoExGcd(BigInt *a, BigInt *b, BigInt *x, BigInt *y, BigInt *result)
     return result;
 }
 
-char *ExGcd(char *s_a, char *s_b, char *s_x, char *s_y, char *s_result)
+char *ExGcd(const char *const s_a, const char *const s_b, const char *const s_x, const char *const s_y, char *s_result)
 {
     BigInt a, b, x, y, result;
 
@@ -938,7 +938,7 @@ char *ExGcd(char *s_a, char *s_b, char *s_x, char *s_y, char *s_result)
     return BigIntToStr(&result, s_result);
 }
 
-BigInt *DoLcm(BigInt *a, BigInt *b, BigInt *result)
+BigInt *DoLcm(const BigInt *const a, const BigInt *const b, BigInt *result)
 {
     BigInt gcd, remainder;
 
@@ -949,7 +949,7 @@ BigInt *DoLcm(BigInt *a, BigInt *b, BigInt *result)
     return DoDiv(result, &gcd, result, &remainder);
 }
 
-char *Lcm(char *s1, char *s2, char *result)
+char *Lcm(const char *const s1, const char *const s2, char *result)
 {
     BigInt a, b, c;
 
@@ -961,7 +961,7 @@ char *Lcm(char *s1, char *s2, char *result)
     return BigIntToStr(&c, result);
 }
 
-Number* StrToNumber(char *str, Number *n)
+Number* StrToNumber(const char *const str, Number *n)
 {
     int i, j;
 
@@ -1025,7 +1025,7 @@ Number* StrToNumber(char *str, Number *n)
 }
 
 
-char* NumberToStr(Number *n, char *str)
+char* NumberToStr(const Number *const n, char *str)
 {
     int i = 0, j;
 
@@ -1057,7 +1057,7 @@ char* NumberToStr(Number *n, char *str)
     return str;
 }
 
-BigInt* StrToBigInt(char *s, BigInt *a)
+BigInt* StrToBigInt(const char *const s, BigInt *a)
 {
     char buf[BUFFER_SIZE];
     Number binNum;
@@ -1072,7 +1072,7 @@ BigInt* StrToBigInt(char *s, BigInt *a)
     return BinNumToBigInt(&binNum, a);
 }
 
-char* BigIntToStr(BigInt *a, char *s)
+char* BigIntToStr(const BigInt *const a, char *s)
 {
     char buf[BUFFER_SIZE];
     Number binNum;
@@ -1087,7 +1087,7 @@ char* BigIntToStr(BigInt *a, char *s)
     return ChangeStringRadix(buf, 2, 10, s);
 }
 
-BigInt* byteSequenceToBinBigInt(unsigned char *source, int size_byte, BigInt *bigint)
+BigInt* byteSequenceToBinBigInt(const unsigned char *const source, const int size_byte, BigInt *bigint)
 {
     if(size_byte * BYTE_SIZE > NUMBER_BIT_LEN)
     {
@@ -1119,7 +1119,7 @@ BigInt* byteSequenceToBinBigInt(unsigned char *source, int size_byte, BigInt *bi
     return bigint;
 }
 
-void PrintBigInt(BigInt *a)
+void PrintBigInt(const BigInt *const a)
 {
     int i;
     for(i = SIGN_BIT; i >= 0; i--)
@@ -1129,7 +1129,7 @@ void PrintBigInt(BigInt *a)
     printf("\n");
 }
 
-void PrintBigIntTrueForm(BigInt* a)
+void PrintBigIntTrueForm(const BigInt *const a)
 {
     int i;
     BigInt t;
@@ -1143,7 +1143,7 @@ void PrintBigIntTrueForm(BigInt* a)
     printf("\n");
 }
 
-void PrintNumber(Number *n)
+void PrintNumber(const Number *const n)
 {
     int i;
 
