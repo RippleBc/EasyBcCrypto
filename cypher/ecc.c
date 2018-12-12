@@ -47,15 +47,24 @@ void InitDomainParameters()
 BigInt *GeneMulReverse(const BigInt *const a, const BigInt *const b, BigInt *x, BigInt *y)
 {
 	BigInt result, zero, one, tmp, neg_tmp;
+	char debug_tmp[BIG_INT_BIT_LEN];
 
 	StrToBigInt("0", &zero);
 	StrToBigInt("1", &one);
 
 	StrToBigInt("0", &tmp);
 	
-	if(DoCompare(a, &zero) <= 0 || DoCompare(b, &zero) <= 0)
+	if(DoCompare(a, &zero) <= 0)
 	{
-		printf("GeneMulReverse, a and b must bigger than zero\n");
+		BigIntToStr(a, debug_tmp);
+		printf("\nGeneMulReverse, a must bigger than zero %s\n", debug_tmp);
+		exit(1);
+	}
+
+	if(DoCompare(b, &zero) <= 0)
+	{
+		BigIntToStr(b, debug_tmp);
+		printf("\nGeneMulReverse, b must bigger than zero %s\n", debug_tmp);
 		exit(1);
 	}
 
@@ -251,7 +260,7 @@ static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 	}
 }
 
-void GenerateEccKey(const char *const key_pair_file)
+void GenerateEccKey(const int byteLen, const char *const key_pair_file)
 {
 	printf("begin to generate ecc key ...\n");
 
@@ -268,7 +277,8 @@ void GenerateEccKey(const char *const key_pair_file)
 	BigIntToStr(&Y_G, s_g_y);
 
 	/* init private key */
-	DoGetPositiveRand(&P, &private_key);
+	DoGetPositiveRandBigInt(byteLen, &private_key);
+	DoMod(&private_key, &P, &private_key);
 	BigIntToStr(&private_key, &s_private_key);
 	
 	ComputeMP(&private_key, &p_x, &p_y, &X_G, &Y_G);
