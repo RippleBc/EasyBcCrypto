@@ -261,13 +261,6 @@ void GenerateEccKey(const int byteLen, const char *const key_pair_file)
 	DoGetPositiveRandBigInt(byteLen, &private_key);
 	DoMod(&private_key, &P, &private_key);
 	BigIntToStr(&private_key, &s_private_key);
-
-	if(ECC_DEBUG)
-	{
-		BigIntToStr(&p_x, s_tmp_1);
-		BigIntToStr(&p_y, s_tmp_2);
-		printf("GenerateEccKey, origin_x: %s\norigin_y: %s\n, private_key: %s\n\n", s_tmp_1, s_tmp_2, s_private_key);
-	}
 	
 	ComputeMP(&private_key, &p_x, &p_y, &X_G, &Y_G);
 
@@ -314,7 +307,7 @@ void GenerateEccKey(const int byteLen, const char *const key_pair_file)
 	fclose(p_public_file);
 }
 
-void EccSign(const int byteLen, const char *const s_source, const int s_source_len, const char *const key_pair_file, char *s_r, char *s_s)
+void EccSign(const int byteLen, const char *const s_source, const char *const key_pair_file, char *s_r, char *s_s)
 {
 	printf("begin to sign ...\n");
 
@@ -448,7 +441,7 @@ void EccSign(const int byteLen, const char *const s_source, const int s_source_l
 	BigIntToStr(&s, s_s);
 }
 
-int EccVerifySign(const char *const s_source, const int s_source_len, const char *const key_pair_file, const char *const s_r, const char *const s_s)
+int EccVerifySign(const char *const s_source, const char *const key_pair_file, const char *const s_r, const char *const s_s)
 {
 	InitDomainParameters();
 

@@ -9,9 +9,9 @@ static unsigned char source[MAX_STR_SIZE];
 
 int main()
 {
-  rsa_test();
+  // rsa_test();
 
-  // ecc_test();
+  ecc_test();
 
   // sha256_test();
 
@@ -94,6 +94,9 @@ void rsa_test()
 void ecc_test()
 {
   /*  */
+  GenerateEccKey(1, "key_pair");
+  return;
+  /*  */
   char text[BIG_INT_BIT_LEN] = "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2sy";
   char r[BIG_INT_BIT_LEN];
   char s[BIG_INT_BIT_LEN];
@@ -108,9 +111,6 @@ void ecc_test()
     printf("%02x ", hash[i]);
   }
   printf("\n\n");
-
-  /*  */
-  // GenerateEccKey(1, "key_pair");
 
   EccSign(1, hash, SHA256_BYTES, "key_pair", r, s);
   printf("r: ");
