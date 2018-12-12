@@ -94,7 +94,7 @@ void rsa_test()
 void ecc_test()
 {
   /*  */
-  GenerateEccKey(1, "key_pair");
+  GenerateEccKey("key_pair");
   return;
   /*  */
   char text[BIG_INT_BIT_LEN] = "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2sy";
@@ -112,7 +112,7 @@ void ecc_test()
   }
   printf("\n\n");
 
-  EccSign(1, hash, SHA256_BYTES, "key_pair", r, s);
+  EccSign(1, hash, "key_pair", r, s);
   printf("r: ");
   for(i = 0; i < strnlen(r, BIG_INT_BIT_LEN); i++)
   {
@@ -126,5 +126,5 @@ void ecc_test()
   }
   printf("\n\n");
 
-  printf("VerifySign: %d\n", EccVerifySign(hash, SHA256_BYTES, "key_pair", r, s));
+  printf("VerifySign: %d\n", EccVerifySign(hash, "key_pair", r, s));
 }

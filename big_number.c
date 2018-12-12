@@ -227,7 +227,7 @@ static Number* BigIntToBinNum(const BigInt *const a, Number *binNum)
     return binNum;
 }
 
-static int GetTrueValueLen(const BigInt *const a)
+int GetTrueValueLen(const BigInt *const a)
 {
     int i;
     BigInt t;
