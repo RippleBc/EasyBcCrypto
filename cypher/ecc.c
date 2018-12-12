@@ -7,6 +7,7 @@ y^2 = (x ^ 3 + a * x + b) mod p (p  is a prime)
 
 #include "../common.h"
 #include <stdio.h>
+#include <string.h>
 #include "../hash/sha256.h"
 
 static BigInt P;
@@ -530,6 +531,7 @@ int EccVerifySign(const char *const s_source, const char *const key_pair_file, c
 
 	/* verify */
 	BigInt source, tmp, truncated_hash, s, r, s_reverse, v1, v2, x_p, y_p, x_q, y_q, result_x, result_y;
+	char debug_tmp[BIG_INT_BIT_LEN];
 
 	byteSequenceToBinBigInt(s_source, SHA256_BYTES, &source);
 	StrToBigInt(s_s, &s);
@@ -558,10 +560,24 @@ int EccVerifySign(const char *const s_source, const char *const key_pair_file, c
 
 	/* compute left */
 	ComputeMP(&v1, &x_p, &y_p, &X_G, &Y_G);
+	if(ECC_DEBUG)
+	{
+		BigIntToStr(&x_p, debug_tmp);
+		printf("EccVerifySign, x_p: %s\n\n", debug_tmp);
+		BigIntToStr(&y_p, debug_tmp);
+		printf("EccVerifySign, y_p: %s\n\n", debug_tmp);
+	}
 
 	/* compute right */
 	ComputeMP(&v2, &x_q, &y_q, &public_p_x, &public_p_y);
-
+	if(ECC_DEBUG)
+	{
+		BigIntToStr(&x_q, debug_tmp);
+		printf("EccVerifySign, x_q: %s\n\n", debug_tmp);
+		BigIntToStr(&y_q, debug_tmp);
+		printf("EccVerifySign, y_q: %s\n\n", debug_tmp);
+	}
+	
 	/*  */
 	ComputeXGAddYG(&x_p, &y_p, &x_q, &y_q, &result_x, &result_y);
 

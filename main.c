@@ -113,18 +113,5 @@ void ecc_test()
   printf("\n\n");
 
   EccSign(1, hash, "key_pair", r, s);
-  printf("r: ");
-  for(i = 0; i < strnlen(r, BIG_INT_BIT_LEN); i++)
-  {
-    printf("%02x ", r[i]);
-  }
-  printf("\n");
-  printf("s: ");
-  for(i = 0; i < strnlen(s, BIG_INT_BIT_LEN); i++)
-  {
-    printf("%02x ", s[i]);
-  }
-  printf("\n\n");
-
   printf("VerifySign: %d\n", EccVerifySign(hash, "key_pair", r, s));
 }
