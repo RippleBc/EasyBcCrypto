@@ -110,6 +110,12 @@ static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 	CopyBigInt(origin_x, p_x);
 	CopyBigInt(origin_y, p_y);
 
+	if(ECC_DEBUG)
+	{
+		BigIntToStr(private_key, debug_tmp);
+		printf("ComputeMP, M %s,  begin ", debug_tmp);
+	}
+
 	while(DoCompare(&i, private_key) < 0)
 	{
 		/* compute slope m */
@@ -162,14 +168,17 @@ static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 
 		if(ECC_DEBUG)
 		{
-			BigIntToStr(&r_x, s_tmp_1);
-			BigIntToStr(&r_y, s_tmp_2);
-
-			printf("ComputeMP, r_x: %s\nr_y: %s\n\n", s_tmp_1, s_tmp_2);
+			printf(".");
+			fflush(stdout);
 		}
 
 		/*  */
 		DoAdd(&i, &one, &i);
+	}
+
+	if(ECC_DEBUG)
+	{
+		printf("\n\n");
 	}
 }
 
@@ -257,9 +266,7 @@ void GenerateEccKey(const int byteLen, const char *const key_pair_file)
 	{
 		BigIntToStr(&p_x, s_tmp_1);
 		BigIntToStr(&p_y, s_tmp_2);
-		printf("GenerateEccKey, origin p_x: %s\norigin p_y: %s\n\n", s_tmp_1, s_tmp_2);
-
-		printf("GenerateEccKey, private_key: %s\n\n", s_private_key);
+		printf("GenerateEccKey, origin_x: %s\norigin_y: %s\n, private_key: %s\n\n", s_tmp_1, s_tmp_2, s_private_key);
 	}
 	
 	ComputeMP(&private_key, &p_x, &p_y, &X_G, &Y_G);
@@ -377,7 +384,6 @@ void EccSign(const int byteLen, const char *const s_source, const int s_source_l
 	/* sign */
 	BigInt source, tmp, p_x, p_y, zero, left, right, k, r, s, truncated_hash;
 	char debug_tmp[BIG_INT_BIT_LEN];
-	int i;
 
 	byteSequenceToBinBigInt(s_source, SHA256_BYTES, &source);
 	StrToBigInt("0", &zero);
@@ -396,12 +402,7 @@ void EccSign(const int byteLen, const char *const s_source, const int s_source_l
 			if(ECC_DEBUG)
 			{
 				BigIntToStr(&k, debug_tmp);
-				printf("EccSign, k: ");
-				for(i = 0; i < strnlen(debug_tmp, BIG_INT_BIT_LEN); i++)
-				{
-					printf("%c", debug_tmp[i]);
-				}
-				printf("\n\n");
+				printf("EccSign, k: %s\n\n", debug_tmp);
 			}
 
 			/* compute kG */
@@ -414,12 +415,7 @@ void EccSign(const int byteLen, const char *const s_source, const int s_source_l
 		if(ECC_DEBUG)
 		{
 			BigIntToStr(&r, debug_tmp);
-			printf("EccSign, r: ");
-			for(i = 0; i < strnlen(debug_tmp, BIG_INT_BIT_LEN); i++)
-			{
-				printf("%c", debug_tmp[i]);
-			}
-			printf("\n\n");
+			printf("EccSign, r: %s\n\n", debug_tmp);
 		}
 
 		/* compute k ^ -1 */
@@ -445,12 +441,7 @@ void EccSign(const int byteLen, const char *const s_source, const int s_source_l
 	if(ECC_DEBUG)
 	{
 		BigIntToStr(&s, debug_tmp);
-		printf("EccSign, s: ");
-		for(i = 0; i < strnlen(debug_tmp, BIG_INT_BIT_LEN); i++)
-		{
-			printf("%c", debug_tmp[i]);
-		}
-		printf("\n\n");
+		printf("EccSign, s: %s\n\n", debug_tmp);
 	}
 
 	BigIntToStr(&r, s_r);
