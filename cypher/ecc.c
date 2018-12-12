@@ -190,6 +190,9 @@ static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 	BigInt zero, one, two, three;
 	int i, true_len, init = 0;
 
+	/*debug*/
+	StrToBigInt("6", private_key);
+
 	true_len = GetTrueValueLen(private_key);
 
 	char s_tmp_1[BIG_INT_BIT_LEN];
@@ -206,68 +209,70 @@ static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 	CopyBigInt(origin_y, &t_y);
 
 	/*  */
-	if(ECC_DEBUG)
-	{
-		BigIntToStr(origin_x, debug_tmp);
-		printf("ComputeMP, origin_x %s\n", debug_tmp);
+	// if(ECC_DEBUG)
+	// {
+	// 	BigIntToStr(origin_x, debug_tmp);
+	// 	printf("ComputeMP, origin_x %s\n", debug_tmp);
 
-		BigIntToStr(origin_y, debug_tmp);
-		printf("ComputeMP, origin_y %s\n", debug_tmp);
+	// 	BigIntToStr(origin_y, debug_tmp);
+	// 	printf("ComputeMP, origin_y %s\n", debug_tmp);
 
-		BigIntToStr(private_key, debug_tmp);
-		printf("ComputeMP, M %s, need round %d, begin ", debug_tmp, true_len);
-	}
+	// 	BigIntToStr(private_key, debug_tmp);
+	// 	printf("ComputeMP, M %s, need round %d, begin ", debug_tmp, true_len);
+	// }
 
-	for(i = 0; i < true_len; i++)
-	{
-		if(private_key->bit[i] == 1)
-		{
-			if(init == 0)
-			{
-				CopyBigInt(&t_x, p_x);
-				CopyBigInt(&t_y, p_y);
+	// for(i = 0; i < true_len; i++)
+	// {
+	// 	if(ECC_DEBUG)
+	// 	{
+	// 		BigIntToStr(&t_x, debug_tmp);
+	// 		printf("\nComputeMP, t_x %s\n", debug_tmp);
 
-				init = 1;
+	// 		BigIntToStr(&t_y, debug_tmp);
+	// 		printf("ComputeMP, t_y %s\n", debug_tmp);
+	// 	}
 
-				if(ECC_DEBUG)
-				{
-					BigIntToStr(&t_x, debug_tmp);
-					printf("\nComputeMP, init, t_x %s\n", debug_tmp);
+	// 	if(private_key->bit[i] == 1)
+	// 	{
+	// 		if(init == 0)
+	// 		{
+	// 			CopyBigInt(&t_x, p_x);
+	// 			CopyBigInt(&t_y, p_y);
 
-					BigIntToStr(&t_y, debug_tmp);
-					printf("ComputeMP, init, t_y %s\n", debug_tmp);
-				}
-			}
-			else
-			{
-				if(ECC_DEBUG)
-				{
-					BigIntToStr(&t_x, debug_tmp);
-					printf("ComputeMP, ComputeXGAddYG before, t_x %s\n", debug_tmp);
+	// 			init = 1;
 
-					BigIntToStr(&t_y, debug_tmp);
-					printf("ComputeMP, ComputeXGAddYG before, t_y %s\n", debug_tmp);
+	// 			if(ECC_DEBUG)
+	// 			{
+	// 				BigIntToStr(&t_x, debug_tmp);
+	// 				printf("\nComputeMP, init, p_x %s\n", debug_tmp);
 
-					BigIntToStr(p_x, debug_tmp);
-					printf("ComputeMP, ComputeXGAddYG before, p_x %s\n", debug_tmp);
+	// 				BigIntToStr(&t_y, debug_tmp);
+	// 				printf("ComputeMP, init, p_x %s\n", debug_tmp);
+	// 			}
+	// 		}
+	// 		else
+	// 		{
+	// 			if(ECC_DEBUG)
+	// 			{
+	// 				BigIntToStr(p_x, debug_tmp);
+	// 				printf("ComputeMP, ComputeXGAddYG before, p_x %s\n", debug_tmp);
 
-					BigIntToStr(p_y, debug_tmp);
-					printf("ComputeMP, ComputeXGAddYG before, p_y %s\n", debug_tmp);
-				}
+	// 				BigIntToStr(p_y, debug_tmp);
+	// 				printf("ComputeMP, ComputeXGAddYG before, p_y %s\n", debug_tmp);
+	// 			}
 
-				ComputeXGAddYG(&t_x, &t_y, p_x, p_y, p_x, p_y);
+	// 			ComputeXGAddYG(&t_x, &t_y, p_x, p_y, p_x, p_y);
 
-				if(ECC_DEBUG)
-				{
-					BigIntToStr(p_x, debug_tmp);
-					printf("ComputeMP, ComputeXGAddYG after, p_x %s\n", debug_tmp);
+	// 			if(ECC_DEBUG)
+	// 			{
+	// 				BigIntToStr(p_x, debug_tmp);
+	// 				printf("ComputeMP, ComputeXGAddYG after, p_x %s\n", debug_tmp);
 
-					BigIntToStr(p_y, debug_tmp);
-					printf("ComputeMP, ComputeXGAddYG after, p_y %s\n", debug_tmp);
-				}
-				
-			}
-		}
+	// 				BigIntToStr(p_y, debug_tmp);
+	// 				printf("ComputeMP, ComputeXGAddYG after, p_y %s\n", debug_tmp);
+	// 			}
+	// 		}
+	// 	}
 
 		/************************************************* compute slope m *************************************************/
 		DoPow(&t_x, &two, &tmp_1);
@@ -292,6 +297,15 @@ static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 		{
 			DoAdd(&m, &P, &m);
 		}
+		if(ECC_DEBUG)
+		{
+			BigIntToStr(&mod_inverse, debug_tmp);
+			printf("\nComputeMP, mod_inverse %s\n", debug_tmp);
+
+			BigIntToStr(&m, debug_tmp);
+			printf("\nComputeMP, m %s\n", debug_tmp);
+		}
+
 
 		/* compute x */
 		DoPow(&m, &two, &tmp_1);
@@ -313,6 +327,15 @@ static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 			DoAdd(&r_y, &P, &r_y);
 		}
 
+		if(ECC_DEBUG)
+		{
+			BigIntToStr(&r_x, debug_tmp);
+			printf("\nComputeMP, r_x %s\n", debug_tmp);
+
+			BigIntToStr(&r_y, debug_tmp);
+			printf("ComputeMP, r_y %s\n", debug_tmp);
+		}
+
 		/*  */
 		CopyBigInt(&r_x, &t_x);
 		CopyBigInt(&r_y, &t_y);
@@ -320,10 +343,21 @@ static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 
 		if(ECC_DEBUG)
 		{
+			BigIntToStr(p_x, debug_tmp);
+			printf("ComputeMP, result_x %s\n", debug_tmp);
+
+			BigIntToStr(p_y, debug_tmp);
+			printf("ComputeMP, result_y %s\n", debug_tmp);
+		}
+
+		if(ECC_DEBUG)
+		{
 			printf(".");
 			fflush(stdout);
 		}
 	}
+
+
 
 	if(ECC_DEBUG)
 	{
