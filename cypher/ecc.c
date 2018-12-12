@@ -76,6 +76,7 @@ BigInt *GeneMulReverse(const BigInt *const a, const BigInt *const b, BigInt *x, 
 			
 			DoSub(&zero, &tmp, &neg_tmp);
 			CopyBigInt(&neg_tmp, y);
+
 			DoExGcd(a, b, x, y, &result);
 			if(DoCompare(y, &zero) > 0)
 			{
@@ -89,13 +90,15 @@ BigInt *GeneMulReverse(const BigInt *const a, const BigInt *const b, BigInt *x, 
 	return y;
 }
 
-static void ComputeMG(const BigInt *const private_key, BigInt *p_x, BigInt *p_y, const BigInt *const origin_x, const BigInt *const origin_y)
+static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y, const BigInt *const origin_x, const BigInt *const origin_y)
 {
-	BigInt tmp, tmp_1, tmp_2, m, r_x, r_y;
+	BigInt tmp, tmp_1, tmp_2, mod_inverse, m, r_x, r_y;
 	BigInt i, zero, one, two, three;
+	int j;
 
 	char s_tmp_1[BIG_INT_BIT_LEN];
 	char s_tmp_2[BIG_INT_BIT_LEN];
+	char debug_tmp[BIG_INT_BIT_LEN];
 
 	StrToBigInt("0", &i);
 	StrToBigInt("0", &zero);
@@ -115,17 +118,18 @@ static void ComputeMG(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 		DoAdd(&tmp_1, &A, &tmp_1);
 		/*  */
 		DoMul(p_y, &two, &tmp_2);
+		
 		if(DoCompare(&P, &tmp_2) > 0)
 		{
-			GeneMulReverse(&P, &tmp_2, &tmp, &tmp_2);
+			GeneMulReverse(&P, &tmp_2, &tmp, &mod_inverse);
 		}
 		else
 		{
-			GeneMulReverse(&tmp_2, &P, &tmp_2, &tmp);
+			GeneMulReverse(&tmp_2, &P, &mod_inverse, &tmp);
 		}
 
 		/*  */
-		DoMul(&tmp_1, &tmp_2, &tmp_1);
+		DoMul(&tmp_1, &mod_inverse, &tmp_1);
 		DoMod(&tmp_1, &P, &m);
 		if(DoCompare(&m, &zero) < 0)
 		{
@@ -161,7 +165,7 @@ static void ComputeMG(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 			BigIntToStr(&r_x, s_tmp_1);
 			BigIntToStr(&r_y, s_tmp_2);
 
-			printf("r_x: %s\nr_y: %s\n\n", s_tmp_1, s_tmp_2);
+			printf("ComputeMP, r_x: %s\nr_y: %s\n\n", s_tmp_1, s_tmp_2);
 		}
 
 		/*  */
@@ -171,7 +175,7 @@ static void ComputeMG(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 
 static void ComputeXGAddYG(const BigInt *const x_p, const BigInt *const y_p, const BigInt *const x_q, const BigInt *const y_q, const BigInt *const result_x, BigInt *result_y)
 {
-	BigInt tmp, tmp_1, tmp_2, m;
+	BigInt tmp, tmp_1, tmp_2, m, mod_inverse;
 	BigInt zero, two;
 
 	char s_tmp_1[BIG_INT_BIT_LEN];
@@ -185,14 +189,14 @@ static void ComputeXGAddYG(const BigInt *const x_p, const BigInt *const y_p, con
 	DoSub(&x_p, &x_q, &tmp_2);
 	if(DoCompare(&P, &tmp_2) > 0)
 	{
-		GeneMulReverse(&P, &tmp_2, &tmp, &tmp_2);
+		GeneMulReverse(&P, &tmp_2, &tmp, &mod_inverse);
 	}
 	else
 	{
-		GeneMulReverse(&tmp_2, &P, &tmp_2, &tmp);
+		GeneMulReverse(&tmp_2, &P, &mod_inverse, &tmp);
 	}
 	
-	DoMul(&tmp_1, &tmp_2, &tmp_1);
+	DoMul(&tmp_1, &mod_inverse, &tmp_1);
 	DoMod(&tmp_1, &P, &m);
 	if(DoCompare(&m, &zero) < 0)
 	{
@@ -224,7 +228,7 @@ static void ComputeXGAddYG(const BigInt *const x_p, const BigInt *const y_p, con
 		BigIntToStr(&result_x, s_tmp_1);
 		BigIntToStr(&result_y, s_tmp_2);
 
-		printf("result_x: %s\nresult_y: %s\n\n", s_tmp_1, s_tmp_2);
+		printf("ComputeXGAddYG, result_x: %s\nresult_y: %s\n\n", s_tmp_1, s_tmp_2);
 	}
 }
 
@@ -253,12 +257,12 @@ void GenerateEccKey(const int byteLen, const char *const key_pair_file)
 	{
 		BigIntToStr(&p_x, s_tmp_1);
 		BigIntToStr(&p_y, s_tmp_2);
-		printf("origin p_x: %s\norigin p_y: %s\n\n", s_tmp_1, s_tmp_2);
+		printf("GenerateEccKey, origin p_x: %s\norigin p_y: %s\n\n", s_tmp_1, s_tmp_2);
 
-		printf("private_key: %s\n\n", s_private_key);
+		printf("GenerateEccKey, private_key: %s\n\n", s_private_key);
 	}
 	
-	ComputeMG(&private_key, &p_x, &p_y, &X_G, &Y_G);
+	ComputeMP(&private_key, &p_x, &p_y, &X_G, &Y_G);
 
 	/*  */
 	BigIntToStr(&p_x, s_public_key_x);
@@ -372,6 +376,8 @@ void EccSign(const int byteLen, const char *const s_source, const int s_source_l
 
 	/* sign */
 	BigInt source, tmp, p_x, p_y, zero, left, right, k, r, s, truncated_hash;
+	char debug_tmp[BIG_INT_BIT_LEN];
+	int i;
 
 	byteSequenceToBinBigInt(s_source, SHA256_BYTES, &source);
 	StrToBigInt("0", &zero);
@@ -386,12 +392,35 @@ void EccSign(const int byteLen, const char *const s_source, const int s_source_l
 			/* init k */
 			DoGetPositiveRandBigInt(byteLen, &k);
 			DoMod(&k, &P, &k);
+
+			if(ECC_DEBUG)
+			{
+				BigIntToStr(&k, debug_tmp);
+				printf("EccSign, k: ");
+				for(i = 0; i < strnlen(debug_tmp, BIG_INT_BIT_LEN); i++)
+				{
+					printf("%c", debug_tmp[i]);
+				}
+				printf("\n\n");
+			}
+
 			/* compute kG */
-			ComputeMG(&k, &p_x, &p_y, &X_G, &Y_G);
+			ComputeMP(&k, &p_x, &p_y, &X_G, &Y_G);
 			/* compute r */
 			DoMod(&p_x, &N, &r);
 		}
 		while(DoCompare(&r, &zero) == 0);
+
+		if(ECC_DEBUG)
+		{
+			BigIntToStr(&r, debug_tmp);
+			printf("EccSign, r: ");
+			for(i = 0; i < strnlen(debug_tmp, BIG_INT_BIT_LEN); i++)
+			{
+				printf("%c", debug_tmp[i]);
+			}
+			printf("\n\n");
+		}
 
 		/* compute k ^ -1 */
 		if(DoCompare(&k, &N) > 0)
@@ -412,6 +441,17 @@ void EccSign(const int byteLen, const char *const s_source, const int s_source_l
 		DoMod(&tmp, &N, &s);
 	}
 	while(DoCompare(&s, &zero) == 0);
+
+	if(ECC_DEBUG)
+	{
+		BigIntToStr(&s, debug_tmp);
+		printf("EccSign, s: ");
+		for(i = 0; i < strnlen(debug_tmp, BIG_INT_BIT_LEN); i++)
+		{
+			printf("%c", debug_tmp[i]);
+		}
+		printf("\n\n");
+	}
 
 	BigIntToStr(&r, s_r);
 	BigIntToStr(&s, s_s);
@@ -506,10 +546,10 @@ int EccVerifySign(const char *const s_source, const int s_source_len, const char
 	DoMod(&tmp, &N, &v2);
 
 	/* compute left */
-	ComputeMG(&v1, &x_p, &y_p, &X_G, &Y_G);
+	ComputeMP(&v1, &x_p, &y_p, &X_G, &Y_G);
 
 	/* compute right */
-	ComputeMG(&v2, &x_q, &y_q, &public_p_x, &public_p_y);
+	ComputeMP(&v2, &x_q, &y_q, &public_p_x, &public_p_y);
 
 	/*  */
 	ComputeXGAddYG(&x_p, &y_p, &x_q, &y_q, &result_x, &result_y);
