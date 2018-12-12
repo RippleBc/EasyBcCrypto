@@ -118,6 +118,11 @@ static void ComputeXGAddYG(const BigInt *const _x_p, const BigInt *const _y_p, c
 	/* compute slope m */
 	DoSub(&y_p, &y_q, &tmp_1);
 	DoSub(&x_p, &x_q, &tmp_2);
+	if(DoCompare(&tmp_2, &zero) < 0)
+	{
+		DoSub(&zero, &tmp_2, &tmp_2);
+	}
+
 	if(DoCompare(&P, &tmp_2) > 0)
 	{
 		GeneMulReverse(&P, &tmp_2, &tmp, &mod_inverse);
@@ -160,7 +165,7 @@ static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 {
 	BigInt t_x, t_y, tmp, tmp_1, tmp_2, mod_inverse, m, r_x, r_y;
 	BigInt zero, one, two, three;
-	int i, true_len;
+	int i, true_len, init = 0;
 
 	true_len = GetTrueValueLen(private_key);
 
@@ -177,6 +182,7 @@ static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 	CopyBigInt(origin_x, &t_x);
 	CopyBigInt(origin_y, &t_y);
 
+	/*  */
 	if(ECC_DEBUG)
 	{
 		BigIntToStr(private_key, debug_tmp);
@@ -187,10 +193,12 @@ static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 	{
 		if(private_key->bit[i] == 1)
 		{
-			if(i == 0)
+			if(init == 0)
 			{
 				CopyBigInt(&t_x, p_x);
 				CopyBigInt(&t_y, p_y);
+
+				init = 1;
 			}
 			else
 			{

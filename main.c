@@ -94,8 +94,8 @@ void rsa_test()
 void ecc_test()
 {
   /*  */
-  GenerateEccKey(256, "key_pair");
-  return;
+  // GenerateEccKey(1, "key_pair");
+  // return;
   /*  */
   char text[BIG_INT_BIT_LEN] = "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2sy";
   char r[BIG_INT_BIT_LEN];
