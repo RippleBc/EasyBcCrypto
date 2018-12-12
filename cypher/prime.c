@@ -31,7 +31,7 @@ Miller-Rabin测试：不断选取不超过p-1的基a(s次)，计算是否每次�
 (a * c) ≡ (b * d) (%p)，(a / c) ≡ (b / d) (%p)； 
 
 */
-int DoMillerRabin(BigInt *p, int times)
+int DoMillerRabin(const BigInt *const p, const int times)
 {
     int i, j, z, miller_rabin_max_test_time;
     BigInt result, base;
@@ -143,7 +143,7 @@ int DoMillerRabin(BigInt *p, int times)
     return 1;
 }
 
-int MillerRabin(char *source, int times)
+int MillerRabin(const char *const source, const int times)
 {
     BigInt bi;
     StrToBigInt(source, &bi);
@@ -151,7 +151,7 @@ int MillerRabin(char *source, int times)
     return DoMillerRabin(&bi, times);
 }
 
-void DoGenPrime(int byteLen, int times, char *file_name)
+void DoGenPrime(const int byteLen, const int times, const char *const file_name)
 {
     if(byteLen * BYTE_SIZE * 2 > BIG_INT_BIT_LEN)
     {
@@ -216,7 +216,7 @@ void DoGenPrime(int byteLen, int times, char *file_name)
     fclose(p_prime_file);
 }
 
-char* DoGenRandomPrime(int if_fix_len, int byteLen, int times, BigInt *result)
+char* DoGenRandomPrime(const int if_fix_len, const int byteLen, const int times, BigInt *result)
 {
     if(byteLen * BYTE_SIZE * 2 > BIG_INT_BIT_LEN)
     {

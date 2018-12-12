@@ -3,7 +3,7 @@
 static unsigned char tmp[AES_GROUP_SIZE];
 
 // notice, at OFB mode, encrypt twice is same to decrypt
-static void crypt(unsigned char *source, int size)
+static void crypt(unsigned char *source, const int size)
 {
 	int i, j;
 
@@ -25,12 +25,12 @@ static void crypt(unsigned char *source, int size)
 	}
 }
 
-void aes_ofb_encrypt(unsigned char *source, int size)
+void aes_ofb_encrypt(unsigned char *source, const int size)
 {
 	crypt(source, size);
 }
 
-void aes_ofb_decrypt(unsigned char *source, int size)
+void aes_ofb_decrypt(unsigned char *source, const int size)
 {
 	crypt(source, size);
 }

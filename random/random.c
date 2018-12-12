@@ -30,7 +30,7 @@ static unsigned char init_state_pool[INIT_STATE_POOL_SIZE] = {
 	0x0f, 0x1f, 0x2f, 0x3f, 0x6f, 0x5f, 0x4f, 0x7f, 0x8f, 0x38, 0xaf, 0xbf, 0xcf, 0xdf, 0xef, 0xff
 };
 
-static void get_random(unsigned char *state, unsigned char *random, int size)
+static void get_random(unsigned char *state, unsigned char *random, const int size)
 {
 	int i;
 	unsigned char *p_time;
@@ -90,7 +90,7 @@ static void get_random(unsigned char *state, unsigned char *random, int size)
 	aes_cfb_encrypt(state, AES_GROUP_SIZE);
 }
 
-void get_specified_size_random(unsigned char *random, int size)
+void get_specified_size_random(unsigned char *random, const int size)
 {
 	int i, j;
 	int state_start_index;
@@ -137,7 +137,7 @@ void get_specified_size_random(unsigned char *random, int size)
 	}
 }
 
-BigInt* DoGetPositiveRandBigInt(int byteLen, BigInt* result)
+BigInt* DoGetPositiveRandBigInt(const int byteLen, BigInt *result)
 {
     int i;
     memset(result->bit, 0, BIG_INT_BIT_LEN);
@@ -168,7 +168,7 @@ BigInt* DoGetPositiveRandBigInt(int byteLen, BigInt* result)
     return result;
 }
 
-BigInt* DoGetPositiveOddRandBigInt(int if_fix_len, int byteLen, BigInt* result)
+BigInt* DoGetPositiveOddRandBigInt(const int if_fix_len, const int byteLen, BigInt* result)
 {
     DoGetPositiveRandBigInt(byteLen, result);
 
@@ -185,7 +185,7 @@ BigInt* DoGetPositiveOddRandBigInt(int if_fix_len, int byteLen, BigInt* result)
     return result;
 }
 
-BigInt* DoGetRand(BigInt *n, BigInt *result)
+BigInt* DoGetRand(const BigInt *const n, BigInt *result)
 {
 	 /*  */
   int i;
@@ -221,7 +221,7 @@ BigInt* DoGetRand(BigInt *n, BigInt *result)
   return DoMod(&tmp, n, result);
 }
 
-BigInt* DoGetPositiveRand(BigInt *n, BigInt *result)
+BigInt* DoGetPositiveRand(const BigInt *const n, BigInt *result)
 {
 	BigInt zero;
 

@@ -39,16 +39,16 @@ extern void des_decrypt(unsigned char *);
 
 const extern unsigned char init_vector[];
 
-extern void aes_cbc_encrypt(unsigned char *, int);
-extern void aes_cbc_decrypt(unsigned char *, int);
+extern void aes_cbc_encrypt(unsigned char *, const int);
+extern void aes_cbc_decrypt(unsigned char *, const int);
 
-extern void aes_cfb_encrypt(unsigned char *, int);
-extern void aes_cfb_decrypt(unsigned char *, int);
+extern void aes_cfb_encrypt(unsigned char *, const int);
+extern void aes_cfb_decrypt(unsigned char *, const int);
 
-extern void aes_ofb_encrypt(unsigned char *, int);
-extern void aes_ofb_decrypt(unsigned char *, int);
+extern void aes_ofb_encrypt(unsigned char *, const int);
+extern void aes_ofb_decrypt(unsigned char *, const int);
 
-void get_specified_size_random(unsigned char *, int);
+extern void get_specified_size_random(unsigned char *, const int);
 
 
 #define BIG_INT_BIT_LEN 4096
