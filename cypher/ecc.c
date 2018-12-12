@@ -44,14 +44,14 @@ void InitDomainParameters()
 	StrToBigInt("1", &H);
 }
 
-BigInt *GeneMulReverse(BigInt *a, BigInt *b, BigInt *x, BigInt *mul_reverse)
+BigInt *GeneMulReverse(const BigInt *const a, const BigInt *const b, BigInt *x, BigInt *y)
 {
-	BigInt result, zero, one, y, neg_y;
+	BigInt result, zero, one, tmp, neg_tmp;
 
 	StrToBigInt("0", &zero);
 	StrToBigInt("1", &one);
 
-	StrToBigInt("0", &y);
+	StrToBigInt("0", &tmp);
 	
 	if(DoCompare(a, &zero) <= 0 || DoCompare(b, &zero) <= 0)
 	{
@@ -61,35 +61,35 @@ BigInt *GeneMulReverse(BigInt *a, BigInt *b, BigInt *x, BigInt *mul_reverse)
 
 	while(1)
 	{
-			CopyBigInt(&y, mul_reverse);
-			DoExGcd(a, b, x, mul_reverse, &result);
-			if(DoCompare(mul_reverse, &zero) > 0)
+			CopyBigInt(&tmp, y);
+			DoExGcd(a, b, x, y, &result);
+			if(DoCompare(y, &zero) > 0)
 			{
 				break;
 			}
 
-			if(DoCompare(&y, &zero) == 0)
+			if(DoCompare(&tmp, &zero) == 0)
 			{
-				DoAdd(&y, &one, &y);
+				DoAdd(&tmp, &one, &tmp);
 				continue;
 			}
 			
-			DoSub(&zero, &y, &neg_y);
-			CopyBigInt(&neg_y, mul_reverse);
-			DoExGcd(a, b, x, mul_reverse, &result);
-			if(DoCompare(mul_reverse, &zero) > 0)
+			DoSub(&zero, &tmp, &neg_tmp);
+			CopyBigInt(&neg_tmp, y);
+			DoExGcd(a, b, x, y, &result);
+			if(DoCompare(y, &zero) > 0)
 			{
 				break;
 			}
 
 
-			DoAdd(&y, &one, &y);
+			DoAdd(&tmp, &one, &tmp);
 	}
 	
-	return mul_reverse;
+	return y;
 }
 
-static void ComputeMG(BigInt *private_key, BigInt *p_x, BigInt *p_y, BigInt *origin_x, BigInt *origin_y)
+static void ComputeMG(const BigInt *const private_key, BigInt *p_x, BigInt *p_y, const BigInt *const origin_x, const BigInt *const origin_y)
 {
 	BigInt tmp, tmp_1, tmp_2, m, r_x, r_y;
 	BigInt i, zero, one, two, three;
@@ -169,7 +169,7 @@ static void ComputeMG(BigInt *private_key, BigInt *p_x, BigInt *p_y, BigInt *ori
 	}
 }
 
-static void ComputeXGAddYG(BigInt *x_p, BigInt *y_p, BigInt *x_q, BigInt *y_q, BigInt *result_x, BigInt *result_y)
+static void ComputeXGAddYG(const BigInt *const x_p, const BigInt *const y_p, const BigInt *const x_q, const BigInt *const y_q, const BigInt *const result_x, BigInt *result_y)
 {
 	BigInt tmp, tmp_1, tmp_2, m;
 	BigInt zero, two;
@@ -228,7 +228,7 @@ static void ComputeXGAddYG(BigInt *x_p, BigInt *y_p, BigInt *x_q, BigInt *y_q, B
 	}
 }
 
-void GenerateEccKey(int byteLen, char *key_pair_file)
+void GenerateEccKey(const int byteLen, const char *const key_pair_file)
 {
 	printf("begin to generate ecc key ...\n");
 
@@ -303,7 +303,7 @@ void GenerateEccKey(int byteLen, char *key_pair_file)
 	fclose(p_public_file);
 }
 
-void EccSign(int byteLen, char *s_source, int s_source_len, char *key_pair_file, char *s_r, char *s_s)
+void EccSign(const int byteLen, const char *const s_source, const int s_source_len, const char *const key_pair_file, char *s_r, char *s_s)
 {
 	printf("begin to sign ...\n");
 
@@ -417,7 +417,7 @@ void EccSign(int byteLen, char *s_source, int s_source_len, char *key_pair_file,
 	BigIntToStr(&s, s_s);
 }
 
-int EccVerifySign(char *s_source, int s_source_len, char *key_pair_file, char *s_r, char *s_s)
+int EccVerifySign(const char *const s_source, const int s_source_len, const char *const key_pair_file, const char *const s_r, const char *const s_s)
 {
 	InitDomainParameters();
 
