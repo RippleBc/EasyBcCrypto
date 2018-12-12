@@ -86,7 +86,7 @@ extern BigInt* DoDiv(const BigInt *const, const BigInt *const, BigInt *, BigInt 
 extern char* Add(const char *const, const char *const, char *);
 extern char* Sub(const char *const, const char *const, char *);
 extern char* Mul(const char *const, const char *const, char *);
-extern char* Div(const char *const, const char *const, const char *const, char *);
+extern char* Div(const char *const, const char *const, char *, char *);
 extern int DoCompare(const BigInt *const, const BigInt *const);
 extern int Compare(const char *const, const char *const); 
 extern BigInt* DoMod(const BigInt *const, const BigInt *const, BigInt *);
