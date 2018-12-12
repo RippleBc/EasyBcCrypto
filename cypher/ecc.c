@@ -175,6 +175,11 @@ static void ComputeXGAddYG(const BigInt *const _x_p, const BigInt *const _y_p, c
 	{
 		DoAdd(&m, &P, &m);
 	}
+	if(ECC_DEBUG)
+	{
+		BigIntToStr(&m, debug_tmp);
+		printf("\nComputeXGAddYG, m %s\n", debug_tmp);
+	}
 
 	/* compute x */
 	DoPow(&m, &two, &tmp_1);
@@ -307,6 +312,11 @@ static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 		if(DoCompare(&m, &zero) < 0)
 		{
 			DoAdd(&m, &P, &m);
+		}
+		if(ECC_DEBUG)
+		{
+			BigIntToStr(&m, debug_tmp);
+			printf("\nComputeMP, m %s\n", debug_tmp);
 		}
 
 		/* compute x */
