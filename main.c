@@ -94,24 +94,24 @@ void rsa_test()
 void ecc_test()
 {
   /*  */
-  // GenerateEccKey(1, "key_pair");
-  // return;
+  GenerateEccKey(1, "key_pair");
+  return;
   /*  */
-  char text[BIG_INT_BIT_LEN] = "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2sy";
-  char r[BIG_INT_BIT_LEN];
-  char s[BIG_INT_BIT_LEN];
+  // char text[BIG_INT_BIT_LEN] = "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2sy";
+  // char r[BIG_INT_BIT_LEN];
+  // char s[BIG_INT_BIT_LEN];
 
-  /* sha256 */
-  uint8_t hash[SHA256_BYTES];
-  int i;
-  sha256(text, strnlen(text, BIG_INT_BIT_LEN), hash);
-  printf("hash: ");
-  for(i = 0; i < SHA256_BYTES; i++)
-  {
-    printf("%02x ", hash[i]);
-  }
-  printf("\n\n");
+  // /* sha256 */
+  // uint8_t hash[SHA256_BYTES];
+  // int i;
+  // sha256(text, strnlen(text, BIG_INT_BIT_LEN), hash);
+  // printf("hash: ");
+  // for(i = 0; i < SHA256_BYTES; i++)
+  // {
+  //   printf("%02x ", hash[i]);
+  // }
+  // printf("\n\n");
 
-  EccSign(1, hash, "key_pair", r, s);
-  printf("VerifySign: %d\n", EccVerifySign(hash, "key_pair", r, s));
+  // EccSign(1, hash, "key_pair", r, s);
+  // printf("VerifySign: %d\n", EccVerifySign(hash, "key_pair", r, s));
 }

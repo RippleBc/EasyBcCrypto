@@ -18,31 +18,53 @@ static BigInt Y_G;
 static BigInt N; /* the order of discrete ellipse curve, N * p = 0 (p is a random point which at descrete ellipse curve) */
 static BigInt H; /* n * h = N, n * ( h * p) = 0, G = h * p (p is a random point which at descrete ellipse curve) */
 
+// char PARA[7][BIG_INT_BIT_LEN] =
+// {
+// 	"fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f",
+// 	"0",
+// 	"7",
+// 	"79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+// 	"483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8",
+// 	"fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141",
+// 	"1"
+// };
+
+char PARA[7][BIG_INT_BIT_LEN] =
+{
+	"61",
+	"2",
+	"3",
+	"3",
+	"6",
+	"5",
+	"1"
+};
+
 void InitDomainParameters()
 {
 	char s_decimal_p[BIG_INT_BIT_LEN];
 	char s_tmp_1[BIG_INT_BIT_LEN];
 	char s_tmp_2[BIG_INT_BIT_LEN];
-	ChangeStringRadix("fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f", 16, 10, s_decimal_p);
+	ChangeStringRadix(PARA[0], 16, 10, s_decimal_p);
 	StrToBigInt(s_decimal_p, &P);
 
-	StrToBigInt("0", &A);
+	StrToBigInt(PARA[1], &A);
 
-	StrToBigInt("7", &B);
+	StrToBigInt(PARA[2], &B);
 
 	char s_decimal_x_g[BIG_INT_BIT_LEN];
-	ChangeStringRadix("79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798", 16, 10, s_decimal_x_g);
+	ChangeStringRadix(PARA[3], 16, 10, s_decimal_x_g);
 	StrToBigInt(s_decimal_x_g, &X_G);
 
 	char s_decimal_y_g[BIG_INT_BIT_LEN];
-	ChangeStringRadix("483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8", 16, 10, s_decimal_y_g);
+	ChangeStringRadix(PARA[4], 16, 10, s_decimal_y_g);
 	StrToBigInt(s_decimal_y_g, &Y_G);
 
 	char s_decimal_n[BIG_INT_BIT_LEN];
-	ChangeStringRadix("fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141", 16, 10, s_decimal_n);
+	ChangeStringRadix(PARA[5], 16, 10, s_decimal_n);
 	StrToBigInt(s_decimal_n, &N);
 
-	StrToBigInt("1", &H);
+	StrToBigInt(PARA[6], &H);
 }
 
 BigInt *GeneMulReverse(const BigInt *const a, const BigInt *const b, BigInt *x, BigInt *y)
@@ -186,6 +208,12 @@ static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 	/*  */
 	if(ECC_DEBUG)
 	{
+		BigIntToStr(origin_x, debug_tmp);
+		printf("ComputeMP, origin_x %s\n", debug_tmp);
+
+		BigIntToStr(origin_y, debug_tmp);
+		printf("ComputeMP, origin_y %s\n", debug_tmp);
+
 		BigIntToStr(private_key, debug_tmp);
 		printf("ComputeMP, M %s, need round %d, begin ", debug_tmp, true_len);
 	}
@@ -200,10 +228,44 @@ static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 				CopyBigInt(&t_y, p_y);
 
 				init = 1;
+
+				if(ECC_DEBUG)
+				{
+					BigIntToStr(&t_x, debug_tmp);
+					printf("\nComputeMP, init, t_x %s\n", debug_tmp);
+
+					BigIntToStr(&t_y, debug_tmp);
+					printf("ComputeMP, init, t_y %s\n", debug_tmp);
+				}
 			}
 			else
 			{
+				if(ECC_DEBUG)
+				{
+					BigIntToStr(&t_x, debug_tmp);
+					printf("ComputeMP, ComputeXGAddYG before, t_x %s\n", debug_tmp);
+
+					BigIntToStr(&t_y, debug_tmp);
+					printf("ComputeMP, ComputeXGAddYG before, t_y %s\n", debug_tmp);
+
+					BigIntToStr(p_x, debug_tmp);
+					printf("ComputeMP, ComputeXGAddYG before, p_x %s\n", debug_tmp);
+
+					BigIntToStr(p_y, debug_tmp);
+					printf("ComputeMP, ComputeXGAddYG before, p_y %s\n", debug_tmp);
+				}
+
 				ComputeXGAddYG(&t_x, &t_y, p_x, p_y, p_x, p_y);
+
+				if(ECC_DEBUG)
+				{
+					BigIntToStr(p_x, debug_tmp);
+					printf("ComputeMP, ComputeXGAddYG after, p_x %s\n", debug_tmp);
+
+					BigIntToStr(p_y, debug_tmp);
+					printf("ComputeMP, ComputeXGAddYG after, p_y %s\n", debug_tmp);
+				}
+				
 			}
 		}
 
@@ -287,7 +349,7 @@ void GenerateEccKey(const int byteLen, const char *const key_pair_file)
 
 	/* init private key */
 	DoGetPositiveRandBigInt(byteLen, &private_key);
-	DoMod(&private_key, &P, &private_key);
+	DoMod(&private_key, &N, &private_key);
 	BigIntToStr(&private_key, &s_private_key);
 	
 	ComputeMP(&private_key, &p_x, &p_y, &X_G, &Y_G);
@@ -577,7 +639,7 @@ int EccVerifySign(const char *const s_source, const char *const key_pair_file, c
 		BigIntToStr(&y_q, debug_tmp);
 		printf("EccVerifySign, y_q: %s\n\n", debug_tmp);
 	}
-	
+
 	/*  */
 	ComputeXGAddYG(&x_p, &y_p, &x_q, &y_q, &result_x, &result_y);
 
