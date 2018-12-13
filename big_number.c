@@ -720,7 +720,7 @@ char* Mod(const char *const s1, const char *const s2, char* remainder)
 }
 
 /* Notice, do not support negative pow operation */
-BigInt* DoPow(const BigInt *const a, const BigInt *const b, BigInt* result)
+BigInt* DoPow(const BigInt *const a, const BigInt *const b, BigInt *result)
 {
     int i, len;
     BigInt t, buf;
@@ -742,7 +742,7 @@ BigInt* DoPow(const BigInt *const a, const BigInt *const b, BigInt* result)
     return CopyBigInt(&t, result);
 }
 
-char* Pow(const char *const s1, const char *const s2, char* result)
+char* Pow(const char *const s1, const char *const s2, char *result)
 {
     BigInt a, b, c;
 
@@ -759,7 +759,7 @@ char* Pow(const char *const s1, const char *const s2, char* result)
 base on formula: (a * b) mod c = (a mod c) * (b mod c) mod c 
 
 */
-BigInt* DoPowMod(const BigInt *const a, const BigInt *const b, const BigInt *const c, BigInt* result)
+BigInt* DoPowMod(const BigInt *const a, const BigInt *const b, const BigInt *const c, BigInt *result)
 {
     int i, len;
     BigInt t, buf, zero;
@@ -805,7 +805,7 @@ BigInt* DoPowMod(const BigInt *const a, const BigInt *const b, const BigInt *con
     return CopyBigInt(&t, result);
 }
 
-char* PowMod(const char *const s1, const char *const s2, const char *const s3, char* result)
+char* PowMod(const char *const s1, const char *const s2, const char *const s3, char *result)
 {
     BigInt a, b, c, d;
 

@@ -451,7 +451,7 @@ void GenerateEccKey(const int byteLen, const char *const key_pair_file)
 	}
 }
 
-void EccSign(const int byteLen, const char *const s_source, const char *const key_pair_file, char *s_r, char *s_s)
+void EccSign(const int byteLen, const unsigned char *const s_source, const char *const key_pair_file, char *s_r, char *s_s)
 {
 	printf("begin to sign ...\n");
 
@@ -512,10 +512,16 @@ void EccSign(const int byteLen, const char *const s_source, const char *const ke
 	BigInt source, p_x, p_y, tmp_1, tmp_2, k, r, s, truncated_hash;
 
 	/*  */
+	memset(source.bit, 0, BIG_INT_BIT_LEN);
 	byteSequenceToBinBigInt(s_source, SHA256_BYTES, &source);
 
 	/* compute truncated_hash */
 	DoMod(&source, &N, &truncated_hash);
+	if(ECC_SIGN_DEBUG)
+	{
+		BigIntToStr(&truncated_hash, debug_tmp);
+		printf("EccSign, truncated_hash: %s\n\n", debug_tmp);
+	}
 
 	do
 	{
@@ -524,6 +530,10 @@ void EccSign(const int byteLen, const char *const s_source, const char *const ke
 		{
 			DoGetPositiveRandBigInt(byteLen, &k);
 			DoMod(&k, &N, &k);
+			if(DoCompare(&k, &BIG_INT_ZERO) == 0)
+			{
+				continue;
+			}
 
 			if(ECC_SIGN_DEBUG)
 			{
@@ -567,7 +577,7 @@ void EccSign(const int byteLen, const char *const s_source, const char *const ke
 	BigIntToStr(&s, s_s);
 }
 
-int EccVerifySign(const char *const s_source, const char *const key_pair_file, const char *const s_r, const char *const s_s)
+int EccVerifySign(const unsigned char *const s_source, const char *const key_pair_file, const char *const s_r, const char *const s_s)
 {
 	InitDomainParameters();
 
@@ -618,12 +628,19 @@ int EccVerifySign(const char *const s_source, const char *const key_pair_file, c
 	BigInt source, tmp, truncated_hash, s, r, s_reverse, v1, v2, x_p, y_p, x_q, y_q, result_x, result_y;
 
 	/*  */
+	memset(source.bit, 0, BIG_INT_BIT_LEN);
 	byteSequenceToBinBigInt(s_source, SHA256_BYTES, &source);
+	
 	StrToBigInt(s_s, &s);
 	StrToBigInt(s_r, &r);
 
 	/* compute truncated_hash */
-	DoMod(&source, &N, &truncated_hash);	
+	DoMod(&source, &N, &truncated_hash);
+	if(ECC_VERIFY_SIGN_DEBUG)
+	{
+		BigIntToStr(&truncated_hash, debug_tmp);
+		printf("EccVerifySign, truncated_hash: %s\n\n", debug_tmp);
+	}
 
 	/*  */
 	GeneMulReverse(&s, &N, &s_reverse);

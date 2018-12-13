@@ -4,8 +4,7 @@
 #include "./common.h"
 #include "./hash/sha256.h"
 
-static int source_index = 0;
-static unsigned char source[MAX_STR_SIZE];
+static unsigned char debug_tmp[MAX_STR_SIZE];
 
 int main()
 {
@@ -68,10 +67,10 @@ void rsa_test()
   }
   printf("\n");
 
-  RsaDecrypt(dest, source, "key_pair");
-  for(i = 0; i < strlen(source); i++)
+  RsaDecrypt(dest, debug_tmp, "key_pair");
+  for(i = 0; i < strlen(debug_tmp); i++)
   {
-   printf("%c", source[i]);
+   printf("%c", debug_tmp[i]);
   }
   printf("\n");
 
@@ -83,34 +82,34 @@ void rsa_test()
   }
   printf("\n");
 
-  RsaVerifySign(dest, source, "key_pair");
-  for(i = 0; i < strlen(source); i++)
+  RsaVerifySign(dest, debug_tmp, "key_pair");
+  for(i = 0; i < strlen(debug_tmp); i++)
   {
-    printf("%c", source[i]);
+    printf("%c", debug_tmp[i]);
   }
   printf("\n");
 }
 
 void ecc_test()
 {
+  int i;
   /*  */
   GenerateEccKey(1, "key_pair");
-  // /*  */
-  // char text[BIG_INT_BIT_LEN] = "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2sy";
-  // char r[BIG_INT_BIT_LEN];
-  // char s[BIG_INT_BIT_LEN];
+  /*  */
+  char text[BIG_INT_BIT_LEN] = "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2syadx";
+  char r[BIG_INT_BIT_LEN];
+  char s[BIG_INT_BIT_LEN];
 
-  // /* sha256 */
-  // uint8_t hash[SHA256_BYTES];
-  // int i;
-  // sha256(text, strnlen(text, BIG_INT_BIT_LEN), hash);
-  // printf("hash: ");
-  // for(i = 0; i < SHA256_BYTES; i++)
-  // {
-  //   printf("%02x ", hash[i]);
-  // }
-  // printf("\n\n");
+  /* sha256 */
+  unsigned char hash[SHA256_BYTES];
+  sha256(text, strnlen(text, BIG_INT_BIT_LEN), hash);
+  printf("sha256 result: ");
+  for(i = 0; i < SHA256_BYTES; i++)
+  {
+    printf("%02x ", hash[i]);
+  }
+  printf("\n");
 
-  // EccSign(1, hash, "key_pair", r, s);
-  // printf("VerifySign: %d\n", EccVerifySign(hash, "key_pair", r, s));
+  EccSign(1, hash, "key_pair", r, s);
+  printf("VerifySign: %d\n", EccVerifySign(hash, "key_pair", r, s));
 }

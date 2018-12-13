@@ -139,6 +139,9 @@ void get_specified_size_random(unsigned char *random, const int size)
 
 BigInt* DoGetPositiveRandBigInt(const int byteLen, BigInt *result)
 {
+		BigInt zero;
+		StrToBigInt("0", &zero);
+
     int i;
     memset(result->bit, 0, BIG_INT_BIT_LEN);
     
@@ -163,6 +166,11 @@ BigInt* DoGetPositiveRandBigInt(const int byteLen, BigInt *result)
 
     /* convert to positive integer */
     result->bit[SIGN_BIT] = 0;
+
+    if(DoCompare(result, &zero) == 0)
+    {
+    	result->bit[0] = 1;
+    }
 
     /*  */  
     return result;
@@ -235,5 +243,10 @@ BigInt* DoGetPositiveRand(const BigInt *const n, BigInt *result)
   	DoSub(&zero, result, result);
   }
 
+  if(DoCompare(result, &zero) == 0)
+  {
+  	result->bit[0] = 1;
+  }
+  
   return result;
 }
