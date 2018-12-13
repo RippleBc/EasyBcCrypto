@@ -397,8 +397,12 @@ void GenerateEccKey(const int byteLen, const char *const key_pair_file)
 	char s_tmp_2[BIG_INT_BIT_LEN];
 
 	/* init private key */
-	DoGetPositiveRandBigInt(byteLen, &private_key);
-	DoMod(&private_key, &N, &private_key);
+	do
+	{
+		DoGetPositiveRandBigInt(byteLen, &private_key);
+		DoMod(&private_key, &N, &private_key);
+	}
+	while(DoCompare(&private_key, &BIG_INT_TWO) == 0);
 	if(DoCompare(&private_key, &BIG_INT_ZERO) == 0)
 	{
 		CopyBigInt(&BIG_INT_ONE, &private_key);
