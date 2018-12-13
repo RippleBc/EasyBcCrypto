@@ -257,7 +257,7 @@ static void ComputeXGAddYG(const BigInt *const _x_p, const BigInt *const _y_p, c
 }
 
 /* double and add */
-static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y, const BigInt *const origin_x, const BigInt *const origin_y)
+static void ComputeMP(const BigInt *const private_key, const BigInt *const origin_x, const BigInt *const origin_y, BigInt *p_x, BigInt *p_y)
 {
 	BigInt t_x, t_y, tmp_1, tmp_2, mod_inverse, m, r_x, r_y;
 	int i, 
@@ -296,7 +296,7 @@ static void ComputeMP(const BigInt *const private_key, BigInt *p_x, BigInt *p_y,
 			{
 				if(DoCompare(&t_x, p_x) == 0 && DoCompare(&t_y, p_y) == 0)
 				{
-					ComputeMP(&BIG_INT_TWO, p_x, p_y, &t_x, &t_y);
+					ComputeMP(&BIG_INT_TWO, &t_x, &t_y, p_x, p_y);
 				}
 				else
 				{
@@ -400,17 +400,14 @@ void GenerateEccKey(const int byteLen, const char *const key_pair_file)
 	DoGetPositiveRandBigInt(byteLen, &private_key);
 	DoMod(&private_key, &N, &private_key);
 	BigIntToStr(&private_key, &s_private_key);
-	
-	/*debug*/
-	StrToBigInt("3", &private_key);
-
-	ComputeMP(&private_key, &p_x, &p_y, &X_G, &Y_G);
+	/* compute public key */
+	ComputeMP(&private_key, &X_G, &Y_G, &p_x, &p_y);
 
 	/*  */
 	BigIntToStr(&p_x, s_public_key_x);
 	BigIntToStr(&p_y, s_public_key_y);
 
-	/* generate key pair file */
+	/*********************************** generate key pair file ***********************************/
 	char private_file_name[FILE_NAME_LEN];
 	snprintf(private_file_name, FILE_NAME_LEN, "%s_private.ecc",  key_pair_file);
 	FILE *p_private_file;
@@ -452,14 +449,14 @@ void EccSign(const int byteLen, const char *const s_source, const char *const ke
 	/*  */
 	InitDomainParameters();
 
-	/*********************************** init key ************************************/
+	/*********************************** init private key ************************************/
 	char private_file_name[FILE_NAME_LEN];
 	snprintf(private_file_name, FILE_NAME_LEN, "%s_private.ecc",  key_pair_file);
 	FILE *p_private_file;
 	p_private_file = fopen(private_file_name, "rt");
 	if(p_private_file == NULL)
 	{
-		printf("EccSign, open file %s err\n", private_file_name);
+		printf("EccSign, can not open file %s\n", private_file_name);
 		exit(1);
 	}
 
@@ -526,7 +523,7 @@ void EccSign(const int byteLen, const char *const s_source, const char *const ke
 			}
 
 			/* compute kG */
-			ComputeMP(&k, &p_x, &p_y, &X_G, &Y_G);
+			ComputeMP(&k, &X_G, &Y_G, &p_x, &p_y);
 			/* compute r */
 			DoMod(&p_x, &N, &r);
 		}
@@ -572,13 +569,13 @@ int EccVerifySign(const char *const s_source, const char *const key_pair_file, c
 	p_public_file = fopen(public_file_name, "rt");
 	if(p_public_file == NULL)
 	{
-		printf("EccVerifySign, open file %s err\n", public_file_name);
+		printf("EccVerifySign, can not open file %s\n", public_file_name);
 		exit(1);
 	}
 
 	/*  */
 	char buffer[BIG_INT_BIT_LEN];
-	BigInt public_p_x, public_p_y, origin_p_x, origin_p_y;
+	BigInt public_p_x, public_p_y;
 	char c;
 	int mark = 0;
 	
@@ -591,25 +588,12 @@ int EccVerifySign(const char *const s_source, const char *const key_pair_file, c
 
 			StrToBigInt(buffer, &public_p_x);
 		}
-		else if(mark == 1)
+		else
 		{
 			int real_size = strnlen(buffer, BIG_INT_BIT_LEN) - SLASH_N_SIZE;
 			buffer[real_size] = '\0';
 
 			StrToBigInt(buffer, &public_p_y);
-		}
-
-		else if(mark == 2)
-		{
-			int real_size = strnlen(buffer, BIG_INT_BIT_LEN) - SLASH_N_SIZE;
-			buffer[real_size] = '\0';
-
-			StrToBigInt(buffer, &origin_p_x);
-		}
-
-		else if(mark == 3)
-		{
-			StrToBigInt(buffer, &origin_p_y);
 		}
 
 		mark++;
@@ -644,7 +628,7 @@ int EccVerifySign(const char *const s_source, const char *const key_pair_file, c
 	DoMod(&tmp, &N, &v2);
 
 	/* compute left */
-	ComputeMP(&v1, &x_p, &y_p, &X_G, &Y_G);
+	ComputeMP(&v1, &X_G, &Y_G, &x_p, &y_p);
 	if(ECC_DEBUG)
 	{
 		BigIntToStr(&x_p, debug_tmp);
@@ -654,7 +638,7 @@ int EccVerifySign(const char *const s_source, const char *const key_pair_file, c
 	}
 
 	/* compute right */
-	ComputeMP(&v2, &x_q, &y_q, &public_p_x, &public_p_y);
+	ComputeMP(&v2, &public_p_x, &public_p_y, &x_q, &y_q);
 	if(ECC_DEBUG)
 	{
 		BigIntToStr(&x_q, debug_tmp);
@@ -664,8 +648,15 @@ int EccVerifySign(const char *const s_source, const char *const key_pair_file, c
 	}
 
 	/*  */
-	ComputeXGAddYG(&x_p, &y_p, &x_q, &y_q, &result_x, &result_y);
-
+	if(DoCompare(&x_p, &x_q) == 0 && DoCompare(&y_p, &y_q) == 0)
+	{
+		ComputeMP(&BIG_INT_TWO, &x_p, &y_p, &result_x, &result_y);
+	}
+	else
+	{
+		ComputeXGAddYG(&x_p, &y_p, &x_q, &y_q, &result_x, &result_y);
+	}
+	
 	/*  */
 	DoMod(&result_x, &N, &tmp);
 
