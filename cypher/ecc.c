@@ -510,6 +510,7 @@ void EccSign(const int byteLen, const unsigned char *const s_source, const char 
 
 	/*********************************** sign ***********************************/
 	BigInt source, p_x, p_y, tmp_1, tmp_2, k, r, s, truncated_hash;
+	memset(&s, 0, BIG_INT_BIT_LEN);
 
 	/*  */
 	memset(source.bit, 0, BIG_INT_BIT_LEN);
@@ -560,8 +561,8 @@ void EccSign(const int byteLen, const unsigned char *const s_source, const char 
 
 		/* compute right */
 		DoMul(&r, &private_key, &tmp_2);
-
 		DoAdd(&tmp_2, &truncated_hash, &tmp_2);
+
 		/*  */
 		DoMul(&tmp_1, &tmp_2, &tmp_1);
 		DoMod(&tmp_1, &N, &s);
