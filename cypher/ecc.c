@@ -399,9 +399,9 @@ void GenerateEccKey(const int byteLen, const char *const key_pair_file)
 	/* init private key */
 	DoGetPositiveRandBigInt(byteLen, &private_key);
 	DoMod(&private_key, &N, &private_key);
-	if(DoCompare(&private_key, &BIG_INT_ZERO) == 0 || DoCompare(&private_key, &BIG_INT_ONE) == 0)
+	if(DoCompare(&private_key, &BIG_INT_ZERO) == 0)
 	{
-		CopyBigInt(&BIG_INT_TWO, &private_key);
+		CopyBigInt(&BIG_INT_ONE, &private_key);
 	}
 	BigIntToStr(&private_key, &s_private_key);
 	/* compute public key */
@@ -663,7 +663,7 @@ int EccVerifySign(const unsigned char *const s_source, const char *const key_pai
 		BigIntToStr(&v2, debug_tmp);
 		printf("EccVerifySign, v2: %s\n\n", debug_tmp);
 	}
-	
+
 	/* compute left */
 	ComputeMP(&v1, &X_G, &Y_G, &x_p, &y_p);
 	if(ECC_VERIFY_SIGN_DEBUG)
