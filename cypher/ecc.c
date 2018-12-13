@@ -82,20 +82,6 @@ void InitDomainParameters()
 
 BigInt *GeneMulReverse(const BigInt *const a, const BigInt *const p, BigInt *mul_inverse)
 {
-	BigInt result, tmp, x, y;
-	unsigned char a_big_p;
-
-	if(DoCompare(a, p) > 0)
-	{
-		a_big_p = 1;
-	}
-	else
-	{
-		a_big_p = 0;
-	}
-
-	StrToBigInt("0", &tmp);
-	
 	/* check arg */
 	if(DoCompare(a, &BIG_INT_ZERO) <= 0)
 	{
@@ -110,6 +96,20 @@ BigInt *GeneMulReverse(const BigInt *const a, const BigInt *const p, BigInt *mul
 		printf("\nGeneMulReverse, p must bigger than zero %s\n", debug_tmp);
 		exit(1);
 	}
+	
+	BigInt result, tmp, x, y;
+	unsigned char a_big_p;
+
+	if(DoCompare(a, p) > 0)
+	{
+		a_big_p = 1;
+	}
+	else
+	{
+		a_big_p = 0;
+	}
+
+	StrToBigInt("0", &tmp);
 
 	while(1)
 	{
