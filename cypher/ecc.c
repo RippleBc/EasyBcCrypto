@@ -399,6 +399,10 @@ void GenerateEccKey(const int byteLen, const char *const key_pair_file)
 	/* init private key */
 	DoGetPositiveRandBigInt(byteLen, &private_key);
 	DoMod(&private_key, &N, &private_key);
+	if(DoCompare(&private_key, &BIG_INT_ZERO) == 0 || DoCompare(&private_key, &BIG_INT_ONE) == 0)
+	{
+		CopyBigInt(&BIG_INT_TWO, &private_key);
+	}
 	BigIntToStr(&private_key, &s_private_key);
 	/* compute public key */
 	ComputeMP(&private_key, &X_G, &Y_G, &p_x, &p_y);
@@ -440,6 +444,11 @@ void GenerateEccKey(const int byteLen, const char *const key_pair_file)
 
 	fclose(p_private_file);
 	fclose(p_public_file);
+
+	if(ECC_GENERATE_KEY_DEBUG)
+	{
+		printf("GenerateEccKey private_key: %s\npublic_x: %s\npublic_y: %s\n", s_private_key, s_public_key_x, s_public_key_y);
+	}
 }
 
 void EccSign(const int byteLen, const char *const s_source, const char *const key_pair_file, char *s_r, char *s_s)
@@ -516,7 +525,7 @@ void EccSign(const int byteLen, const char *const s_source, const char *const ke
 			DoGetPositiveRandBigInt(byteLen, &k);
 			DoMod(&k, &N, &k);
 
-			if(ECC_DEBUG)
+			if(ECC_SIGN_DEBUG)
 			{
 				BigIntToStr(&k, debug_tmp);
 				printf("EccSign, k: %s\n\n", debug_tmp);
@@ -529,7 +538,7 @@ void EccSign(const int byteLen, const char *const s_source, const char *const ke
 		}
 		while(DoCompare(&r, &BIG_INT_ZERO) == 0);
 
-		if(ECC_DEBUG)
+		if(ECC_SIGN_DEBUG)
 		{
 			BigIntToStr(&r, debug_tmp);
 			printf("EccSign, r: %s\n\n", debug_tmp);
@@ -548,7 +557,7 @@ void EccSign(const int byteLen, const char *const s_source, const char *const ke
 	}
 	while(DoCompare(&s, &BIG_INT_ZERO) == 0);
 
-	if(ECC_DEBUG)
+	if(ECC_SIGN_DEBUG)
 	{
 		BigIntToStr(&s, debug_tmp);
 		printf("EccSign, s: %s\n\n", debug_tmp);
@@ -629,7 +638,7 @@ int EccVerifySign(const char *const s_source, const char *const key_pair_file, c
 
 	/* compute left */
 	ComputeMP(&v1, &X_G, &Y_G, &x_p, &y_p);
-	if(ECC_DEBUG)
+	if(ECC_VERIFY_SIGN_DEBUG)
 	{
 		BigIntToStr(&x_p, debug_tmp);
 		printf("EccVerifySign, x_p: %s\n\n", debug_tmp);
@@ -639,7 +648,7 @@ int EccVerifySign(const char *const s_source, const char *const key_pair_file, c
 
 	/* compute right */
 	ComputeMP(&v2, &public_p_x, &public_p_y, &x_q, &y_q);
-	if(ECC_DEBUG)
+	if(ECC_VERIFY_SIGN_DEBUG)
 	{
 		BigIntToStr(&x_q, debug_tmp);
 		printf("EccVerifySign, x_q: %s\n\n", debug_tmp);
