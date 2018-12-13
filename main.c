@@ -94,7 +94,7 @@ void ecc_test()
 {
   int i;
   /*  */
-  GenerateEccKey(1, "key_pair");
+  // GenerateEccKey(1, "key_pair");
   /*  */
   char text[BIG_INT_BIT_LEN] = "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2syadx";
   char r[BIG_INT_BIT_LEN];

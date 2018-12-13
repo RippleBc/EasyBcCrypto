@@ -96,7 +96,7 @@ BigInt *GeneMulReverse(const BigInt *const a, const BigInt *const p, BigInt *mul
 		printf("\nGeneMulReverse, p must bigger than zero %s\n", debug_tmp);
 		exit(1);
 	}
-	
+
 	BigInt result, tmp, x, y;
 	unsigned char a_big_p;
 
@@ -519,6 +519,8 @@ void EccSign(const int byteLen, const unsigned char *const s_source, const char 
 	DoMod(&source, &N, &truncated_hash);
 	if(ECC_SIGN_DEBUG)
 	{
+		BigIntToStr(&private_key, debug_tmp);
+		printf("EccSign, private_key: %s\n\n", debug_tmp);
 		BigIntToStr(&truncated_hash, debug_tmp);
 		printf("EccSign, truncated_hash: %s\n\n", debug_tmp);
 	}
@@ -526,28 +528,27 @@ void EccSign(const int byteLen, const unsigned char *const s_source, const char 
 	do
 	{
 		/* init r */
-		do
+		DoGetPositiveRandBigInt(byteLen, &k);
+		DoMod(&k, &N, &k);
+		if(DoCompare(&k, &BIG_INT_ZERO) == 0)
 		{
-			DoGetPositiveRandBigInt(byteLen, &k);
-			DoMod(&k, &N, &k);
-			if(DoCompare(&k, &BIG_INT_ZERO) == 0)
-			{
-				continue;
-			}
-
-			if(ECC_SIGN_DEBUG)
-			{
-				BigIntToStr(&k, debug_tmp);
-				printf("EccSign, k: %s\n\n", debug_tmp);
-			}
-
-			/* compute kG */
-			ComputeMP(&k, &X_G, &Y_G, &p_x, &p_y);
-			/* compute r */
-			DoMod(&p_x, &N, &r);
+			continue;
 		}
-		while(DoCompare(&r, &BIG_INT_ZERO) == 0);
+		if(ECC_SIGN_DEBUG)
+		{
+			BigIntToStr(&k, debug_tmp);
+			printf("EccSign, k: %s\n\n", debug_tmp);
+		}
 
+		/* compute kG */
+		ComputeMP(&k, &X_G, &Y_G, &p_x, &p_y);
+		/* compute r */
+		DoMod(&p_x, &N, &r);
+
+		if(DoCompare(&r, &BIG_INT_ZERO) == 0)
+		{
+			continue;
+		}
 		if(ECC_SIGN_DEBUG)
 		{
 			BigIntToStr(&r, debug_tmp);
@@ -559,8 +560,8 @@ void EccSign(const int byteLen, const unsigned char *const s_source, const char 
 
 		/* compute right */
 		DoMul(&r, &private_key, &tmp_2);
-		DoAdd(&tmp_2, &truncated_hash, &tmp_2);
 
+		DoAdd(&tmp_2, &truncated_hash, &tmp_2);
 		/*  */
 		DoMul(&tmp_1, &tmp_2, &tmp_1);
 		DoMod(&tmp_1, &N, &s);
@@ -648,11 +649,21 @@ int EccVerifySign(const unsigned char *const s_source, const char *const key_pai
 	/* compute v1 */
 	DoMul(&s_reverse, &truncated_hash, &tmp);
 	DoMod(&tmp, &N, &v1);
+	if(ECC_VERIFY_SIGN_DEBUG)
+	{
+		BigIntToStr(&v1, debug_tmp);
+		printf("EccVerifySign, v1: %s\n\n", debug_tmp);
+	}
 
 	/* compute v2 */
 	DoMul(&s_reverse, &r, &tmp);
 	DoMod(&tmp, &N, &v2);
-
+	if(ECC_VERIFY_SIGN_DEBUG)
+	{
+		BigIntToStr(&v2, debug_tmp);
+		printf("EccVerifySign, v2: %s\n\n", debug_tmp);
+	}
+	
 	/* compute left */
 	ComputeMP(&v1, &X_G, &Y_G, &x_p, &y_p);
 	if(ECC_VERIFY_SIGN_DEBUG)
