@@ -30,9 +30,9 @@
 #define GENE_D_DEBUG (0)
 
 #define ECC_DEBUG (0)
-#define ECC_GENERATE_KEY_DEBUG (1)
-#define ECC_SIGN_DEBUG (1)
-#define ECC_VERIFY_SIGN_DEBUG (1)
+#define ECC_GENERATE_KEY_DEBUG (0)
+#define ECC_SIGN_DEBUG (0)
+#define ECC_VERIFY_SIGN_DEBUG (0)
 
 #define MILLER_RABIN_TEST_TIMES 5
 

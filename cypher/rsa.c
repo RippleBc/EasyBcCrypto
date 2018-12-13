@@ -3,7 +3,7 @@
 
 BigInt *GeneD(const BigInt *const e, BigInt *d, const BigInt *const l)
 {
-	BigInt tmp, i, neg_i, zero, one, result;
+	BigInt tmp, i, zero, one, result;
 
 	StrToBigInt("0", &zero);
 	StrToBigInt("1", &one);
@@ -21,18 +21,16 @@ BigInt *GeneD(const BigInt *const e, BigInt *d, const BigInt *const l)
 			if(DoCompare(&i, &zero) == 0)
 			{
 				DoAdd(&i, &one, &i);
-				continue;
 			}
-
-			DoSub(&zero, &i, &neg_i);
-			CopyBigInt(&neg_i, d);
-			DoExGcd(l, e, &tmp, d, &result);
-			if(DoCompare(d, &zero) > 0)
+			else if(DoCompare(&i, &zero) > 0)
 			{
-				break;
+				DoSub(&zero, &i, &i);
 			}
-
-			DoAdd(&i, &one, &i);
+			else
+			{
+				DoSub(&zero, &i, &i);
+				DoAdd(&i, &one, &i);
+			}
 	}
 	
 	return d;
