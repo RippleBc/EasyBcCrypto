@@ -66,6 +66,7 @@ static BigInt* ToComplement(const BigInt *const src, BigInt *dst)
     }
 
     int i;
+    BigInt t;
 
     if(src->bit[SIGN_BIT] == NEGATIVE)
     {
@@ -168,23 +169,24 @@ static BigInt* BinNumToBigInt(const Number *const binNum, BigInt *a)
     }
 
     int i;
+    BigInt t;
 
-    memset(a->bit, 0, BIG_INT_BIT_LEN);
+    memset(t.bit, 0, BIG_INT_BIT_LEN);
 
     /*  */
     for(i = 0; i < binNum->len; i++)
     {
-        a->bit[i] = binNum->value[i];
+        t.bit[i] = binNum->value[i];
     }
 
     if(binNum->sign == POSITIVE)
     {
-        return a;
+        return CopyBigInt(&t, a);
     }
 
-    a->bit[SIGN_BIT] = NEGATIVE;
+    t.bit[SIGN_BIT] = NEGATIVE;
 
-    return ToComplement(a, a);
+    return ToComplement(&t, a);
 }
 
 static Number* BigIntToBinNum(const BigInt *const a, Number *binNum)
