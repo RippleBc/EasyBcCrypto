@@ -66,7 +66,6 @@ static BigInt* ToComplement(const BigInt *const src, BigInt *dst)
     }
 
     int i;
-    BigInt t;
 
     if(src->bit[SIGN_BIT] == NEGATIVE)
     {
@@ -345,11 +344,8 @@ BigInt* CopyBigInt(const BigInt *const src, BigInt *dst)
         exit(1);
     }
 
-    int i;
-    for(i = 0; i < BIG_INT_BIT_LEN; i++)
-    {
-        dst->bit[i] = src->bit[i];
-    }
+    memcpy(dst->bit, src->bit, BIG_INT_BIT_LEN);
+    
     return dst;
 }
 
@@ -359,19 +355,11 @@ BigInt* ShiftArithmeticLeft(const BigInt *const _src, const int indent, BigInt *
 
     CopyBigInt(_src, &src);
 
-    int i, j;
-
     dst->bit[SIGN_BIT] = src.bit[SIGN_BIT];
 
-    for(i = SIGN_BIT - 1, j = i - indent; j >= 0; i--, j--)
-    {
-        dst->bit[i] = src.bit[j];
-    }
+    memcpy(&(dst->bit[indent]), src.bit, BIG_INT_BIT_LEN - indent - 1);
 
-    while(i >= 0)
-    {
-        dst->bit[i--] = 0;
-    }
+    memset(dst->bit, 0, indent);
 
     return dst;
 }
@@ -382,45 +370,34 @@ BigInt* ShiftArithmeticRight(const BigInt *const _src, const int indent, BigInt 
 
     CopyBigInt(_src, &src);
 
-    int i, j;
-
     dst->bit[SIGN_BIT] = src.bit[SIGN_BIT];
-
-    for(i = 0, j = i + indent; j < SIGN_BIT; i++, j++)
-    {
-        dst->bit[i] = src.bit[j];
-    }
+    
+    memcpy(dst->bit, &(src.bit[indent]), BIG_INT_BIT_LEN - indent - 1);
 
     /* sign bit extend */
-    while(i < SIGN_BIT)
-    {
-        dst->bit[i++] = src.bit[SIGN_BIT];
-    }
+    memset(&(dst->bit[BIG_INT_BIT_LEN - indent - 1]), src.bit[SIGN_BIT], indent);
 
     return dst;
 }
 
-BigInt* DoAdd(const BigInt *const _a, const BigInt *const _b, BigInt *result)
+BigInt* DoAdd(const BigInt *const a, const BigInt *const b, BigInt *result)
 {
-    BigInt a, b;
-    CopyBigInt(_a, &a);
-    CopyBigInt(_b, &b);
+    int i;
+    unsigned char t, carryFlag = 0;
 
-    int i, t, carryFlag;
+    int aSign = a->bit[SIGN_BIT];
+    int bSign = b->bit[SIGN_BIT];
 
-    int aSign = a.bit[SIGN_BIT];
-    int bSign = b.bit[SIGN_BIT];
-
-    for(carryFlag = i = 0; i < BIG_INT_BIT_LEN; i++)
+    for(i = 0; i < BIG_INT_BIT_LEN; i++)
     {
         /*  */
-        t = a.bit[i] + b.bit[i] + carryFlag;
+        t = a->bit[i] + b->bit[i] + carryFlag;
 
         /*  */
-        result->bit[i] = t % 2;
+        result->bit[i] = t % (unsigned char)2;
 
         /*  */
-        carryFlag = t > 1 ? 1 : 0;
+        carryFlag = t > (unsigned char)1 ? (unsigned char)1 : (unsigned char)0;
     }
 
     if(aSign == bSign && aSign != result->bit[SIGN_BIT])
@@ -428,7 +405,6 @@ BigInt* DoAdd(const BigInt *const _a, const BigInt *const _b, BigInt *result)
         printf("DoAdd, overflow\n");
         exit(1);
     }
-
     return result;
 }
 

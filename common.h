@@ -36,6 +36,8 @@
 
 #define MILLER_RABIN_TEST_TIMES 5
 
+#define OPT_DEBUG (0)
+
 extern void aes_encrypt(unsigned char *);
 extern void aes_decrypt(unsigned char *);
 

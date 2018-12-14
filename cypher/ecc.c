@@ -18,18 +18,20 @@ static BigInt Y_G;
 static BigInt N; /* the order of discrete ellipse curve, N * p = 0 (p is a random point which at descrete ellipse curve) */
 static BigInt H; /* n * h = N, n * ( h * p) = 0, G = h * p (p is a random point which at descrete ellipse curve) */
 
-// char PARA[7][BIG_INT_BIT_LEN] =
-// {
-// 	"fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f",
-// 	"0",
-// 	"7",
-// 	"79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
-// 	"483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8",
-// 	"fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141",
-// 	"1"
-// };
+static int TEST_ECC_DOMAIN_PARAMETER = 1;
 
-char PARA[7][BIG_INT_BIT_LEN] =
+char SECP_256_K1_PARA[7][BIG_INT_BIT_LEN] =
+{
+	"fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f",
+	"0",
+	"7",
+	"79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+	"483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8",
+	"fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141",
+	"1"
+};
+
+char TEST_PARA[7][BIG_INT_BIT_LEN] =
 {
 	"61",
 	"2",
@@ -49,35 +51,67 @@ static char debug_tmp[BIG_INT_BIT_LEN];
 
 void InitDomainParameters()
 {
+	if(OPT_DEBUG)
+	{
+		TEST_ECC_DOMAIN_PARAMETER = 0;
+	}
+
 	char s_decimal_p[BIG_INT_BIT_LEN];
 	char s_tmp_1[BIG_INT_BIT_LEN];
 	char s_tmp_2[BIG_INT_BIT_LEN];
-	ChangeStringRadix(PARA[0], 16, 10, s_decimal_p);
-	StrToBigInt(s_decimal_p, &P);
-
-	StrToBigInt(PARA[1], &A);
-
-	StrToBigInt(PARA[2], &B);
-
-	char s_decimal_x_g[BIG_INT_BIT_LEN];
-	ChangeStringRadix(PARA[3], 16, 10, s_decimal_x_g);
-	StrToBigInt(s_decimal_x_g, &X_G);
-
-	char s_decimal_y_g[BIG_INT_BIT_LEN];
-	ChangeStringRadix(PARA[4], 16, 10, s_decimal_y_g);
-	StrToBigInt(s_decimal_y_g, &Y_G);
-
-	char s_decimal_n[BIG_INT_BIT_LEN];
-	ChangeStringRadix(PARA[5], 16, 10, s_decimal_n);
-	StrToBigInt(s_decimal_n, &N);
-
-	StrToBigInt(PARA[6], &H);
 
 	StrToBigInt("-99", &ECC_ZERO);
 	StrToBigInt("0", &BIG_INT_ZERO);
 	StrToBigInt("1", &BIG_INT_ONE);
 	StrToBigInt("2", &BIG_INT_TWO);
 	StrToBigInt("3", &BIG_INT_THREE);
+
+	if(TEST_ECC_DOMAIN_PARAMETER)
+	{
+		ChangeStringRadix(TEST_PARA[0], 16, 10, s_decimal_p);
+		StrToBigInt(s_decimal_p, &P);
+
+		StrToBigInt(TEST_PARA[1], &A);
+
+		StrToBigInt(TEST_PARA[2], &B);
+
+		char s_decimal_x_g[BIG_INT_BIT_LEN];
+		ChangeStringRadix(TEST_PARA[3], 16, 10, s_decimal_x_g);
+		StrToBigInt(s_decimal_x_g, &X_G);
+
+		char s_decimal_y_g[BIG_INT_BIT_LEN];
+		ChangeStringRadix(TEST_PARA[4], 16, 10, s_decimal_y_g);
+		StrToBigInt(s_decimal_y_g, &Y_G);
+
+		char s_decimal_n[BIG_INT_BIT_LEN];
+		ChangeStringRadix(TEST_PARA[5], 16, 10, s_decimal_n);
+		StrToBigInt(s_decimal_n, &N);
+
+		StrToBigInt(TEST_PARA[6], &H);
+	}
+	else
+	{
+		ChangeStringRadix(SECP_256_K1_PARA[0], 16, 10, s_decimal_p);
+		StrToBigInt(s_decimal_p, &P);
+
+		StrToBigInt(SECP_256_K1_PARA[1], &A);
+
+		StrToBigInt(SECP_256_K1_PARA[2], &B);
+
+		char s_decimal_x_g[BIG_INT_BIT_LEN];
+		ChangeStringRadix(SECP_256_K1_PARA[3], 16, 10, s_decimal_x_g);
+		StrToBigInt(s_decimal_x_g, &X_G);
+
+		char s_decimal_y_g[BIG_INT_BIT_LEN];
+		ChangeStringRadix(SECP_256_K1_PARA[4], 16, 10, s_decimal_y_g);
+		StrToBigInt(s_decimal_y_g, &Y_G);
+
+		char s_decimal_n[BIG_INT_BIT_LEN];
+		ChangeStringRadix(SECP_256_K1_PARA[5], 16, 10, s_decimal_n);
+		StrToBigInt(s_decimal_n, &N);
+
+		StrToBigInt(SECP_256_K1_PARA[6], &H);
+	}
 }
 
 BigInt *GeneMulReverse(const BigInt *const a, const BigInt *const p, BigInt *mul_inverse)
@@ -213,7 +247,7 @@ static void ComputeXGAddYG(const BigInt *const _x_p, const BigInt *const _y_p, c
 	}
 
 	/* compute x */
-	DoPow(&m, &BIG_INT_TWO, &tmp_1);
+	DoMul(&m, &m, &tmp_1);
 	DoSub(&tmp_1, &x_p, &tmp_1);
 	DoSub(&tmp_1, &x_q, &tmp_1);
 	DoMod(&tmp_1, &P, result_x);
@@ -306,7 +340,7 @@ static void ComputeMP(const BigInt *const private_key, const BigInt *const origi
 		}
 
 		/************************************************* compute slope m *************************************************/
-		DoPow(&t_x, &BIG_INT_TWO, &tmp_1);
+		DoMul(&t_x, &t_x, &tmp_1);
 		DoMul(&BIG_INT_THREE, &tmp_1, &tmp_1);
 		DoAdd(&tmp_1, &A, &tmp_1);
 		/*  */
@@ -334,7 +368,7 @@ static void ComputeMP(const BigInt *const private_key, const BigInt *const origi
 		}
 
 		/* compute x */
-		DoPow(&m, &BIG_INT_TWO, &tmp_1);
+		DoMul(&m, &m, &tmp_1);
 		DoMul(&t_x, &BIG_INT_TWO, &tmp_2);
 		DoSub(&tmp_1, &tmp_2, &tmp_1);
 		DoMod(&tmp_1, &P, &r_x);
@@ -369,6 +403,11 @@ static void ComputeMP(const BigInt *const private_key, const BigInt *const origi
 		}
 	}
 
+	if(OPT_DEBUG)
+  {
+      op_debug("ComputeMP");
+  }
+
 	if(ECC_DEBUG)
 	{
 		BigIntToStr(p_x, debug_tmp);
@@ -397,17 +436,31 @@ void GenerateEccKey(const int byteLen, const char *const key_pair_file)
 	char s_tmp_2[BIG_INT_BIT_LEN];
 
 	/* init private key */
-	do
+	if(OPT_DEBUG)
 	{
-		DoGetPositiveRandBigInt(byteLen, &private_key);
-		DoMod(&private_key, &N, &private_key);
+		StrToBigInt("1", &private_key);
 	}
-	while(DoCompare(&private_key, &BIG_INT_TWO) == 0);
-	if(DoCompare(&private_key, &BIG_INT_ZERO) == 0)
+	else
 	{
-		CopyBigInt(&BIG_INT_ONE, &private_key);
+		do
+		{
+			DoGetPositiveRandBigInt(byteLen, &private_key);
+			DoMod(&private_key, &N, &private_key);
+		}
+		while(DoCompare(&private_key, &BIG_INT_TWO) == 0);
+		if(DoCompare(&private_key, &BIG_INT_ZERO) == 0)
+		{
+			CopyBigInt(&BIG_INT_ONE, &private_key);
+		}
 	}
+
 	BigIntToStr(&private_key, &s_private_key);
+
+  if(OPT_DEBUG)
+  {
+      init_op_debug();
+  }
+
 	/* compute public key */
 	ComputeMP(&private_key, &X_G, &Y_G, &p_x, &p_y);
 

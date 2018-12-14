@@ -14,6 +14,30 @@ int main()
 
   // sha256_test();
 
+  // BigInt a;
+  // BigInt b;
+  // BigInt result;
+  // char debug_tmp[BIG_INT_BIT_LEN];
+
+  // StrToBigInt("-3", &a);
+  // StrToBigInt("3", &b);
+
+  // ShiftArithmeticRight(&a, 1, &result);
+  // BigIntToStr(&result, debug_tmp);
+  // printf("%s\n", debug_tmp);
+
+  // ShiftArithmeticLeft(&a, 1, &result);
+  // BigIntToStr(&result, debug_tmp);
+  // printf("%s\n", debug_tmp);
+
+  // ShiftArithmeticRight(&b, 1, &result);
+  // BigIntToStr(&result, debug_tmp);
+  // printf("%s\n", debug_tmp);
+  
+  // ShiftArithmeticLeft(&b, 1, &result);
+  // BigIntToStr(&result, debug_tmp);
+  // printf("%s\n", debug_tmp);
+
   return 0;
 }
 
