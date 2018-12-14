@@ -417,7 +417,7 @@ void GenerateEccKey(const int byteLen, const char *const key_pair_file)
 
 	/*********************************** generate key pair file ***********************************/
 	char private_file_name[FILE_NAME_LEN];
-	snprintf(private_file_name, FILE_NAME_LEN, "%s_private.ecc",  key_pair_file);
+	snprintf(private_file_name, FILE_NAME_LEN, "keys/%s_private.ecc",  key_pair_file);
 	FILE *p_private_file;
 	p_private_file = fopen(private_file_name, "wt");
 	if(p_private_file == NULL)
@@ -427,7 +427,7 @@ void GenerateEccKey(const int byteLen, const char *const key_pair_file)
 	}
 
 	char public_file_name[FILE_NAME_LEN];
-	snprintf(public_file_name, FILE_NAME_LEN, "%s_public.ecc",  key_pair_file);
+	snprintf(public_file_name, FILE_NAME_LEN, "keys/%s_public.ecc",  key_pair_file);
 	FILE *p_public_file;
 	p_public_file = fopen(public_file_name, "wt");
 	if(p_public_file == NULL)
@@ -464,7 +464,7 @@ void EccSign(const int byteLen, const unsigned char *const s_source, const char 
 
 	/*********************************** init private key ************************************/
 	char private_file_name[FILE_NAME_LEN];
-	snprintf(private_file_name, FILE_NAME_LEN, "%s_private.ecc",  key_pair_file);
+	snprintf(private_file_name, FILE_NAME_LEN, "keys/%s_private.ecc",  key_pair_file);
 	FILE *p_private_file;
 	p_private_file = fopen(private_file_name, "rt");
 	if(p_private_file == NULL)
@@ -589,7 +589,7 @@ int EccVerifySign(const unsigned char *const s_source, const char *const key_pai
 
 	/*********************************** init public key ***********************************/
 	char public_file_name[FILE_NAME_LEN];
-	snprintf(public_file_name, FILE_NAME_LEN, "%s_public.ecc",  key_pair_file);
+	snprintf(public_file_name, FILE_NAME_LEN, "keys/%s_public.ecc",  key_pair_file);
 	FILE *p_public_file;
 	p_public_file = fopen(public_file_name, "rt");
 	if(p_public_file == NULL)

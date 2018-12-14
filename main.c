@@ -110,12 +110,5 @@ void ecc_test()
   }
   printf("\n");
   EccSign(1, hash, "key_pair", r, s);
-
-  printf("sha256 result: ");
-  for(i = 0; i < SHA256_BYTES; i++)
-  {
-    printf("%02x ", hash[i]);
-  }
-  printf("\n");
   printf("VerifySign: %d\n", EccVerifySign(hash, "key_pair", r, s));
 }
