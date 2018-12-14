@@ -371,7 +371,7 @@ BigInt* ShiftArithmeticRight(const BigInt *const _src, const int indent, BigInt 
     CopyBigInt(_src, &src);
 
     dst->bit[SIGN_BIT] = src.bit[SIGN_BIT];
-    
+
     memcpy(dst->bit, &(src.bit[indent]), BIG_INT_BIT_LEN - indent - 1);
 
     /* sign bit extend */
@@ -383,7 +383,7 @@ BigInt* ShiftArithmeticRight(const BigInt *const _src, const int indent, BigInt 
 BigInt* DoAdd(const BigInt *const a, const BigInt *const b, BigInt *result)
 {
     int i;
-    unsigned char t, carryFlag = 0;
+    unsigned char t, carryFlag = 0, one = 0x01;
 
     int aSign = a->bit[SIGN_BIT];
     int bSign = b->bit[SIGN_BIT];
@@ -394,7 +394,7 @@ BigInt* DoAdd(const BigInt *const a, const BigInt *const b, BigInt *result)
         t = a->bit[i] + b->bit[i] + carryFlag;
 
         /*  */
-        result->bit[i] = t % (unsigned char)2;
+        result->bit[i] = t & one;
 
         /*  */
         carryFlag = t > (unsigned char)1 ? (unsigned char)1 : (unsigned char)0;

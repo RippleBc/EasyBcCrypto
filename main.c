@@ -8,7 +8,7 @@ static unsigned char debug_tmp[MAX_STR_SIZE];
 
 int main()
 {
-  rsa_test();
+  // rsa_test();
 
   ecc_test();
 

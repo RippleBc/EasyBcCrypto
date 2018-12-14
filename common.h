@@ -57,7 +57,6 @@ extern void aes_ofb_decrypt(unsigned char *, const int);
 
 extern void get_specified_size_random(unsigned char *, const int);
 
-
 #define BIG_INT_BIT_LEN 4096
 #define SIGN_BIT BIG_INT_BIT_LEN - 1
 #define NUMBER_BIT_LEN BIG_INT_BIT_LEN
