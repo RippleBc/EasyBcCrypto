@@ -6,4 +6,4 @@ CUR_OBJS=${patsubst %.c, $(OBJS_DIR)/%.o, $(notdir $(CUR_SOURCE))}
 all:$(CUR_OBJS)
 
 $(OBJS_DIR)/%.o:%.c
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CC) -o $@ -c $< $(CFLAGS)

@@ -30,7 +30,7 @@ static unsigned char init_state_pool[INIT_STATE_POOL_SIZE] = {
 	0x0f, 0x1f, 0x2f, 0x3f, 0x6f, 0x5f, 0x4f, 0x7f, 0x8f, 0x38, 0xaf, 0xbf, 0xcf, 0xdf, 0xef, 0xff
 };
 
-static void get_random(unsigned char *state, unsigned char *random, const int size)
+static void get_seed(unsigned char *state, unsigned char *seed, const int size)
 {
 	int i;
 	unsigned char *p_time;
@@ -49,7 +49,7 @@ static void get_random(unsigned char *state, unsigned char *random, const int si
 
 	if(sizeof(cur_time.tv_sec) + i != AES_GROUP_SIZE)
 	{
-		printf("get_random, init mask err %d", sizeof(cur_time.tv_sec) + i);
+		printf("get_seed, init mask err %d", sizeof(cur_time.tv_sec) + i);
 		exit(1);
 	}
 
@@ -73,11 +73,11 @@ static void get_random(unsigned char *state, unsigned char *random, const int si
 		state[i] ^= mask[i];
 	}
 
-	/* get random sequence */
+	/* get seed sequence */
 	aes_cbc_encrypt(state, AES_GROUP_SIZE);
 	for(i = 0; i < size; i++)
 	{
-		random[i] = state[i];
+		seed[i] = state[i];
 	}
 
 	/*  */
@@ -90,7 +90,7 @@ static void get_random(unsigned char *state, unsigned char *random, const int si
 	aes_cfb_encrypt(state, AES_GROUP_SIZE);
 }
 
-void get_specified_size_random(unsigned char *random, const int size)
+void get_specified_size_seed(unsigned char *seed, const int size)
 {
 	int i, j;
 	int state_start_index;
@@ -108,7 +108,7 @@ void get_specified_size_random(unsigned char *random, const int size)
   /*  */
   if(RANDOM_DEBUG)
 	{
-  	printf("start to get random, size is %d\n\n", size);
+  	printf("start to get seed, size is %d\n\n", size);
   }
 
   /*  */
@@ -128,125 +128,171 @@ void get_specified_size_random(unsigned char *random, const int size)
 
 		if(i + AES_GROUP_SIZE > size)
 		{
-			get_random(init_state, &random[i], size - i);
+			get_seed(init_state, &seed[i], size - i);
 		}
 		else
 		{
-			get_random(init_state, &random[i], AES_GROUP_SIZE);
+			get_seed(init_state, &seed[i], AES_GROUP_SIZE);
 		}
 	}
 }
 
-BigInt* DoGetPositiveRandBigInt(const int byteLen, BigInt *result)
+void GetRandom(mpz_t random, int seed_size, int random_size)
 {
-		BigInt zero;
-		StrToBigInt("0", &zero);
+	/* init state */
+	gmp_randstate_t state;
+	gmp_randinit_mt(state);
 
-    int i;
-    memset(result->bit, 0, BIG_INT_BIT_LEN);
+	/* init seed */
+	int i, j = 0;
+	unsigned char tmp, s_seed[100];
+	char s_hex_seed[100];
+	mpz_t seed;
+	get_specified_size_seed(s_seed, seed_size);
+	/*  */
+	for(i = 0; i < seed_size; i++)
+	{
+		/* first nibble */
+		tmp = (s_seed[i] & 0xf0) >> 4;
+		if(tmp >= 10)
+		{
+			s_hex_seed[j++] = 'a' + tmp - 10;
+		}
+		else
+		{
+			s_hex_seed[j++] = '0' + tmp;
+		}
+
+		/* second nibble */
+		tmp = s_seed[i] & 0x0f;
+		if(tmp >= 10)
+		{
+			s_hex_seed[j++] = 'a' + tmp - 10;
+		}
+		else
+		{
+			s_hex_seed[j++] = '0' + tmp;
+		}
+	}
+	mpz_init_set_str(seed, s_hex_seed, 16);
+
+	/* init state seed */
+	gmp_randseed(state, seed);
+
+	/* get random */
+	mpz_urandomb(random, state, random_size * BYTE_SIZE);
+}
+
+// BigInt* DoGetPositiveRandBigInt(const int byteLen, BigInt *result)
+// {
+// 		BigInt zero;
+// 		StrToBigInt("0", &zero);
+
+//     int i;
+//     memset(result->bit, 0, BIG_INT_BIT_LEN);
     
-    /*  */
-    unsigned char random_byte_sequence[byteLen];
+//     /*  */
+//     unsigned char random_byte_sequence[byteLen];
 
-    /*  */
-    get_specified_size_random(random_byte_sequence, byteLen);
+//     /*  */
+//     get_specified_size_random(random_byte_sequence, byteLen);
 
-    if(RANDOM_DEBUG)
-    {
-        printf("hex odd random result begin\n");
-        for(i = 0; i < byteLen; i++)
-        {
-            printf("%x ", random_byte_sequence[i]);
-        }
-        printf("\nhex odd random result end\n\n");
-    }
+//     if(RANDOM_DEBUG)
+//     {
+//         printf("hex odd random result begin\n");
+//         for(i = 0; i < byteLen; i++)
+//         {
+//             printf("%x ", random_byte_sequence[i]);
+//         }
+//         printf("\nhex odd random result end\n\n");
+//     }
 
-    /*  */
-    byteSequenceToBinBigInt(random_byte_sequence, byteLen, result);
+//     /*  */
+//     byteSequenceToBinBigInt(random_byte_sequence, byteLen, result);
 
-    /* convert to positive integer */
-    result->bit[SIGN_BIT] = 0;
+//     /* convert to positive integer */
+//     result->bit[SIGN_BIT] = 0;
 
-    if(DoCompare(result, &zero) == 0)
-    {
-    	result->bit[0] = 1;
-    }
+//     if(DoCompare(result, &zero) == 0)
+//     {
+//     	result->bit[0] = 1;
+//     }
 
-    /*  */  
-    return result;
-}
+//     /*  */  
+//     return result;
+// }
 
-BigInt* DoGetPositiveOddRandBigInt(const int if_fix_len, const int byteLen, BigInt* result)
-{
-    DoGetPositiveRandBigInt(byteLen, result);
+// BigInt* DoGetPositiveOddRandBigInt(const int if_fix_len, const int byteLen, BigInt* result)
+// {
+//     DoGetPositiveRandBigInt(byteLen, result);
 
-    /* convert to odd integer */
-    result->bit[0] = 1;
+//     /* convert to odd integer */
+//     result->bit[0] = 1;
     
-    /* fix min prime len */
-    if(if_fix_len)
-    {
-        result->bit[byteLen * BYTE_SIZE - 1] = 1;
-    }
+//     /* fix min prime len */
+//     if(if_fix_len)
+//     {
+//         result->bit[byteLen * BYTE_SIZE - 1] = 1;
+//     }
 
-    /*  */  
-    return result;
-}
+//     /*  */  
+//     return result;
+// }
 
-BigInt* DoGetRand(const BigInt *const n, BigInt *result)
-{
-	 /*  */
-  int i;
-  BigInt tmp;
+// BigInt* DoGetRand(const BigInt *const n, BigInt *result)
+// {
+// 	 /*  */
+//   int i;
+//   BigInt tmp;
 
-  /*  */
-  memset(result->bit, 0, BIG_INT_BIT_LEN);
+//   /*  */
+//   memset(result->bit, 0, BIG_INT_BIT_LEN);
 
-  /*  */
-  int random_byte_sequence_size = floor(BIG_INT_BIT_LEN / BYTE_SIZE);
+//   /*  */
+//   int random_byte_sequence_size = floor(BIG_INT_BIT_LEN / BYTE_SIZE);
   
   
-  /*  */
-  unsigned char random_byte_sequence[random_byte_sequence_size];
+//   /*  */
+//   unsigned char random_byte_sequence[random_byte_sequence_size];
 
-  /*  */
-  get_specified_size_random(random_byte_sequence, random_byte_sequence_size);
+//   /*  */
+//   get_specified_size_random(random_byte_sequence, random_byte_sequence_size);
 
-  if(RANDOM_DEBUG)
-  {
-      printf("hex random result begin\n");
-      for(i = 0; i < random_byte_sequence_size; i ++)
-      {
-          printf("%x ", random_byte_sequence[i]);
-      }
-      printf("\nhex random result end\n\n");
-  }
+//   if(RANDOM_DEBUG)
+//   {
+//       printf("hex random result begin\n");
+//       for(i = 0; i < random_byte_sequence_size; i ++)
+//       {
+//           printf("%x ", random_byte_sequence[i]);
+//       }
+//       printf("\nhex random result end\n\n");
+//   }
 
-  /*  */
-  byteSequenceToBinBigInt(random_byte_sequence, random_byte_sequence_size, &tmp);
+//   /*  */
+//   byteSequenceToBinBigInt(random_byte_sequence, random_byte_sequence_size, &tmp);
 
-  /*  */
-  return DoMod(&tmp, n, result);
-}
+//   /*  */
+//   return DoMod(&tmp, n, result);
+// }
 
-BigInt* DoGetPositiveRand(const BigInt *const n, BigInt *result)
-{
-	BigInt zero;
+// BigInt* DoGetPositiveRand(const BigInt *const n, BigInt *result)
+// {
+// 	BigInt zero;
 
-	StrToBigInt("0", &zero);
+// 	StrToBigInt("0", &zero);
 
-	DoGetRand(n, result);
+// 	DoGetRand(n, result);
 
-	/* convert to positive integer */
-  if(DoCompare(result, &zero) < 0)
-  {
-  	DoSub(&zero, result, result);
-  }
+// 	/* convert to positive integer */
+//   if(DoCompare(result, &zero) < 0)
+//   {
+//   	DoSub(&zero, result, result);
+//   }
 
-  if(DoCompare(result, &zero) == 0)
-  {
-  	result->bit[0] = 1;
-  }
+//   if(DoCompare(result, &zero) == 0)
+//   {
+//   	result->bit[0] = 1;
+//   }
   
-  return result;
-}
+//   return result;
+// }

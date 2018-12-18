@@ -4,13 +4,31 @@
 #include "./common.h"
 #include "./hash/sha256.h"
 
-static unsigned char debug_tmp[MAX_STR_SIZE];
+AC_CHECK_LIB(gmp, __gmpz_init);
+
+unsigned char debug_tmp[MAX_STR_SIZE];
+
+mpz_t G_BIG_INT_ZERO;
+mpz_t G_BIG_INT_ONE;
+mpz_t G_BIG_INT_TWO;
+mpz_t G_BIG_INT_THREE;
+
+void init()
+{
+  mpz_init_set_str(G_BIG_INT_ZERO, "0", 2);
+  mpz_init_set_str(G_BIG_INT_ONE, "1", 2);
+  mpz_init_set_str(G_BIG_INT_TWO, "2", 2);
+  mpz_init_set_str(G_BIG_INT_THREE, "3", 2);
+}
 
 int main()
 {
+  init();
+
+  random_test();
   // rsa_test();
 
-  ecc_test();
+  // ecc_test();
 
   // sha256_test();
 
@@ -41,6 +59,22 @@ int main()
   return 0;
 }
 
+void random_test()
+{ 
+  // int i;
+  // get_specified_size_seed(debug_tmp, 32);
+  // for(i = 0; i < 32; i++)
+  // {
+  //   printf("%02x", debug_tmp[i]);
+  // }
+  // printf("\n");
+
+  mpz_t random;
+
+  GetRandom(random, 8, 8);
+
+  gmp_printf("%Zd\n", random);
+}
 
 void sha256_test()
 {
@@ -76,63 +110,63 @@ void sha256_test()
     }
 }
 
-void rsa_test()
-{
-  int i;
+// void rsa_test()
+// {
+//   int i;
   
-  DoGenerateRsaKey(1, "key_pair");
+//   DoGenerateRsaKey(1, "key_pair");
 
-  unsigned char dest[MAX_STR_SIZE];
+//   unsigned char dest[MAX_STR_SIZE];
 
-  RsaEncrypt("56", dest, "key_pair");
-  for(i = 0; i < strlen(dest); i++)
-  {
-   printf("%c", dest[i]);
-  }
-  printf("\n");
+//   RsaEncrypt("56", dest, "key_pair");
+//   for(i = 0; i < strlen(dest); i++)
+//   {
+//    printf("%c", dest[i]);
+//   }
+//   printf("\n");
 
-  RsaDecrypt(dest, debug_tmp, "key_pair");
-  for(i = 0; i < strlen(debug_tmp); i++)
-  {
-   printf("%c", debug_tmp[i]);
-  }
-  printf("\n");
+//   RsaDecrypt(dest, debug_tmp, "key_pair");
+//   for(i = 0; i < strlen(debug_tmp); i++)
+//   {
+//    printf("%c", debug_tmp[i]);
+//   }
+//   printf("\n");
 
 
-  RsaSign("56", dest, "key_pair");
-  for(i = 0; i < strlen(dest); i++)
-  {
-    printf("%c", dest[i]);
-  }
-  printf("\n");
+//   RsaSign("56", dest, "key_pair");
+//   for(i = 0; i < strlen(dest); i++)
+//   {
+//     printf("%c", dest[i]);
+//   }
+//   printf("\n");
 
-  RsaVerifySign(dest, debug_tmp, "key_pair");
-  for(i = 0; i < strlen(debug_tmp); i++)
-  {
-    printf("%c", debug_tmp[i]);
-  }
-  printf("\n");
-}
+//   RsaVerifySign(dest, debug_tmp, "key_pair");
+//   for(i = 0; i < strlen(debug_tmp); i++)
+//   {
+//     printf("%c", debug_tmp[i]);
+//   }
+//   printf("\n");
+// }
 
-void ecc_test()
-{
-  int i;
-  /*  */
-  GenerateEccKey(1, "key_pair");
-  /*  */
-  char text[BIG_INT_BIT_LEN] = "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2syadx";
-  char r[BIG_INT_BIT_LEN];
-  char s[BIG_INT_BIT_LEN];
+// void ecc_test()
+// {
+//   int i;
+//   /*  */
+//   GenerateEccKey(1, "key_pair");
+//   /*  */
+//   char text[BIG_INT_BIT_LEN] = "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2syadx";
+//   char r[BIG_INT_BIT_LEN];
+//   char s[BIG_INT_BIT_LEN];
 
-  /* sha256 */
-  unsigned char hash[SHA256_BYTES];
-  sha256(text, strnlen(text, BIG_INT_BIT_LEN), hash);
-  printf("sha256 result: ");
-  for(i = 0; i < SHA256_BYTES; i++)
-  {
-    printf("%02x ", hash[i]);
-  }
-  printf("\n");
-  EccSign(1, hash, "key_pair", r, s);
-  printf("VerifySign: %d\n", EccVerifySign(hash, "key_pair", r, s));
-}
+//   /* sha256 */
+//   unsigned char hash[SHA256_BYTES];
+//   sha256(text, strnlen(text, BIG_INT_BIT_LEN), hash);
+//   printf("sha256 result: ");
+//   for(i = 0; i < SHA256_BYTES; i++)
+//   {
+//     printf("%02x ", hash[i]);
+//   }
+//   printf("\n");
+//   EccSign(1, hash, "key_pair", r, s);
+//   printf("VerifySign: %d\n", EccVerifySign(hash, "key_pair", r, s));
+// }

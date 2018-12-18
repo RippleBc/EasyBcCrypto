@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-g -Wall -lm
+CFLAGS=-g -Wall -lm -lgmp
 
 #
 SUB_DIRS=cypher mode random hash
@@ -32,7 +32,7 @@ ECHO:
 	@echo $(SUBDIRS)
 
 $(OBJS_DIR)/%.o:%.c
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CC) -o $@ -c $< $(CFLAGS)
 
 clean:
 	rm -f debug/crypto
