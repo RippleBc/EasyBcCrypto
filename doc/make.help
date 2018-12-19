@@ -1,1 +1,1 @@
---enable-alloca=malloc-notreentrant
+--enable-alloca=malloc-notreentrant -fstack-check -fstack-limit-symbol --enable-alloca=debug

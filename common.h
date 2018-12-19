@@ -24,7 +24,7 @@
 #define SLASH_N_SIZE 1
 
 #define AES_DEBUG (0)
-#define RANDOM_DEBUG (0)
+#define RANDOM_DEBUG (1)
 #define MILLER_RABIN_DEBUG (0)
 #define DO_POW_MOD_DEBUG (0)
 #define RSA_DEBUG (0)
@@ -56,9 +56,9 @@ extern void aes_cfb_decrypt(unsigned char *, const int);
 extern void aes_ofb_encrypt(unsigned char *, const int);
 extern void aes_ofb_decrypt(unsigned char *, const int);
 
-extern mpz_t BIG_INT_ZERO;
-extern mpz_t BIG_INT_ONE;
-extern mpz_t BIG_INT_TWO;
-extern mpz_t BIG_INT_THREE;
+extern mpz_t G_BIG_INT_ZERO;
+extern mpz_t G_BIG_INT_ONE;
+extern mpz_t G_BIG_INT_TWO;
+extern mpz_t G_BIG_INT_THREE;
 
 #endif

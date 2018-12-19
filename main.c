@@ -61,18 +61,22 @@ int main()
 
 void random_test()
 { 
-  // int i;
-  // get_specified_size_seed(debug_tmp, 32);
-  // for(i = 0; i < 32; i++)
-  // {
-  //   printf("%02x", debug_tmp[i]);
-  // }
-  // printf("\n");
-
   mpz_t random;
+  mpz_t limit;
 
-  GetRandom(random, 8, 8);
+  mpz_init(random);
 
+  mpz_init_set_str(limit, "123", 16);
+
+  InitRandom(8);
+
+  DoGetPositiveRandBigInt(8, random);
+  gmp_printf("%Zd\n", random);
+
+  DoGetPositiveOddRandBigInt(1, 8, random);
+  gmp_printf("%Zd\n", random);
+
+  DoGetPositiveRand(limit, random);
   gmp_printf("%Zd\n", random);
 }
 
