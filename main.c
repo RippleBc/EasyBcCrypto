@@ -137,26 +137,37 @@ void rsa_test()
   unsigned char dest[MAX_STR_SIZE];
   int dest_size, debug_tmp_size;
 
-  debug_tmp[0] = 0x35;
-  debug_tmp[1] = 0x36;
-  RsaEncrypt(debug_tmp, 2, dest, &dest_size, "key_pair");
-  printf("encrypt text: ");
+  for(i = 0; i < 256; i++)
+  {
+    debug_tmp[i] = 0x11;
+  }
+  
+  printf("origin text: ");
+  for(i = 0; i < 256; i++)
+  {
+    printf("%02x", debug_tmp[i]);
+  }
+  printf("\n");
+
+  RsaEncrypt(debug_tmp, 256, dest, &dest_size, "key_pair");
+  printf("RsaEncrypt text: ");
   for(i = 0; i < strlen(dest); i++)
   {
    printf("%02x", dest[i]);
   }
   printf("\n");
 
-  printf("decrypt text: ");
   RsaDecrypt(dest, dest_size, debug_tmp, &debug_tmp_size, "key_pair");
-  for(i = 0; i < debug_tmp_size; i++)
+  printf("RsaDecrypt text: ", debug_tmp_size);
+  for(i = 0; i < strlen(debug_tmp); i++)
   {
    printf("%02x", debug_tmp[i]);
   }
   printf("\n");
 
 
-  RsaSign(debug_tmp, 2, dest, &dest_size, "key_pair");
+  RsaSign(debug_tmp, 256, dest, &dest_size, "key_pair");
+  printf("RsaSign text: ");
   for(i = 0; i < strlen(dest); i++)
   {
     printf("%02x", dest[i]);
@@ -164,6 +175,7 @@ void rsa_test()
   printf("\n");
 
   RsaVerifySign(dest, dest_size, debug_tmp, &debug_tmp_size, "key_pair");
+  printf("RsaVerifySign text: ");
   for(i = 0; i < strlen(debug_tmp); i++)
   {
     printf("%02x", debug_tmp[i]);
