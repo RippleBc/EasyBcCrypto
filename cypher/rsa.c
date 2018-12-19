@@ -121,9 +121,10 @@ void DoGenerateRsaKey(const int byteLen, const char *const key_pair_file)
 		exit(1);
 	}
 
-	if(-1 == gmp_fprintf(p_public_file, "%Zd\n", e) || EOF == fputc('\n', p_public_file) 
-		|| -1 == gmp_fprintf(p_private_file, "%Zd\n", d) || EOF == fputc('\n', p_private_file) 
-		|| -1 == gmp_fprintf(p_public_file, "%Zd\n", n) || -1 == gmp_fprintf(p_private_file, "%Zd\n", n))
+	if(-1 == gmp_fprintf(p_public_file, "%Z02x\n", e) 
+		|| -1 == gmp_fprintf(p_private_file, "%Z02x\n", d)
+		|| -1 == gmp_fprintf(p_public_file, "%Z02x\n", n)
+		|| -1 == gmp_fprintf(p_private_file, "%Z02x\n", n))
 	{
 		printf("DoGenerateRsaKey, write key to file err\n");
 		exit(1);
@@ -133,16 +134,16 @@ void DoGenerateRsaKey(const int byteLen, const char *const key_pair_file)
 	fclose(p_public_file);
 }
 
-// static char *Crypt(const unsigned char *const source, unsigned char *dest, const BigInt *const key, const BigInt *const n)
-// {
-// 	BigInt s, d;
+static void Crypt(const unsigned char *const source, unsigned char *dest, const mpz_t const key, const mpz_t const n)
+{
+	BigInt s, d;
 
-// 	StrToBigInt(source, &s);
+	StrToBigInt(source, &s);
 
-// 	DoPowMod(&s, key, n, &d);
+	DoPowMod(&s, key, n, &d);
 
-// 	return BigIntToStr(&d, dest);
-// }
+	return BigIntToStr(&d, dest);
+}
 
 // char *RsaEncrypt(const unsigned char *const source, unsigned char *dest, const char *const key_pair_file)
 // {
