@@ -19,14 +19,19 @@ void init()
   mpz_init_set_str(G_BIG_INT_ONE, "1", 2);
   mpz_init_set_str(G_BIG_INT_TWO, "2", 2);
   mpz_init_set_str(G_BIG_INT_THREE, "3", 2);
+
+  InitRandom(8);
 }
 
 int main()
 {
   init();
 
-  random_test();
-  // rsa_test();
+  // prime_test();
+
+  // random_test();
+
+  rsa_test();
 
   // ecc_test();
 
@@ -59,6 +64,17 @@ int main()
   return 0;
 }
 
+void prime_test()
+{
+  mpz_t prime;
+
+  mpz_init(prime);
+
+  DoGenRandomPrime(1, 64, prime);
+
+  gmp_printf("%Zd\n", prime);
+}
+
 void random_test()
 { 
   mpz_t random;
@@ -67,8 +83,6 @@ void random_test()
   mpz_init(random);
 
   mpz_init_set_str(limit, "123", 16);
-
-  InitRandom(8);
 
   DoGetPositiveRandBigInt(8, random);
   gmp_printf("%Zd\n", random);
@@ -114,43 +128,43 @@ void sha256_test()
     }
 }
 
-// void rsa_test()
-// {
-//   int i;
+void rsa_test()
+{
+  int i;
   
-//   DoGenerateRsaKey(1, "key_pair");
+  DoGenerateRsaKey(512, "key_pair");
 
-//   unsigned char dest[MAX_STR_SIZE];
+  // unsigned char dest[MAX_STR_SIZE];
 
-//   RsaEncrypt("56", dest, "key_pair");
-//   for(i = 0; i < strlen(dest); i++)
-//   {
-//    printf("%c", dest[i]);
-//   }
-//   printf("\n");
+  // RsaEncrypt("56", dest, "key_pair");
+  // for(i = 0; i < strlen(dest); i++)
+  // {
+  //  printf("%c", dest[i]);
+  // }
+  // printf("\n");
 
-//   RsaDecrypt(dest, debug_tmp, "key_pair");
-//   for(i = 0; i < strlen(debug_tmp); i++)
-//   {
-//    printf("%c", debug_tmp[i]);
-//   }
-//   printf("\n");
+  // RsaDecrypt(dest, debug_tmp, "key_pair");
+  // for(i = 0; i < strlen(debug_tmp); i++)
+  // {
+  //  printf("%c", debug_tmp[i]);
+  // }
+  // printf("\n");
 
 
-//   RsaSign("56", dest, "key_pair");
-//   for(i = 0; i < strlen(dest); i++)
-//   {
-//     printf("%c", dest[i]);
-//   }
-//   printf("\n");
+  // RsaSign("56", dest, "key_pair");
+  // for(i = 0; i < strlen(dest); i++)
+  // {
+  //   printf("%c", dest[i]);
+  // }
+  // printf("\n");
 
-//   RsaVerifySign(dest, debug_tmp, "key_pair");
-//   for(i = 0; i < strlen(debug_tmp); i++)
-//   {
-//     printf("%c", debug_tmp[i]);
-//   }
-//   printf("\n");
-// }
+  // RsaVerifySign(dest, debug_tmp, "key_pair");
+  // for(i = 0; i < strlen(debug_tmp); i++)
+  // {
+  //   printf("%c", debug_tmp[i]);
+  // }
+  // printf("\n");
+}
 
 // void ecc_test()
 // {

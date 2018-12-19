@@ -1,172 +1,137 @@
-// #include "../common.h"
-// #include <stdio.h>
+#include "../common.h"
+#include <stdio.h>
 
-// BigInt *GeneD(const BigInt *const e, BigInt *d, const BigInt *const l)
-// {
-// 	BigInt tmp, i, zero, one, result;
+void GeneD(const mpz_t const e, mpz_t d, const mpz_t const l)
+{
+	mpz_t tmp;
 
-// 	StrToBigInt("0", &zero);
-// 	StrToBigInt("1", &one);
-// 	StrToBigInt("0", &i);
+	mpz_init(tmp);
 
-// 	while(1)
-// 	{
-// 			CopyBigInt(&i, d);
-// 			DoExGcd(l, e, &tmp, d, &result);
-// 			if(DoCompare(d, &zero) > 0)
-// 			{
-// 				break;
-// 			}
 
-// 			if(DoCompare(&i, &zero) == 0)
-// 			{
-// 				DoAdd(&i, &one, &i);
-// 			}
-// 			else if(DoCompare(&i, &zero) > 0)
-// 			{
-// 				DoSub(&zero, &i, &i);
-// 			}
-// 			else
-// 			{
-// 				DoSub(&zero, &i, &i);
-// 				DoAdd(&i, &one, &i);
-// 			}
-// 	}
-	
-// 	return d;
-// }
+		/* compute d */
+		mpz_gcdext(G_BIG_INT_ONE, tmp, d, l, e);
 
-// void DoGenerateRsaKey(const int byteLen, const char *const key_pair_file)
-// {
-// 	printf("generating rsa key ...\n");
+		if(RSA_DEBUG)
+		{
+			gmp_printf("GeneD, s: %Zd\n", tmp);
+			gmp_printf("GeneD, d: %Zd\n", d);
+		}
+}
 
-// 	int i;
-// 	int fix_len = 1;
-// 	BigInt p, q, e, d, n, pMinusOne, qMinusOne, l, gcd;
-// 	BigInt one;
-// 	char s_result[MAX_STR_SIZE], s_e[MAX_STR_SIZE], s_d[MAX_STR_SIZE], s_n[MAX_STR_SIZE];
+void DoGenerateRsaKey(const int byteLen, const char *const key_pair_file)
+{
+	printf("DoGenerateRsaKey, generating rsa key ...\n");
 
-// 	/*  */
-// 	StrToBigInt("1", &one);
+	int fix_len = 1;
+	mpz_t p, q, e, d, n, pMinusOne, qMinusOne, l, gcd;
 
-// 	DoGenRandomPrime(fix_len, byteLen, MILLER_RABIN_TEST_TIMES, &p);	
+	mpz_init(p);
+	mpz_init(q);
+	mpz_init(e);
+	mpz_init(d);
+	mpz_init(n);
+	mpz_init(pMinusOne);
+	mpz_init(qMinusOne);
+	mpz_init(l);
+	mpz_init(gcd);
 
-// 	do
-// 	{
-// 		DoGenRandomPrime(fix_len, byteLen, MILLER_RABIN_TEST_TIMES, &q);
-// 	}
-// 	while(DoCompare(&p, &q) == 0);
+	/* generate prime p and q */
+	DoGenRandomPrime(fix_len, byteLen, &p);	
+	do
+	{
+		DoGenRandomPrime(fix_len, byteLen, &q);
+	}
+	while(mpz_cmp(p, q) == 0);
 
-// 	/* generate n */
-// 	DoMul(&p, &q, &n);
-// 	BigIntToStr(&n, s_n);
+	/* generate n */
+	mpz_mul(&n, &p, &q);
 
-// 	/* generate l */
-// 	DoSub(&p, &one, &pMinusOne);
-// 	DoSub(&q, &one, &qMinusOne);
-// 	DoLcm(&pMinusOne, &qMinusOne, &l);
+	/* generate l */
+	mpz_sub(pMinusOne, p, G_BIG_INT_ONE);
+	mpz_sub(qMinusOne, q, G_BIG_INT_ONE);
+	mpz_lcm(l, pMinusOne, qMinusOne);
  	
-// 	if(RSA_DEBUG)
-// 	{
-// 		printf("p: ");
-// 		BigIntToStr(&p, s_result);
-// 		for(i = 0; i < strlen(s_result); i++)
-// 		{
-// 			printf("%c", s_result[i]);
-// 		}
-// 		printf("\n");
+	if(RSA_DEBUG)
+	{
+		gmp_printf("DoGenerateRsaKey, p: %Zd\n", p);
+		gmp_printf("DoGenerateRsaKey, q: %Zd\n", q);
+		gmp_printf("DoGenerateRsaKey, n: %Zd\n", n);
+		gmp_printf("DoGenerateRsaKey, l: %Zd\n", l);
+	}
+	while(1)
+	{
+		/* init e */
+		DoGetPositiveRand(l, e);
+		if(RSA_DEBUG)
+		{
+			gmp_printf("DoGenerateRsaKey, test e: %Zd\n", e);
+		}
+ 		if(mpz_cmp(e, G_BIG_INT_TWO) <= 0)
+ 		{
+ 			continue;
+ 		}
 
-// 		printf("q: ");
-// 		BigIntToStr(&q, s_result);
-// 		for(i = 0; i < strlen(s_result); i++)
-// 		{
-// 			printf("%c", s_result[i]);
-// 		}
-// 		printf("\n");
+ 		/* check e */
+ 		mpz_gcd(gcd, e, l);
+		if(mpz_cmp(gcd, G_BIG_INT_ONE) != 0)
+		{
+			continue;
+		}
+	 	if(RSA_DEBUG)
+		{
+			gmp_printf("DoGenerateRsaKey, e: %Zd\n", e);
+		}
 
-// 		printf("n: ");
-// 		for(i = 0; i < strlen(s_n); i++)
-// 		{
-// 			printf("%c", s_n[i]);
-// 		}
-// 		printf("\n");
+	 	/* generate d */
+	 	GeneD(e, d, l);
+	 	if(RSA_DEBUG)
+		{
+			gmp_printf("DoGenerateRsaKey, test d: %Zd\n", d);
+		}
+	 	if(mpz_cmp(d, G_BIG_INT_TWO) <= 0)
+	 	{
+	 		continue;
+	 	}
+	 	if(RSA_DEBUG)
+		{
+			gmp_printf("DoGenerateRsaKey, d: %Zd\n", d);
+		}
 
-// 		printf("l: ");
-// 		BigIntToStr(&l, s_result);
-// 		for(i = 0; i < strlen(s_result); i++)
-// 		{
-// 			printf("%c", s_result[i]);
-// 		}
-// 		printf("\n");
-// 	}
+		break;
+	}
 
-//  	/* generate e */
-// 	do{
-//  		/*  */
-//  		do
-//  		{
-//  			DoGetPositiveRand(&l, &e);
-//  		} while(DoCompare(&e, &one) <= 0);
+	/* generate key pair file */
+	char private_file_name[FILE_NAME_LEN];
+	snprintf(private_file_name, FILE_NAME_LEN, "keys/%s_private.rsa",  key_pair_file);
+	FILE *p_private_file;
+	p_private_file = fopen(private_file_name, "wt");
+	if(p_private_file == NULL)
+	{
+		printf("DoGenerateRsaKey, open file %s err\n", private_file_name);
+		exit(1);
+	}
 
-//  		/*  */
-//  		DoGcd(&e, &l, &gcd);
-//  	}
-//  	while(DoCompare(&gcd, &one) != 0);
-// 	BigIntToStr(&e, s_e);
- 	
-//  	/* generate d */
-//  	GeneD(&e, &d, &l);
-//  	BigIntToStr(&d, s_d);
+	char public_file_name[FILE_NAME_LEN];
+	snprintf(public_file_name, FILE_NAME_LEN, "keys/%s_public.rsa",  key_pair_file);
+	FILE *p_public_file;
+	p_public_file = fopen(public_file_name, "wt");
+	if(p_public_file == NULL)
+	{
+		printf("DoGenerateRsaKey, open file %s err\n", public_file_name);
+		exit(1);
+	}
 
-//  	if(RSA_DEBUG)
-// 	{
-// 		printf("e: ");
-// 		for(i = 0; i < strlen(s_e); i++)
-// 		{
-// 			printf("%c", s_e[i]);
-// 		}
-// 		printf("\n");
+	if(-1 == gmp_fprintf(p_public_file, "%Zd\n", e) || EOF == fputc('\n', p_public_file) 
+		|| -1 == gmp_fprintf(p_private_file, "%Zd\n", d) || EOF == fputc('\n', p_private_file) 
+		|| -1 == gmp_fprintf(p_public_file, "%Zd\n", n) || -1 == gmp_fprintf(p_private_file, "%Zd\n", n))
+	{
+		printf("DoGenerateRsaKey, write key to file err\n");
+		exit(1);
+	}
 
-// 		printf("d: ");
-// 		for(i = 0; i < strlen(s_d); i++)
-// 		{
-// 			printf("%c", s_d[i]);
-// 		}
-// 		printf("\n");
-// 	}
-
-// 	/* generate key pair file */
-// 	char private_file_name[FILE_NAME_LEN];
-// 	snprintf(private_file_name, FILE_NAME_LEN, "keys/%s_private.rsa",  key_pair_file);
-// 	FILE *p_private_file;
-// 	p_private_file = fopen(private_file_name, "wt");
-// 	if(p_private_file == NULL)
-// 	{
-// 		printf("DoGenerateRsaKey, open file %s err\n", private_file_name);
-// 		exit(1);
-// 	}
-
-// 	char public_file_name[FILE_NAME_LEN];
-// 	snprintf(public_file_name, FILE_NAME_LEN, "keys/%s_public.rsa",  key_pair_file);
-// 	FILE *p_public_file;
-// 	p_public_file = fopen(public_file_name, "wt");
-// 	if(p_public_file == NULL)
-// 	{
-// 		printf("DoGenerateRsaKey, open file %s err\n", public_file_name);
-// 		exit(1);
-// 	}
-
-// 	if(EOF == fputs(s_e, p_public_file) || EOF == fputc('\n', p_public_file) 
-// 		|| EOF == fputs(s_d, p_private_file) || EOF == fputc('\n', p_private_file) 
-// 		|| EOF == fputs(s_n, p_public_file) || EOF == fputs(s_n, p_private_file))
-// 	{
-// 		printf("DoGenerateRsaKey, write e to file err\n");
-// 		exit(1);
-// 	}
-
-// 	fclose(p_private_file);
-// 	fclose(p_public_file);
-// }
+	fclose(p_private_file);
+	fclose(p_public_file);
+}
 
 // static char *Crypt(const unsigned char *const source, unsigned char *dest, const BigInt *const key, const BigInt *const n)
 // {

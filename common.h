@@ -23,11 +23,13 @@
 
 #define SLASH_N_SIZE 1
 
+#define MILLER_RABIN_TIMES 40
+
 #define AES_DEBUG (0)
 #define RANDOM_DEBUG (1)
-#define MILLER_RABIN_DEBUG (0)
+#define PRIME_DEBUG (1)
 #define DO_POW_MOD_DEBUG (0)
-#define RSA_DEBUG (0)
+#define RSA_DEBUG (1)
 #define GENE_D_DEBUG (0)
 
 #define ECC_DEBUG (0)
