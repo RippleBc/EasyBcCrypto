@@ -128,37 +128,11 @@ void InitRandom(int seed_size)
 
 	/* init seed */
 	int i, j = 0;
-	unsigned char tmp, s_seed[100];
-	char s_hex_seed[100];
+	unsigned char s_seed[MAX_STR_SIZE];
 	mpz_t seed;
 	get_specified_size_seed(s_seed, seed_size);
 	/*  */
-	for(i = 0; i < seed_size; i++)
-	{
-		/* first nibble */
-		tmp = (s_seed[i] & 0xf0) >> 4;
-		if(tmp >= 10)
-		{
-			s_hex_seed[j++] = 'a' + tmp - 10;
-		}
-		else
-		{
-			s_hex_seed[j++] = '0' + tmp;
-		}
-
-		/* second nibble */
-		tmp = s_seed[i] & 0x0f;
-		if(tmp >= 10)
-		{
-			s_hex_seed[j++] = 'a' + tmp - 10;
-		}
-		else
-		{
-			s_hex_seed[j++] = '0' + tmp;
-		}
-	}
-	s_hex_seed[j] = '\0';
-	mpz_init_set_str(seed, s_hex_seed, 16);
+	mpz_import(seed, seed_size, 1, sizeof(unsigned char), 1, 0, s_seed);
 
 	if(RANDOM_DEBUG)
 	{

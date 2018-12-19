@@ -17,7 +17,7 @@ void DoGenRandomPrime(const int if_fix_len, const int byteLen, mpz_t prime)
 		}
 
 		/*  */
-		prime_test_result = mpz_probab_prime_p(prime, MILLER_RABIN_TIMES);
+		prime_test_result = mpz_probab_prime_p(prime, MILLER_RABIN_TEST_TIMES);
 		if(prime_test_result == 1)
 		{
 			if(PRIME_DEBUG)

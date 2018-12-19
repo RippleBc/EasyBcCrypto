@@ -17,13 +17,13 @@
 
 #define DES_ROUND_NUM 12
 
-#define MAX_STR_SIZE 1024 * 10
+#define MAX_STR_SIZE 1024
 
 #define BYTE_SIZE 8
 
 #define SLASH_N_SIZE 1
 
-#define MILLER_RABIN_TIMES 40
+#define MILLER_RABIN_TEST_TIMES 40
 
 #define AES_DEBUG (0)
 #define RANDOM_DEBUG (1)
@@ -36,8 +36,6 @@
 #define ECC_GENERATE_KEY_DEBUG (0)
 #define ECC_SIGN_DEBUG (0)
 #define ECC_VERIFY_SIGN_DEBUG (0)
-
-#define MILLER_RABIN_TEST_TIMES 5
 
 #define OPT_DEBUG (0)
 

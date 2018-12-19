@@ -27,9 +27,9 @@ int main()
 {
   init();
 
-  // prime_test();
-
   // random_test();
+
+  // prime_test();
 
   rsa_test();
 
@@ -132,38 +132,43 @@ void rsa_test()
 {
   int i;
   
-  DoGenerateRsaKey(512, "key_pair");
+  // DoGenerateRsaKey(512, "key_pair");
 
-  // unsigned char dest[MAX_STR_SIZE];
+  unsigned char dest[MAX_STR_SIZE];
+  int dest_size, debug_tmp_size;
 
-  // RsaEncrypt("56", dest, "key_pair");
-  // for(i = 0; i < strlen(dest); i++)
-  // {
-  //  printf("%c", dest[i]);
-  // }
-  // printf("\n");
+  debug_tmp[0] = 0x35;
+  debug_tmp[1] = 0x36;
+  RsaEncrypt(debug_tmp, 2, dest, &dest_size, "key_pair");
+  printf("encrypt text: ");
+  for(i = 0; i < strlen(dest); i++)
+  {
+   printf("%02x", dest[i]);
+  }
+  printf("\n");
 
-  // RsaDecrypt(dest, debug_tmp, "key_pair");
-  // for(i = 0; i < strlen(debug_tmp); i++)
-  // {
-  //  printf("%c", debug_tmp[i]);
-  // }
-  // printf("\n");
+  printf("decrypt text: ");
+  RsaDecrypt(dest, dest_size, debug_tmp, &debug_tmp_size, "key_pair");
+  for(i = 0; i < debug_tmp_size; i++)
+  {
+   printf("%02x", debug_tmp[i]);
+  }
+  printf("\n");
 
 
-  // RsaSign("56", dest, "key_pair");
-  // for(i = 0; i < strlen(dest); i++)
-  // {
-  //   printf("%c", dest[i]);
-  // }
-  // printf("\n");
+  RsaSign(debug_tmp, 2, dest, &dest_size, "key_pair");
+  for(i = 0; i < strlen(dest); i++)
+  {
+    printf("%02x", dest[i]);
+  }
+  printf("\n");
 
-  // RsaVerifySign(dest, debug_tmp, "key_pair");
-  // for(i = 0; i < strlen(debug_tmp); i++)
-  // {
-  //   printf("%c", debug_tmp[i]);
-  // }
-  // printf("\n");
+  RsaVerifySign(dest, dest_size, debug_tmp, &debug_tmp_size, "key_pair");
+  for(i = 0; i < strlen(debug_tmp); i++)
+  {
+    printf("%02x", debug_tmp[i]);
+  }
+  printf("\n");
 }
 
 // void ecc_test()
