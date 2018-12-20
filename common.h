@@ -17,7 +17,7 @@
 
 #define DES_ROUND_NUM 12
 
-#define MAX_STR_SIZE 1024
+#define MAX_STR_SIZE (1024 * 8)
 
 #define BYTE_SIZE 8
 

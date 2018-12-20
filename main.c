@@ -27,39 +27,17 @@ int main()
 {
   init();
 
+  // sha256_test();
+  
   // random_test();
 
   // prime_test();
 
-  rsa_test();
+  // rsa_test();
 
   // ecc_test();
 
-  // sha256_test();
-
-  // BigInt a;
-  // BigInt b;
-  // BigInt result;
-  // char debug_tmp[BIG_INT_BIT_LEN];
-
-  // StrToBigInt("-3", &a);
-  // StrToBigInt("3", &b);
-
-  // ShiftArithmeticRight(&a, 1, &result);
-  // BigIntToStr(&result, debug_tmp);
-  // printf("%s\n", debug_tmp);
-
-  // ShiftArithmeticLeft(&a, 1, &result);
-  // BigIntToStr(&result, debug_tmp);
-  // printf("%s\n", debug_tmp);
-
-  // ShiftArithmeticRight(&b, 1, &result);
-  // BigIntToStr(&result, debug_tmp);
-  // printf("%s\n", debug_tmp);
   
-  // ShiftArithmeticLeft(&b, 1, &result);
-  // BigIntToStr(&result, debug_tmp);
-  // printf("%s\n", debug_tmp);
 
   return 0;
 }
@@ -151,15 +129,15 @@ void rsa_test()
 
   RsaEncrypt(debug_tmp, 256, dest, &dest_size, "key_pair");
   printf("RsaEncrypt text: ");
-  for(i = 0; i < strlen(dest); i++)
+  for(i = 0; i < dest_size; i++)
   {
    printf("%02x", dest[i]);
   }
   printf("\n");
 
   RsaDecrypt(dest, dest_size, debug_tmp, &debug_tmp_size, "key_pair");
-  printf("RsaDecrypt text: ", debug_tmp_size);
-  for(i = 0; i < strlen(debug_tmp); i++)
+  printf("RsaDecrypt text: ");
+  for(i = 0; i < debug_tmp_size; i++)
   {
    printf("%02x", debug_tmp[i]);
   }
@@ -168,7 +146,7 @@ void rsa_test()
 
   RsaSign(debug_tmp, 256, dest, &dest_size, "key_pair");
   printf("RsaSign text: ");
-  for(i = 0; i < strlen(dest); i++)
+  for(i = 0; i < dest_size; i++)
   {
     printf("%02x", dest[i]);
   }
@@ -176,7 +154,7 @@ void rsa_test()
 
   RsaVerifySign(dest, dest_size, debug_tmp, &debug_tmp_size, "key_pair");
   printf("RsaVerifySign text: ");
-  for(i = 0; i < strlen(debug_tmp); i++)
+  for(i = 0; i < debug_tmp_size; i++)
   {
     printf("%02x", debug_tmp[i]);
   }
