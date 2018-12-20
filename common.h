@@ -32,7 +32,7 @@
 #define RSA_DEBUG (1)
 #define GENE_D_DEBUG (0)
 
-#define ECC_DEBUG (0)
+#define ECC_DEBUG (1)
 #define ECC_GENERATE_KEY_DEBUG (0)
 #define ECC_SIGN_DEBUG (0)
 #define ECC_VERIFY_SIGN_DEBUG (0)

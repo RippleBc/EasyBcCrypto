@@ -15,10 +15,10 @@ mpz_t G_BIG_INT_THREE;
 
 void init()
 {
-  mpz_init_set_str(G_BIG_INT_ZERO, "0", 2);
-  mpz_init_set_str(G_BIG_INT_ONE, "1", 2);
-  mpz_init_set_str(G_BIG_INT_TWO, "2", 2);
-  mpz_init_set_str(G_BIG_INT_THREE, "3", 2);
+  mpz_init_set_str(G_BIG_INT_ZERO, "0", 16);
+  mpz_init_set_str(G_BIG_INT_ONE, "1", 16);
+  mpz_init_set_str(G_BIG_INT_TWO, "2", 16);
+  mpz_init_set_str(G_BIG_INT_THREE, "3", 16);
 
   InitRandom(8);
 }
@@ -35,7 +35,7 @@ int main()
 
   // rsa_test();
 
-  // ecc_test();
+  ecc_test();
 
   return 0;
 }
@@ -159,25 +159,25 @@ void rsa_test()
   printf("\n");
 }
 
-// void ecc_test()
-// {
-//   int i;
-//   /*  */
-//   GenerateEccKey(1, "key_pair");
-//   /*  */
-//   char text[BIG_INT_BIT_LEN] = "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2syadx";
-//   char r[BIG_INT_BIT_LEN];
-//   char s[BIG_INT_BIT_LEN];
+void ecc_test()
+{
+  int i;
+  /*  */
+  GenerateEccKey("key_pair");
+  /*  */
+  char text[MAX_STR_SIZE] = "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2syadx";
+  // char r[MAX_STR_SIZE];
+  // char s[MAX_STR_SIZE];
 
-//   /* sha256 */
-//   unsigned char hash[SHA256_BYTES];
-//   sha256(text, strnlen(text, BIG_INT_BIT_LEN), hash);
-//   printf("sha256 result: ");
-//   for(i = 0; i < SHA256_BYTES; i++)
-//   {
-//     printf("%02x ", hash[i]);
-//   }
-//   printf("\n");
-//   EccSign(1, hash, "key_pair", r, s);
-//   printf("VerifySign: %d\n", EccVerifySign(hash, "key_pair", r, s));
-// }
+  // /* sha256 */
+  // unsigned char hash[SHA256_BYTES];
+  // sha256(text, strnlen(text, MAX_STR_SIZE), hash);
+  // printf("sha256 result: ");
+  // for(i = 0; i < SHA256_BYTES; i++)
+  // {
+  //   printf("%02x ", hash[i]);
+  // }
+  // printf("\n");
+  // EccSign(1, hash, "key_pair", r, s);
+  // printf("VerifySign: %d\n", EccVerifySign(hash, "key_pair", r, s));
+}

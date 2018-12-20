@@ -143,29 +143,30 @@ void InitRandom(int seed_size)
 	gmp_randseed(G_RANDOM_STATE, seed);
 }
 
-void DoGetPositiveRandBigInt(const int byteLen, mpz_t random)
+void DoGetPositiveRandBigInt(const int if_fix_len, const int byteLen, mpz_t random)
 {
-	do
+	if(if_fix_len)
 	{
-		/* get random */
-		mpz_urandomb(random, G_RANDOM_STATE, byteLen * BYTE_SIZE);
+		mpz_rrandomb(random, G_RANDOM_STATE, byteLen * BYTE_SIZE);
 	}
-	while(mpz_cmp(random, G_BIG_INT_ZERO) == 0);
+	else
+	{
+		do
+		{
+			/* get random */
+			mpz_urandomb(random, G_RANDOM_STATE, byteLen * BYTE_SIZE);
+		}
+		while(mpz_cmp(random, G_BIG_INT_ZERO) == 0);
+	}
+	
 }
 
 void DoGetPositiveOddRandBigInt(const int if_fix_len, const int byteLen, mpz_t random)
 {    
-    if(if_fix_len)
-    {
-			mpz_rrandomb(random, G_RANDOM_STATE, byteLen * BYTE_SIZE);
-    }
-    else
-    {  
-			DoGetPositiveRandBigInt(byteLen, random);
-    }
-
-    /* convert to odd integer */
-    mpz_setbit(random, 0);
+	DoGetPositiveRandBigInt(if_fix_len, byteLen, random);
+	
+	/* convert to odd integer */
+  mpz_setbit(random, 0);
 }
 
 void DoGetPositiveRand(mpz_t n, mpz_t result)
