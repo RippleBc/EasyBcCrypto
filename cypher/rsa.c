@@ -7,15 +7,19 @@ void GeneD(const mpz_t const e, mpz_t d, const mpz_t const l)
 
 	mpz_init(tmp);
 
+	/* compute d */
+	mpz_gcdext(G_BIG_INT_ONE, tmp, d, l, e);
 
-		/* compute d */
-		mpz_gcdext(G_BIG_INT_ONE, tmp, d, l, e);
+	if(mpz_cmp(d, G_BIG_INT_ZERO) < 0)
+	{
+		mpz_add(d, d, l);
+	}
 
-		if(RSA_DEBUG)
-		{
-			gmp_printf("GeneD, s: %Zd\n", tmp);
-			gmp_printf("GeneD, d: %Zd\n", d);
-		}
+	if(RSA_DEBUG)
+	{
+		gmp_printf("GeneD, s: %Zd\n", tmp);
+		gmp_printf("GeneD, d: %Zd\n", d);
+	}
 }
 
 void DoGenerateRsaKey(const int byteLen, const char *const key_pair_file)
@@ -84,14 +88,6 @@ void DoGenerateRsaKey(const int byteLen, const char *const key_pair_file)
 
 	 	/* generate d */
 	 	GeneD(e, d, l);
-	 	if(RSA_DEBUG)
-		{
-			gmp_printf("DoGenerateRsaKey, test d: %Zd\n", d);
-		}
-	 	if(mpz_cmp(d, G_BIG_INT_TWO) <= 0)
-	 	{
-	 		continue;
-	 	}
 	 	if(RSA_DEBUG)
 		{
 			gmp_printf("DoGenerateRsaKey, d: %Zd\n", d);

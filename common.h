@@ -26,8 +26,8 @@
 #define MILLER_RABIN_TEST_TIMES 40
 
 #define AES_DEBUG (0)
-#define RANDOM_DEBUG (1)
-#define PRIME_DEBUG (1)
+#define RANDOM_DEBUG (0)
+#define PRIME_DEBUG (0)
 #define DO_POW_MOD_DEBUG (0)
 #define RSA_DEBUG (1)
 #define GENE_D_DEBUG (0)

@@ -33,9 +33,9 @@ int main()
 
   // prime_test();
 
-  // rsa_test();
+  rsa_test();
 
-  ecc_test();
+  // ecc_test();
 
   return 0;
 }
@@ -115,7 +115,7 @@ void rsa_test()
 
   for(i = 0; i < 256; i++)
   {
-    debug_tmp[i] = 0x11;
+    debug_tmp[i] = 0x15;
   }
   
   printf("origin text: ");
