@@ -119,8 +119,8 @@ void DoGenerateRsaKey(const int byteLen, const char *const key_pair_file)
 
 	if(-1 == gmp_fprintf(p_public_file, "%Z02x\n", e) 
 		|| -1 == gmp_fprintf(p_private_file, "%Z02x\n", d)
-		|| -1 == gmp_fprintf(p_public_file, "%Z02x\n", n)
-		|| -1 == gmp_fprintf(p_private_file, "%Z02x\n", n))
+		|| -1 == gmp_fprintf(p_public_file, "%Z02x", n)
+		|| -1 == gmp_fprintf(p_private_file, "%Z02x", n))
 	{
 		printf("DoGenerateRsaKey, write key to file err\n");
 		exit(1);
@@ -188,8 +188,6 @@ char *RsaEncrypt(const unsigned char *const source, const int source_size, unsig
 		exit(1);
 	}
 	fclose(p_public_file);
-
-
 
 	Crypt(source, source_size, dest, dest_size, e, n);
 }

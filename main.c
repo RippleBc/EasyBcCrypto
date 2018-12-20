@@ -33,9 +33,9 @@ int main()
 
   // prime_test();
 
-  rsa_test();
+  // rsa_test();
 
-  // ecc_test();
+  ecc_test();
 
   return 0;
 }
@@ -108,7 +108,7 @@ void rsa_test()
 {
   int i;
   
-  // DoGenerateRsaKey(512, "key_pair");
+  DoGenerateRsaKey(512, "key_pair");
 
   unsigned char dest[MAX_STR_SIZE];
   int dest_size, debug_tmp_size;
@@ -162,22 +162,39 @@ void rsa_test()
 void ecc_test()
 {
   int i;
+
   /*  */
   GenerateEccKey("key_pair");
-  /*  */
-  char text[MAX_STR_SIZE] = "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2syadx";
-  // char r[MAX_STR_SIZE];
-  // char s[MAX_STR_SIZE];
 
-  // /* sha256 */
-  // unsigned char hash[SHA256_BYTES];
-  // sha256(text, strnlen(text, MAX_STR_SIZE), hash);
-  // printf("sha256 result: ");
-  // for(i = 0; i < SHA256_BYTES; i++)
-  // {
-  //   printf("%02x ", hash[i]);
-  // }
-  // printf("\n");
-  // EccSign(1, hash, "key_pair", r, s);
-  // printf("VerifySign: %d\n", EccVerifySign(hash, "key_pair", r, s));
+  /* sha256 */
+  char text[MAX_STR_SIZE] = "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2sy";
+  unsigned char hash[SHA256_BYTES];
+  sha256(text, strnlen(text, MAX_STR_SIZE), hash);
+  printf("sha256 result: ");
+  for(i = 0; i < SHA256_BYTES; i++)
+  {
+    printf("%02x ", hash[i]);
+  }
+  printf("\n");
+
+  /* sign */
+  unsigned char r[MAX_STR_SIZE];
+  unsigned char s[MAX_STR_SIZE];
+  int r_size, s_size;
+  EccSign(hash, "key_pair", r, &r_size, s, &s_size);
+  printf("r: ");
+  for(i = 0; i < r_size; i++)
+  {
+    printf("%02x", r[i]);
+  }
+  printf("\n");
+  printf("s: ");
+  for(i = 0; i < s_size; i++)
+  {
+    printf("%02x", s[i]);
+  }
+  printf("\n");
+
+  /* verify */
+  printf("VerifySign: %d\n", EccVerifySign(hash, "key_pair", r, r_size, s, s_size));
 }

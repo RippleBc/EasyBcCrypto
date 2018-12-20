@@ -364,10 +364,10 @@ void GenerateEccKey(const char *const key_pair_file)
 		exit(1);
 	}
 
-	if(-1 == gmp_fprintf(p_public_file, "%Z02x", p_x)
+	if(-1 == gmp_fprintf(p_public_file, "%Z02x\n", p_x)
 		|| -1 == gmp_fprintf(p_public_file, "%Z02x", p_y)
-		|| -1 == gmp_fprintf(p_private_file, "%Z02x", private_key)
-		|| -1 == gmp_fprintf(p_private_file, "%Z02x", p_x) 
+		|| -1 == gmp_fprintf(p_private_file, "%Z02x\n", private_key)
+		|| -1 == gmp_fprintf(p_private_file, "%Z02x\n", p_x) 
 		|| -1 == gmp_fprintf(p_private_file, "%Z02x", p_y))
 	{
 		printf("GenerateEccKey, write e to file err\n");
@@ -383,256 +383,274 @@ void GenerateEccKey(const char *const key_pair_file)
 	}
 }
 
-// void EccSign(const int byteLen, const unsigned char *const s_source, const char *const key_pair_file, char *s_r, char *s_s)
-// {
-// 	printf("begin to sign ...\n");
+void EccSign(const unsigned char *const s_source, const char *const key_pair_file, unsigned char *s_r, int *s_r_size, unsigned char *s_s, int *s_s_size)
+{
+	printf("begin to sign ...\n");
 
-// 	/*  */
-// 	InitDomainParameters();
+	/*  */
+	InitDomainParameters();
 
-// 	/*********************************** init private key ************************************/
-// 	char private_file_name[FILE_NAME_LEN];
-// 	snprintf(private_file_name, FILE_NAME_LEN, "keys/%s_private.ecc",  key_pair_file);
-// 	FILE *p_private_file;
-// 	p_private_file = fopen(private_file_name, "rt");
-// 	if(p_private_file == NULL)
-// 	{
-// 		printf("EccSign, can not open file %s\n", private_file_name);
-// 		exit(1);
-// 	}
+	/*********************************** init private key ************************************/
+	char private_file_name[FILE_NAME_LEN];
+	snprintf(private_file_name, FILE_NAME_LEN, "keys/%s_private.ecc",  key_pair_file);
+	FILE *p_private_file;
+	p_private_file = fopen(private_file_name, "rt");
+	if(p_private_file == NULL)
+	{
+		printf("EccSign, can not open file %s\n", private_file_name);
+		exit(1);
+	}
 
-// 	/*  */
-// 	char buffer[MAX_STR_SIZE];
-// 	BigInt private_key, public_p_x, public_p_y;
-// 	char c;
-// 	int mark = 0;
+	/*  */
+	char buffer[MAX_STR_SIZE];
+	mpz_t private_key, public_p_x, public_p_y;
+	char c;
+	int mark = 0;
 	
-// 	while((fgets(buffer, MAX_STR_SIZE, p_private_file)) != NULL)
-// 	{
-// 		if(mark == 0)
-// 		{
-// 			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
-// 			buffer[real_size] = '\0';
+	while((fgets(buffer, MAX_STR_SIZE, p_private_file)) != NULL)
+	{
+		if(mark == 0)
+		{
+			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
+			buffer[real_size] = '\0';
 
-// 			StrToBigInt(buffer, &private_key);
-// 		}
-// 		else if(mark == 1)
-// 		{
-// 			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
-// 			buffer[real_size] = '\0';
+			mpz_init_set_str(private_key, buffer, 16);
+		}
+		else if(mark == 1)
+		{
+			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
+			buffer[real_size] = '\0';
 
-// 			StrToBigInt(buffer, &public_p_x);
-// 		}
-// 		else
-// 		{
-// 			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
-// 			buffer[real_size] = '\0';
+			mpz_init_set_str(public_p_x, buffer, 16);
+		}
+		else
+		{
+			mpz_init_set_str(public_p_y, buffer, 16);
+		}
 
-// 			StrToBigInt(buffer, &public_p_y);
-// 		}
-
-// 		mark++;
-// 	}
-// 	if(!feof(p_private_file))
-// 	{
-// 		printf("EccSign, fgets err %s\n", private_file_name);
-// 		exit(1);
-// 	}
-// 	fclose(p_private_file);
-
-// 	/*********************************** sign ***********************************/
-// 	BigInt source, p_x, p_y, tmp_1, tmp_2, k, r, s, truncated_hash;
-// 	memset(&s, 0, MAX_STR_SIZE);
-
-// 	/*  */
-// 	memset(source.bit, 0, MAX_STR_SIZE);
-// 	byteSequenceToBinBigInt(s_source, SHA256_BYTES, &source);
-
-// 	/* compute truncated_hash */
-// 	DoMod(&source, &N, &truncated_hash);
-// 	if(ECC_SIGN_DEBUG)
-// 	{
-// 		BigIntToStr(&private_key, debug_tmp);
-// 		printf("EccSign, private_key: %s\n\n", debug_tmp);
-// 		BigIntToStr(&truncated_hash, debug_tmp);
-// 		printf("EccSign, truncated_hash: %s\n\n", debug_tmp);
-// 	}
-
-// 	do
-// 	{
-// 		/* init r */
-// 		DoGetPositiveRandBigInt(byteLen, &k);
-// 		DoMod(&k, &N, &k);
-// 		if(mpz_cmp(&k, &G_BIG_INT_ZERO) == 0)
-// 		{
-// 			continue;
-// 		}
-// 		if(ECC_SIGN_DEBUG)
-// 		{
-// 			BigIntToStr(&k, debug_tmp);
-// 			printf("EccSign, k: %s\n\n", debug_tmp);
-// 		}
-
-// 		/* compute kG */
-// 		ComputeMP(&k, &X_G, &Y_G, &p_x, &p_y);
-// 		/* compute r */
-// 		DoMod(&p_x, &N, &r);
-
-// 		if(mpz_cmp(&r, &G_BIG_INT_ZERO) == 0)
-// 		{
-// 			continue;
-// 		}
-// 		if(ECC_SIGN_DEBUG)
-// 		{
-// 			BigIntToStr(&r, debug_tmp);
-// 			printf("EccSign, r: %s\n\n", debug_tmp);
-// 		}
-
-// 		/* compute k ^ -1 */
-// 		GeneMulReverse(&k, &N, &tmp_1);
-
-// 		/* compute right */
-// 		DoMul(&r, &private_key, &tmp_2);
-// 		DoAdd(&tmp_2, &truncated_hash, &tmp_2);
-
-// 		/*  */
-// 		DoMul(&tmp_1, &tmp_2, &tmp_1);
-// 		DoMod(&tmp_1, &N, &s);
-// 	}
-// 	while(mpz_cmp(&s, &G_BIG_INT_ZERO) == 0);
-
-// 	if(ECC_SIGN_DEBUG)
-// 	{
-// 		BigIntToStr(&s, debug_tmp);
-// 		printf("EccSign, s: %s\n\n", debug_tmp);
-// 	}
-
-// 	BigIntToStr(&r, s_r);
-// 	BigIntToStr(&s, s_s);
-// }
-
-// int EccVerifySign(const unsigned char *const s_source, const char *const key_pair_file, const char *const s_r, const char *const s_s)
-// {
-// 	InitDomainParameters();
-
-// 	/*********************************** init public key ***********************************/
-// 	char public_file_name[FILE_NAME_LEN];
-// 	snprintf(public_file_name, FILE_NAME_LEN, "keys/%s_public.ecc",  key_pair_file);
-// 	FILE *p_public_file;
-// 	p_public_file = fopen(public_file_name, "rt");
-// 	if(p_public_file == NULL)
-// 	{
-// 		printf("EccVerifySign, can not open file %s\n", public_file_name);
-// 		exit(1);
-// 	}
-
-// 	/*  */
-// 	char buffer[MAX_STR_SIZE];
-// 	BigInt public_p_x, public_p_y;
-// 	char c;
-// 	int mark = 0;
+		mark++;
+	}
+	if(!feof(p_private_file))
+	{
+		printf("EccSign, fgets err %s\n", private_file_name);
+		exit(1);
+	}
+	fclose(p_private_file);
+	if(ECC_SIGN_DEBUG)
+	{
+		gmp_printf("EccVerifySign, private_key: %Zd\n", private_key);
+		gmp_printf("EccVerifySign, public_p_x: %Zd\n", public_p_x);
+		gmp_printf("EccVerifySign, public_p_y: %Zd\n", public_p_y);
+	}
+	/*********************************** sign ***********************************/
+	mpz_t source, p_x, p_y, tmp_1, tmp_2, k, r, s, truncated_hash;
 	
-// 	while((fgets(buffer, MAX_STR_SIZE, p_public_file)) != NULL)
-// 	{
-// 		if(mark == 0)
-// 		{
-// 			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
-// 			buffer[real_size] = '\0';
+	mpz_init(source);
+	mpz_init(p_x);
+	mpz_init(p_y);
+	mpz_init(tmp_1);
+	mpz_init(tmp_2);
+	mpz_init(k);
+	mpz_init(r);
+	mpz_init(s);
+	mpz_init(truncated_hash);
 
-// 			StrToBigInt(buffer, &public_p_x);
-// 		}
-// 		else
-// 		{
-// 			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
-// 			buffer[real_size] = '\0';
+	/* convert byte sequence to big int */
+	mpz_import(source, SHA256_BYTES, 1, sizeof(unsigned char), 1, 0, s_source);
+	/* compute truncated_hash */
+	mpz_mod(truncated_hash, source, N);
+	if(ECC_SIGN_DEBUG)
+	{
+		gmp_printf("EccSign, private_key: %Zd\n", private_key);
+		gmp_printf("EccSign, truncated_hash: %Zd\n", truncated_hash);
+	}
 
-// 			StrToBigInt(buffer, &public_p_y);
-// 		}
+	do
+	{
+		/* init r */
+		DoGetPositiveRand(N, k);
+		if(mpz_cmp(k, G_BIG_INT_ZERO) == 0)
+		{
+			continue;
+		}
+		if(ECC_SIGN_DEBUG)
+		{
+			gmp_printf("EccSign, k: %Zd\n", k);
+		}
 
-// 		mark++;
-// 	}
-// 	if(!feof(p_public_file))
-// 	{
-// 		printf("EccVerifySign, fgets err %s\n", public_file_name);
-// 		exit(1);
-// 	}
-// 	fclose(p_public_file);
+		/* compute kG */
+		ComputeMP(k, X_G, Y_G, p_x, p_y);
+		/* compute r */
+		mpz_mod(r, p_x, N);
+		if(mpz_cmp(r, G_BIG_INT_ZERO) == 0)
+		{
+			continue;
+		}
+		if(ECC_SIGN_DEBUG)
+		{
+			gmp_printf("EccSign, r: %Zd\n", r);
+		}
 
-// 	/*********************************** verify ***********************************/
-// 	BigInt source, tmp, truncated_hash, s, r, s_reverse, v1, v2, x_p, y_p, x_q, y_q, result_x, result_y;
+		/* compute k ^ -1 */
+		GeneMulReverse(k, N, tmp_1);
 
-// 	/*  */
-// 	memset(source.bit, 0, MAX_STR_SIZE);
-// 	byteSequenceToBinBigInt(s_source, SHA256_BYTES, &source);
+		/* compute right */
+		mpz_mul(tmp_2, r, private_key);
+		mpz_add(tmp_2, truncated_hash, tmp_2);
+
+		/*  */
+		mpz_mul(tmp_1, tmp_2, tmp_1);
+		mpz_mod(s, tmp_1, N);
+	}
+	while(mpz_cmp(&s, &G_BIG_INT_ZERO) == 0);
+
+	if(ECC_SIGN_DEBUG)
+	{
+		gmp_printf("EccSign, s: %Zd\n", s);
+	}
+
+	mpz_export(s_r, s_r_size, 1, sizeof(unsigned char), 1, 0, r);
+	mpz_export(s_s, s_s_size, 1, sizeof(unsigned char), 1, 0, s);
+}
+
+int EccVerifySign(const unsigned char *const s_source, const char *const key_pair_file, const char *const s_r, const int s_r_size, const char *const s_s, const int s_s_size)
+{
+	InitDomainParameters();
+
+	/*********************************** init public key ***********************************/
+	char public_file_name[FILE_NAME_LEN];
+	snprintf(public_file_name, FILE_NAME_LEN, "keys/%s_public.ecc",  key_pair_file);
+	FILE *p_public_file;
+	p_public_file = fopen(public_file_name, "rt");
+	if(p_public_file == NULL)
+	{
+		printf("EccVerifySign, can not open file %s\n", public_file_name);
+		exit(1);
+	}
+
+	/*  */
+	char buffer[MAX_STR_SIZE];
+	mpz_t public_p_x, public_p_y;
+	char c;
+	int mark = 0;
 	
-// 	StrToBigInt(s_s, &s);
-// 	StrToBigInt(s_r, &r);
+	while((fgets(buffer, MAX_STR_SIZE, p_public_file)) != NULL)
+	{
+		if(mark == 0)
+		{
+			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
+			buffer[real_size] = '\0';
 
-// 	/* compute truncated_hash */
-// 	DoMod(&source, &N, &truncated_hash);
-// 	if(ECC_VERIFY_SIGN_DEBUG)
-// 	{
-// 		BigIntToStr(&truncated_hash, debug_tmp);
-// 		printf("EccVerifySign, truncated_hash: %s\n\n", debug_tmp);
-// 	}
+			mpz_init_set_str(public_p_x, buffer, 16);
+		}
+		else
+		{
+			mpz_init_set_str(public_p_y, buffer, 16);
+		}
 
-// 	/*  */
-// 	GeneMulReverse(&s, &N, &s_reverse);
+		mark++;
+	}
+	if(!feof(p_public_file))
+	{
+		printf("EccVerifySign, fgets err %s\n", public_file_name);
+		exit(1);
+	}
+	fclose(p_public_file);
+	if(ECC_VERIFY_SIGN_DEBUG)
+	{
+		gmp_printf("EccVerifySign, public_p_x: %Zd\n", public_p_x);
+		gmp_printf("EccVerifySign, public_p_y: %Zd\n", public_p_y);
+	}
 
-// 	/* compute v1 */
-// 	DoMul(&s_reverse, &truncated_hash, &tmp);
-// 	DoMod(&tmp, &N, &v1);
-// 	if(ECC_VERIFY_SIGN_DEBUG)
-// 	{
-// 		BigIntToStr(&v1, debug_tmp);
-// 		printf("EccVerifySign, v1: %s\n\n", debug_tmp);
-// 	}
+	/*********************************** verify ***********************************/
+	mpz_t source, tmp, truncated_hash, s, r, s_reverse, v1, v2, x_p, y_p, x_q, y_q, result_x, result_y;
 
-// 	/* compute v2 */
-// 	DoMul(&s_reverse, &r, &tmp);
-// 	DoMod(&tmp, &N, &v2);
-// 	if(ECC_VERIFY_SIGN_DEBUG)
-// 	{
-// 		BigIntToStr(&v2, debug_tmp);
-// 		printf("EccVerifySign, v2: %s\n\n", debug_tmp);
-// 	}
+	mpz_init(source);
+	mpz_init(tmp);
+	mpz_init(truncated_hash);
+	mpz_init(s);
+	mpz_init(r);
+	mpz_init(s_reverse);
+	mpz_init(v1);
+	mpz_init(v2);
+	mpz_init(x_p);
+	mpz_init(y_p);
+	mpz_init(x_q);
+	mpz_init(y_q);
+	mpz_init(result_x);
+	mpz_init(result_y);
 
-// 	/* compute left */
-// 	ComputeMP(&v1, &X_G, &Y_G, &x_p, &y_p);
-// 	if(ECC_VERIFY_SIGN_DEBUG)
-// 	{
-// 		BigIntToStr(&x_p, debug_tmp);
-// 		printf("EccVerifySign, x_p: %s\n\n", debug_tmp);
-// 		BigIntToStr(&y_p, debug_tmp);
-// 		printf("EccVerifySign, y_p: %s\n\n", debug_tmp);
-// 	}
+	/* init source */
+	mpz_import(source, SHA256_BYTES, 1 , sizeof(unsigned char), 1, 0, s_source);
 
-// 	/* compute right */
-// 	ComputeMP(&v2, &public_p_x, &public_p_y, &x_q, &y_q);
-// 	if(ECC_VERIFY_SIGN_DEBUG)
-// 	{
-// 		BigIntToStr(&x_q, debug_tmp);
-// 		printf("EccVerifySign, x_q: %s\n\n", debug_tmp);
-// 		BigIntToStr(&y_q, debug_tmp);
-// 		printf("EccVerifySign, y_q: %s\n\n", debug_tmp);
-// 	}
+	/* init public key */
+	mpz_import(s, s_s_size, 1 , sizeof(unsigned char), 1, 0, s_s);
+	mpz_import(r, s_r_size, 1 , sizeof(unsigned char), 1, 0, s_r);
+	if(ECC_VERIFY_SIGN_DEBUG)
+	{
+		gmp_printf("EccVerifySign, s: %Zd\n", s);
+		gmp_printf("EccVerifySign, r: %Zd\n", r);
+	}
 
-// 	/*  */
-// 	if(mpz_cmp(&x_p, &x_q) == 0 && mpz_cmp(&y_p, &y_q) == 0)
-// 	{
-// 		ComputeMP(&G_BIG_INT_TWO, &x_p, &y_p, &result_x, &result_y);
-// 	}
-// 	else
-// 	{
-// 		ComputeXGAddYG(&x_p, &y_p, &x_q, &y_q, &result_x, &result_y);
-// 	}
+	/* compute truncated_hash */
+	mpz_mod(truncated_hash, source, N);
+	if(ECC_VERIFY_SIGN_DEBUG)
+	{
+		gmp_printf("EccVerifySign, truncated_hash: %Zd\n", truncated_hash);
+	}
+
+	/*  */
+	GeneMulReverse(s, N, s_reverse);
+
+	/* compute v1 */
+	mpz_mul(tmp, s_reverse, truncated_hash);
+	mpz_mod(v1, tmp, N);
+	if(ECC_VERIFY_SIGN_DEBUG)
+	{
+		gmp_printf("EccVerifySign, v1: %Zd\n", v1);
+	}
+
+	/* compute v2 */
+	mpz_mul(tmp, s_reverse, r);
+	mpz_mod(v2, tmp, N);
+	if(ECC_VERIFY_SIGN_DEBUG)
+	{
+		gmp_printf("EccVerifySign, v2: %Zd\n", v2);
+	}
+
+	/* compute left */
+	ComputeMP(v1, X_G, Y_G, x_p, y_p);
+	if(ECC_VERIFY_SIGN_DEBUG)
+	{
+		
+		gmp_printf("EccVerifySign, x_p: %Zd\n", x_p);
+		gmp_printf("EccVerifySign, y_p: %Zd\n", y_p);
+	}
+
+	/* compute right */
+	ComputeMP(v2, public_p_x, public_p_y, x_q, y_q);
+	if(ECC_VERIFY_SIGN_DEBUG)
+	{
+		gmp_printf("EccVerifySign, x_q: %Zd\n", x_q);
+		gmp_printf("EccVerifySign, y_q: %Zd\n", y_q);
+	}
+
+	/*  */
+	if(mpz_cmp(x_p, x_q) == 0 && mpz_cmp(y_p, y_q) == 0)
+	{
+		ComputeMP(G_BIG_INT_TWO, x_p, y_p, result_x, result_y);
+	}
+	else
+	{
+		ComputeXGAddYG(x_p, y_p, x_q, y_q, result_x, result_y);
+	}
 	
-// 	/*  */
-// 	DoMod(&result_x, &N, &tmp);
+	/*  */
+	mpz_mod(tmp, result_x, N);
 
-// 	if(mpz_cmp(&tmp, &r) == 0)
-// 	{
-// 		return 1;
-// 	}
-// 	return 0;
-// }
+	if(mpz_cmp(tmp, r) == 0)
+	{
+		return 1;
+	}
+	return 0;
+}
