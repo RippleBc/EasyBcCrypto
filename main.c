@@ -28,7 +28,7 @@ int main()
   init();
 
   // sha256_test();
-  
+
   // random_test();
 
   // prime_test();
@@ -36,8 +36,6 @@ int main()
   // rsa_test();
 
   // ecc_test();
-
-  
 
   return 0;
 }

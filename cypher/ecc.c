@@ -10,17 +10,17 @@
 // #include <string.h>
 // #include "../hash/sha256.h"
 
-// static BigInt P;
-// static BigInt A;
-// static BigInt B;
-// static BigInt X_G;
-// static BigInt Y_G;
-// static BigInt N; /* the order of discrete ellipse curve, N * p = 0 (p is a random point which at descrete ellipse curve) */
-// static BigInt H; /* n * h = N, n * ( h * p) = 0, G = h * p (p is a random point which at descrete ellipse curve) */
+// static mpz_t P;
+// static mpz_t A;
+// static mpz_t B;
+// static mpz_t X_G;
+// static mpz_t Y_G;
+// static mpz_t N; /* the order of discrete ellipse curve, N * p = 0 (p is a random point which at descrete ellipse curve) */
+// static mpz_t H; /* n * h = N, n * ( h * p) = 0, G = h * p (p is a random point which at descrete ellipse curve) */
 
 // static int TEST_ECC_DOMAIN_PARAMETER = 1;
 
-// char SECP_256_K1_PARA[7][BIG_INT_BIT_LEN] =
+// char SECP_256_K1_PARA[7][MAX_STR_SIZE] =
 // {
 // 	"fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f",
 // 	"0",
@@ -31,7 +31,7 @@
 // 	"1"
 // };
 
-// char TEST_PARA[7][BIG_INT_BIT_LEN] =
+// char TEST_PARA[7][MAX_STR_SIZE] =
 // {
 // 	"61",
 // 	"2",
@@ -42,12 +42,7 @@
 // 	"1"
 // };
 
-// static BigInt ECC_ZERO;
-// static BigInt BIG_INT_ZERO;
-// static BigInt BIG_INT_ONE;
-// static BigInt BIG_INT_TWO;
-// static BigInt BIG_INT_THREE;
-// static char debug_tmp[BIG_INT_BIT_LEN];
+// static mpz_t ECC_ZERO;
 
 // void InitDomainParameters()
 // {
@@ -56,247 +51,162 @@
 // 		TEST_ECC_DOMAIN_PARAMETER = 0;
 // 	}
 
-// 	char s_decimal_p[BIG_INT_BIT_LEN];
-// 	char s_tmp_1[BIG_INT_BIT_LEN];
-// 	char s_tmp_2[BIG_INT_BIT_LEN];
-
-// 	StrToBigInt("-99", &ECC_ZERO);
-// 	StrToBigInt("0", &BIG_INT_ZERO);
-// 	StrToBigInt("1", &BIG_INT_ONE);
-// 	StrToBigInt("2", &BIG_INT_TWO);
-// 	StrToBigInt("3", &BIG_INT_THREE);
+// 	mpz_init_set_str(ECC_ZERO, "-99", 16);
 
 // 	if(TEST_ECC_DOMAIN_PARAMETER)
 // 	{
-// 		ChangeStringRadix(TEST_PARA[0], 16, 10, s_decimal_p);
-// 		StrToBigInt(s_decimal_p, &P);
-
-// 		StrToBigInt(TEST_PARA[1], &A);
-
-// 		StrToBigInt(TEST_PARA[2], &B);
-
-// 		char s_decimal_x_g[BIG_INT_BIT_LEN];
-// 		ChangeStringRadix(TEST_PARA[3], 16, 10, s_decimal_x_g);
-// 		StrToBigInt(s_decimal_x_g, &X_G);
-
-// 		char s_decimal_y_g[BIG_INT_BIT_LEN];
-// 		ChangeStringRadix(TEST_PARA[4], 16, 10, s_decimal_y_g);
-// 		StrToBigInt(s_decimal_y_g, &Y_G);
-
-// 		char s_decimal_n[BIG_INT_BIT_LEN];
-// 		ChangeStringRadix(TEST_PARA[5], 16, 10, s_decimal_n);
-// 		StrToBigInt(s_decimal_n, &N);
-
-// 		StrToBigInt(TEST_PARA[6], &H);
+// 		mpz_init_set_str(P, TEST_PARA[0], 16);
+// 		mpz_init_set_str(A, TEST_PARA[1], 16);
+// 		mpz_init_set_str(B, TEST_PARA[2], 16);
+// 		mpz_init_set_str(X_G, TEST_PARA[3], 16);
+// 		mpz_init_set_str(Y_G, TEST_PARA[4], 16);
+// 		mpz_init_set_str(N, TEST_PARA[5], 16);
+// 		mpz_init_set_str(H, TEST_PARA[6], 16);
 // 	}
 // 	else
 // 	{
-// 		ChangeStringRadix(SECP_256_K1_PARA[0], 16, 10, s_decimal_p);
-// 		StrToBigInt(s_decimal_p, &P);
-
-// 		StrToBigInt(SECP_256_K1_PARA[1], &A);
-
-// 		StrToBigInt(SECP_256_K1_PARA[2], &B);
-
-// 		char s_decimal_x_g[BIG_INT_BIT_LEN];
-// 		ChangeStringRadix(SECP_256_K1_PARA[3], 16, 10, s_decimal_x_g);
-// 		StrToBigInt(s_decimal_x_g, &X_G);
-
-// 		char s_decimal_y_g[BIG_INT_BIT_LEN];
-// 		ChangeStringRadix(SECP_256_K1_PARA[4], 16, 10, s_decimal_y_g);
-// 		StrToBigInt(s_decimal_y_g, &Y_G);
-
-// 		char s_decimal_n[BIG_INT_BIT_LEN];
-// 		ChangeStringRadix(SECP_256_K1_PARA[5], 16, 10, s_decimal_n);
-// 		StrToBigInt(s_decimal_n, &N);
-
-// 		StrToBigInt(SECP_256_K1_PARA[6], &H);
+// 		mpz_init_set_str(P, SECP_256_K1_PARA[0], 16);
+// 		mpz_init_set_str(A, SECP_256_K1_PARA[1], 16);
+// 		mpz_init_set_str(B, SECP_256_K1_PARA[2], 16);
+// 		mpz_init_set_str(X_G, SECP_256_K1_PARA[3], 16);
+// 		mpz_init_set_str(Y_G, SECP_256_K1_PARA[4], 16);
+// 		mpz_init_set_str(N, SECP_256_K1_PARA[5], 16);
+// 		mpz_init_set_str(H, SECP_256_K1_PARA[6], 16);
 // 	}
 // }
 
-// BigInt *GeneMulReverse(const BigInt *const a, const BigInt *const p, BigInt *mul_inverse)
+// void GeneMulReverse(const mpz_t const a, const mpz_t const p, mpz_t mul_inverse)
 // {
 // 	/* check arg */
-// 	if(DoCompare(a, &BIG_INT_ZERO) <= 0)
+// 	if(mpz_cmp(a, BIG_INT_ZERO) <= 0)
 // 	{
-// 		BigIntToStr(a, debug_tmp);
-// 		printf("\nGeneMulReverse, a must bigger than zero %s\n", debug_tmp);
+// 		gmp_printf("\nGeneMulReverse, a must bigger than zero %Z02x\n", a);
 // 		exit(1);
 // 	}
 
-// 	if(DoCompare(p, &BIG_INT_ZERO) <= 0)
+// 	if(mpz_cmp(p, BIG_INT_ZERO) <= 0)
 // 	{
-// 		BigIntToStr(p, debug_tmp);
-// 		printf("\nGeneMulReverse, p must bigger than zero %s\n", debug_tmp);
+// 		gmp_printf("\nGeneMulReverse, p must bigger than zero %Z02x\n", p);
 // 		exit(1);
 // 	}
 
-// 	BigInt result, tmp, x, y;
-// 	unsigned char a_big_p;
+// 	mpz_t tmp;
 
-// 	if(DoCompare(a, p) > 0)
-// 	{
-// 		a_big_p = 1;
-// 	}
-// 	else
-// 	{
-// 		a_big_p = 0;
-// 	}
+// 	mpz_init(tmp);
 
-// 	StrToBigInt("0", &tmp);
-
-// 	while(1)
-// 	{
-// 			CopyBigInt(&tmp, &y);
-// 			if(a_big_p)
-// 			{
-// 				DoExGcd(a, p, &x, &y, &result);
-// 				if(DoCompare(&x, &BIG_INT_ZERO) > 0)
-// 				{
-// 					return CopyBigInt(&x, mul_inverse);
-// 				}
-// 			}
-// 			else
-// 			{
-// 				DoExGcd(p, a, &x, &y, &result);
-// 				if(DoCompare(&y, &BIG_INT_ZERO) > 0)
-// 				{
-// 					return CopyBigInt(&y, mul_inverse);
-// 				}
-// 			}
-
-// 			if(DoCompare(&tmp, &BIG_INT_ZERO) == 0)
-// 			{
-// 				DoAdd(&tmp, &BIG_INT_ONE, &tmp);
-// 			}
-// 			else if(DoCompare(&tmp, &BIG_INT_ZERO) > 0)
-// 			{
-// 				DoSub(&BIG_INT_ZERO, &tmp, &tmp);
-// 			}
-// 			else
-// 			{
-// 				DoSub(&BIG_INT_ZERO, &tmp, &tmp);
-// 				DoAdd(&tmp, &BIG_INT_ONE, &tmp);
-// 			}
-// 	}
+// 	mpz_gcdext(G_BIG_INT_ONE, mul_inverse, tmp, a, p);
 // }
 
-// static void ComputeXGAddYG(const BigInt *const _x_p, const BigInt *const _y_p, const BigInt *const _x_q, const BigInt *const _y_q, BigInt *result_x, BigInt *result_y)
+// static void ComputeXGAddYG(const mpz_t const _x_p, const mpz_t const _y_p, const mpz_t const _x_q, const mpz_t const _y_q, mpz_t result_x, mpz_t result_y)
 // {
-// 	if(DoCompare(_x_p, _x_q) == 0 && DoCompare(_y_p, _y_q) == 0)
+// 	if(mpz_cmp(_x_p, _x_q) == 0 && mpz_cmp(_y_p, _y_q) == 0)
 // 	{
 // 		printf("ComputeXGAddYG, point p and q must be different\n");
 // 		exit(1);
 // 	}
 
 // 	/* check zero */
-// 	if(DoCompare(_x_p, &ECC_ZERO) == 0 || DoCompare(_y_p, &ECC_ZERO) == 0)
+// 	if(mpz_cmp(_x_p, ECC_ZERO) == 0 || mpz_cmp(_y_p, ECC_ZERO) == 0)
 // 	{
-// 		CopyBigInt(_x_q, result_x);
-// 		CopyBigInt(_y_q, result_y);
+// 		mpz_set(result_x, _x_q);
+// 		mpz_set(result_y, _y_q);
 // 		return;
 // 	}
 
-// 	if(DoCompare(_x_q, &ECC_ZERO) == 0 || DoCompare(_y_q, &ECC_ZERO) == 0)
+// 	if(DoCompare(_x_q, ECC_ZERO) == 0 || DoCompare(_y_q, ECC_ZERO) == 0)
 // 	{
-// 		CopyBigInt(_x_p, result_x);
-// 		CopyBigInt(_y_p, result_y);
+// 		mpz_set(result_x, _x_p);
+// 		mpz_set(result_y, _y_p);
 // 		return;
 // 	}
 
 // 	if(DoCompare(_x_p, _x_q) == 0)
 // 	{
-// 		StrToBigInt(&ECC_ZERO, result_x);
-// 		StrToBigInt(&ECC_ZERO, result_y);
+// 		mpz_set_str(result_x, ECC_ZERO, 16);
+// 		mpz_set_str(result_y, ECC_ZERO, 16);
 // 		return;
 // 	}
 
-// 	BigInt tmp_1, tmp_2, m, mod_inverse, x_p, y_p, x_q, y_q;
 
-// 	CopyBigInt(_x_p, &x_p);
-// 	CopyBigInt(_y_p, &y_p);
-// 	CopyBigInt(_x_q, &x_q);
-// 	CopyBigInt(_y_q, &y_q);
+// 	/************************************ compute ************************************/
+// 	mpz_t tmp_1, tmp_2, m, mod_inverse, x_p, y_p, x_q, y_q;
+
+// 	mpz_init(tmp_1);
+// 	mpz_init(tmp_2);
+// 	mpz_init(m);
+// 	mpz_init(mod_inverse);
+// 	mpz_init(x_p);
+// 	mpz_init(y_p);
+// 	mpz_init(x_q);
+// 	mpz_init(y_q);
+
+// 	mpz_set(x_p, _x_p);
+// 	mpz_set(y_p, _y_p);
+// 	mpz_set(x_q, _x_q);
+// 	mpz_set(y_q, _y_q);
 
 // 	/* compute slope m */
-// 	DoSub(&y_p, &y_q, &tmp_1);
-// 	DoSub(&x_p, &x_q, &tmp_2);
-// 	if(DoCompare(&tmp_2, &BIG_INT_ZERO) < 0)
+// 	mpz_sub(tmp_1, y_p, y_q);
+// 	mpz_sub(tmp_2, x_p, x_q);
+// 	if(mpz_cmp(tmp_2, BIG_INT_ZERO) < 0)
 // 	{
-// 		DoSub(&BIG_INT_ZERO, &tmp_2, &tmp_2);
+// 		mpz_sub(tmp_2, BIG_INT_ZERO, tmp_2);
 // 	}
-
-// 	GeneMulReverse(&tmp_2, &P, &mod_inverse);
-	
+// 	GeneMulReverse(tmp_2, P, mod_inverse);
 // 	if(ECC_DEBUG)
 // 	{
-// 		BigIntToStr(&mod_inverse, debug_tmp);
-// 		printf("\nComputeXGAddYG, mod_inverse %s\n", debug_tmp);
+// 		printf("ComputeXGAddYG, mod_inverse: %Zd\n", mod_inverse);
 // 	}
 
-// 	DoMul(&tmp_1, &mod_inverse, &tmp_1);
-// 	DoMod(&tmp_1, &P, &m);
-// 	if(DoCompare(&m, &BIG_INT_ZERO) < 0)
+// 	mpz_mul(tmp_1, tmp_1, mod_inverse);
+// 	mpz_mod(m, tmp_1, P);
+// 	if(mpz_cmp(m, BIG_INT_ZERO) < 0)
 // 	{
-// 		DoAdd(&m, &P, &m);
+// 		mpz_add(m, P, m);
 // 	}
 // 	if(ECC_DEBUG)
 // 	{
-// 		BigIntToStr(&m, debug_tmp);
-// 		printf("\nComputeXGAddYG, m %s\n", debug_tmp);
+// 		printf("ComputeXGAddYG, m: %Zd\n", m);
 // 	}
 
 // 	/* compute x */
-// 	DoMul(&m, &m, &tmp_1);
-// 	DoSub(&tmp_1, &x_p, &tmp_1);
-// 	DoSub(&tmp_1, &x_q, &tmp_1);
-// 	DoMod(&tmp_1, &P, result_x);
-// 	if(DoCompare(result_x, &BIG_INT_ZERO) < 0)
+// 	mpz_mul(tmp_1, m, m);
+// 	mpz_sub(tmp_1, x_p, tmp_1);
+// 	mpz_sub(tmp_1, x_q, tmp_1);
+// 	mpz_mod(result_x, tmp_1, P);
+// 	if(mpz_cmp(result_x, BIG_INT_ZERO) < 0)
 // 	{
-// 		DoAdd(result_x, &P, result_x);
+// 		mpz_add(result_x, P, result_x);
 // 	}
 
 // 	/* compute y */
-// 	DoSub(result_x, &x_p, &tmp_1);
-// 	DoMul(&tmp_1, &m, &tmp_1);
-// 	DoAdd(&tmp_1, &y_p, &tmp_1);
-// 	DoMod(&tmp_1, &P, result_y);
-// 	if(DoCompare(result_y, &BIG_INT_ZERO) < 0)
+// 	mpz_sub(tmp_1, result_x, x_p);
+// 	mpz_mul(tmp_1, tmp_1, m);
+// 	mpz_add(tmp_1, y_p, tmp_1);
+// 	mpz_mod(result_y, tmp_1, P);
+// 	if(mpz_cmp(result_y, BIG_INT_ZERO) < 0)
 // 	{
-// 		DoAdd(result_y, &P, result_y);
+// 		mpz_add(result_y, P, result_y);
 // 	}
-// 	DoSub(&P, result_y, result_y);
-
+// 	mpz_sub(result_y, P, result_y);
 
 // 	if(ECC_DEBUG)
 // 	{
-// 		BigIntToStr(&x_p, debug_tmp);
-// 		printf("\nComputeXGAddYG, x_p %s\n", debug_tmp);
-
-// 		BigIntToStr(&y_p, debug_tmp);
-// 		printf("ComputeXGAddYG, y_p %s\n", debug_tmp);
-
-// 		BigIntToStr(&x_q, debug_tmp);
-// 		printf("ComputeXGAddYG, x_q %s\n", debug_tmp);
-
-// 		BigIntToStr(&y_q, debug_tmp);
-// 		printf("ComputeXGAddYG, y_q %s\n", debug_tmp);
-
-// 		BigIntToStr(result_x, debug_tmp);
-// 		printf("ComputeXGAddYG, result_x %s\n", debug_tmp);
-
-// 		BigIntToStr(result_y, debug_tmp);
-// 		printf("ComputeXGAddYG, result_y %s\n", debug_tmp);
+// 		gmp_printf("ComputeXGAddYG, x_p %Zd\n", x_p);
+// 		gmp_printf("ComputeXGAddYG, y_p %Zd\n", y_p);
+// 		gmp_printf("ComputeXGAddYG, x_q %Zd\n", x_q);
+// 		gmp_printf("ComputeXGAddYG, y_q %Zd\n", y_q);
+// 		gmp_printf("ComputeXGAddYG, result_x %Zd\n", result_x);
+// 		gmp_printf("ComputeXGAddYG, result_y %Zd\n", result_y);
 // 	}
+	
 // }
 
 // /* double and add */
-// static void ComputeMP(const BigInt *const private_key, const BigInt *const origin_x, const BigInt *const origin_y, BigInt *p_x, BigInt *p_y)
+// static void ComputeMP(const mpz_t const private_key, const mpz_t const origin_x, const mpz_t const origin_y, mpz_t p_x, mpz_t p_y)
 // {
-// 	BigInt t_x, t_y, tmp_1, tmp_2, mod_inverse, m, r_x, r_y;
-// 	int i, 
-// 	compute_round = GetTrueValueLen(private_key), 
-// 	init = 0;
+// 	mpz_t t_x, t_y, tmp_1, tmp_2, mod_inverse, m, r_x, r_y;
+// 	size_t i, compute_round = mp_szie(private_key), init = 0;
 
 // 	/* init origin point */
 // 	CopyBigInt(origin_x, &t_x);
@@ -431,9 +341,9 @@
 
 // 	BigInt p_x, p_y, private_key;
 
-// 	char s_private_key[BIG_INT_BIT_LEN], s_public_key_x[BIG_INT_BIT_LEN], s_public_key_y[BIG_INT_BIT_LEN];
-// 	char s_tmp_1[BIG_INT_BIT_LEN];
-// 	char s_tmp_2[BIG_INT_BIT_LEN];
+// 	char s_private_key[MAX_STR_SIZE], s_public_key_x[MAX_STR_SIZE], s_public_key_y[MAX_STR_SIZE];
+// 	char s_tmp_1[MAX_STR_SIZE];
+// 	char s_tmp_2[MAX_STR_SIZE];
 
 // 	/* init private key */
 // 	if(OPT_DEBUG)
@@ -527,30 +437,30 @@
 // 	}
 
 // 	/*  */
-// 	char buffer[BIG_INT_BIT_LEN];
+// 	char buffer[MAX_STR_SIZE];
 // 	BigInt private_key, public_p_x, public_p_y;
 // 	char c;
 // 	int mark = 0;
 	
-// 	while((fgets(buffer, BIG_INT_BIT_LEN, p_private_file)) != NULL)
+// 	while((fgets(buffer, MAX_STR_SIZE, p_private_file)) != NULL)
 // 	{
 // 		if(mark == 0)
 // 		{
-// 			int real_size = strnlen(buffer, BIG_INT_BIT_LEN) - SLASH_N_SIZE;
+// 			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
 // 			buffer[real_size] = '\0';
 
 // 			StrToBigInt(buffer, &private_key);
 // 		}
 // 		else if(mark == 1)
 // 		{
-// 			int real_size = strnlen(buffer, BIG_INT_BIT_LEN) - SLASH_N_SIZE;
+// 			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
 // 			buffer[real_size] = '\0';
 
 // 			StrToBigInt(buffer, &public_p_x);
 // 		}
 // 		else
 // 		{
-// 			int real_size = strnlen(buffer, BIG_INT_BIT_LEN) - SLASH_N_SIZE;
+// 			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
 // 			buffer[real_size] = '\0';
 
 // 			StrToBigInt(buffer, &public_p_y);
@@ -567,10 +477,10 @@
 
 // 	/*********************************** sign ***********************************/
 // 	BigInt source, p_x, p_y, tmp_1, tmp_2, k, r, s, truncated_hash;
-// 	memset(&s, 0, BIG_INT_BIT_LEN);
+// 	memset(&s, 0, MAX_STR_SIZE);
 
 // 	/*  */
-// 	memset(source.bit, 0, BIG_INT_BIT_LEN);
+// 	memset(source.bit, 0, MAX_STR_SIZE);
 // 	byteSequenceToBinBigInt(s_source, SHA256_BYTES, &source);
 
 // 	/* compute truncated_hash */
@@ -652,23 +562,23 @@
 // 	}
 
 // 	/*  */
-// 	char buffer[BIG_INT_BIT_LEN];
+// 	char buffer[MAX_STR_SIZE];
 // 	BigInt public_p_x, public_p_y;
 // 	char c;
 // 	int mark = 0;
 	
-// 	while((fgets(buffer, BIG_INT_BIT_LEN, p_public_file)) != NULL)
+// 	while((fgets(buffer, MAX_STR_SIZE, p_public_file)) != NULL)
 // 	{
 // 		if(mark == 0)
 // 		{
-// 			int real_size = strnlen(buffer, BIG_INT_BIT_LEN) - SLASH_N_SIZE;
+// 			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
 // 			buffer[real_size] = '\0';
 
 // 			StrToBigInt(buffer, &public_p_x);
 // 		}
 // 		else
 // 		{
-// 			int real_size = strnlen(buffer, BIG_INT_BIT_LEN) - SLASH_N_SIZE;
+// 			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
 // 			buffer[real_size] = '\0';
 
 // 			StrToBigInt(buffer, &public_p_y);
@@ -687,7 +597,7 @@
 // 	BigInt source, tmp, truncated_hash, s, r, s_reverse, v1, v2, x_p, y_p, x_q, y_q, result_x, result_y;
 
 // 	/*  */
-// 	memset(source.bit, 0, BIG_INT_BIT_LEN);
+// 	memset(source.bit, 0, MAX_STR_SIZE);
 // 	byteSequenceToBinBigInt(s_source, SHA256_BYTES, &source);
 	
 // 	StrToBigInt(s_s, &s);
