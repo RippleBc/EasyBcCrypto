@@ -173,7 +173,7 @@ void ecc_test()
   printf("sha256 result: ");
   for(i = 0; i < SHA256_BYTES; i++)
   {
-    printf("%02x ", hash[i]);
+    printf("%02x", hash[i]);
   }
   printf("\n");
 
