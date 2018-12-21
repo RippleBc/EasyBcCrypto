@@ -25,17 +25,20 @@ void init()
 
 int main()
 {
-  init();
+  if(TEST_BEGIN)
+  {
+    init();
 
-  // sha256_test();
+    sha256_test();
 
-  // random_test();
+    random_test();
 
-  // prime_test();
+    prime_test();
 
-  // rsa_test();
+    rsa_test();
 
-  ecc_test();
+    ecc_test();
+  }
 
   return 0;
 }
@@ -60,7 +63,7 @@ void random_test()
 
   mpz_init_set_str(limit, "123", 16);
 
-  DoGetPositiveRandBigInt(8, random);
+  DoGetPositiveRandBigInt(0, 8, random);
   gmp_printf("%Zd\n", random);
 
   DoGetPositiveOddRandBigInt(1, 8, random);

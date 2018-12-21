@@ -171,5 +171,9 @@ void DoGetPositiveOddRandBigInt(const int if_fix_len, const int byteLen, mpz_t r
 
 void DoGetPositiveRand(mpz_t n, mpz_t result)
 {
-	mpz_urandomm(result, G_RANDOM_STATE, n);
+	do
+	{
+		mpz_urandomm(result, G_RANDOM_STATE, n);
+	}
+	while(mpz_cmp(result, G_BIG_INT_ZERO) == 0);
 }

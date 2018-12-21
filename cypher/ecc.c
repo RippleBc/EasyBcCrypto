@@ -20,7 +20,7 @@ static mpz_t H; /* n * h = N, n * ( h * p) = 0, G = h * p (p is a random point w
 
 static int TEST_ECC_DOMAIN_PARAMETER = 0;
 
-char SECP_256_K1_PARA[7][MAX_STR_SIZE] =
+static char SECP_256_K1_PARA[7][MAX_STR_SIZE] =
 {
 	"fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f",
 	"0",
@@ -31,7 +31,7 @@ char SECP_256_K1_PARA[7][MAX_STR_SIZE] =
 	"1"
 };
 
-char TEST_PARA[7][MAX_STR_SIZE] =
+static char TEST_PARA[7][MAX_STR_SIZE] =
 {
 	"61",
 	"2",
@@ -44,7 +44,7 @@ char TEST_PARA[7][MAX_STR_SIZE] =
 
 static mpz_t ECC_ZERO;
 
-void InitDomainParameters()
+static void InitDomainParameters()
 {
 
 	mpz_init_set_str(ECC_ZERO, "-99", 16);
@@ -71,21 +71,8 @@ void InitDomainParameters()
 	}
 }
 
-void GeneMulReverse(const mpz_t const a, const mpz_t const p, mpz_t mul_inverse)
+static void GeneMulReverse(const mpz_t const a, const mpz_t const p, mpz_t mul_inverse)
 {
-	/* check arg */
-	// if(mpz_cmp(a, G_BIG_INT_ZERO) <= 0)
-	// {
-	// 	gmp_printf("\nGeneMulReverse, a must bigger than zero %Zd\n", a);
-	// 	exit(1);
-	// }
-
-	// if(mpz_cmp(p, G_BIG_INT_ZERO) <= 0)
-	// {
-	// 	gmp_printf("\nGeneMulReverse, p must bigger than zero %Zd\n", p);
-	// 	exit(1);
-	// }
-
 	mpz_t tmp;
 
 	mpz_init(tmp);
@@ -469,10 +456,6 @@ void EccSign(const unsigned char *const s_source, const char *const key_pair_fil
 	{
 		/* init r */
 		DoGetPositiveRand(N, k);
-		if(mpz_cmp(k, G_BIG_INT_ZERO) == 0)
-		{
-			continue;
-		}
 		if(ECC_SIGN_DEBUG)
 		{
 			gmp_printf("EccSign, k: %Zd\n", k);

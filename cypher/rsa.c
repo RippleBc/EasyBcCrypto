@@ -1,7 +1,7 @@
 #include "../common.h"
 #include <stdio.h>
 
-void GeneD(const mpz_t const e, mpz_t d, const mpz_t const l)
+static void GeneD(const mpz_t const e, mpz_t d, const mpz_t const l)
 {
 	mpz_t tmp;
 
@@ -147,7 +147,7 @@ static void Crypt(const unsigned char *const source, const int source_size, unsi
 	mpz_export(dest, dest_size, 1, sizeof(unsigned char), 1, 0, d);
 }
 
-char *RsaEncrypt(const unsigned char *const source, const int source_size, unsigned char *dest, int *dest_size, const char *const key_pair_file)
+void RsaEncrypt(const unsigned char *const source, const int source_size, unsigned char *dest, int *dest_size, const char *const key_pair_file)
 {
 	/*  */
 	char public_file_name[FILE_NAME_LEN];

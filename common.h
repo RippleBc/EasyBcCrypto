@@ -25,6 +25,8 @@
 
 #define MILLER_RABIN_TEST_TIMES 40
 
+#define TEST_BEGIN (1)
+
 #define AES_DEBUG (0)
 #define RANDOM_DEBUG (0)
 #define PRIME_DEBUG (0)
@@ -61,4 +63,24 @@ extern mpz_t G_BIG_INT_ONE;
 extern mpz_t G_BIG_INT_TWO;
 extern mpz_t G_BIG_INT_THREE;
 
+/* random */
+void InitRandom(int seed_size);
+void DoGetPositiveRandBigInt(const int if_fix_len, const int byteLen, mpz_t random);
+void DoGetPositiveOddRandBigInt(const int if_fix_len, const int byteLen, mpz_t random);
+void DoGetPositiveRand(mpz_t n, mpz_t result);
+
+/* prime */
+void DoGenRandomPrime(const int if_fix_len, const int byteLen, mpz_t prime);
+
+/* ecc */
+void GenerateEccKey(const char *const key_pair_file);
+void EccSign(const unsigned char *const s_source, const char *const key_pair_file, unsigned char *s_r, int *s_r_size, unsigned char *s_s, int *s_s_size);
+int EccVerifySign(const unsigned char *const s_source, const char *const key_pair_file, const char *const s_r, const int s_r_size, const char *const s_s, const int s_s_size);
+
+/* rsa */
+void DoGenerateRsaKey(const int byteLen, const char *const key_pair_file);
+void RsaEncrypt(const unsigned char *const source, const int source_size, unsigned char *dest, int *dest_size, const char *const key_pair_file);
+void RsaDecrypt(const unsigned char *const source, const int source_size, unsigned char *dest, int *dest_size, const char *const key_pair_file);
+void RsaSign(const unsigned char *const source, int source_size, unsigned char *dest, int *dest_size, const char *const key_pair_file);
+void RsaVerifySign(const unsigned char *const source, const int source_size, unsigned char *dest, int *dest_size, const char *const key_pair_file);
 #endif
