@@ -3,35 +3,34 @@
 
 #include <assert.h>
 #include <gmp.h>
+#include <stdio.h>
+#include <string.h>
 
 #define NAME_LEN 218
 #define FILE_NAME_LEN 218
+#define MAX_STR_SIZE (1024 * 8)
+#define BYTE_SIZE 8
+#define SLASH_N_SIZE 1
 
 #define AES_GROUP_SIZE 16
 #define AES_SUB_GROUP_SIZE 4
-
 #define AES_ROUND_NUM 12
 
 #define DES_GROUPING_SIZE 8
 #define DES_SUB_GROUPING_SIZE (DES_GROUPING_SIZE / 2)
-
 #define DES_ROUND_NUM 12
-
-#define MAX_STR_SIZE (1024 * 8)
-
-#define BYTE_SIZE 8
-
-#define SLASH_N_SIZE 1
 
 #define MILLER_RABIN_TEST_TIMES 40
 
 #define TEST_BEGIN (1)
 
+#define DEBUG (0)
+
 #define AES_DEBUG (0)
 #define RANDOM_DEBUG (0)
 #define PRIME_DEBUG (0)
 #define DO_POW_MOD_DEBUG (0)
-#define RSA_DEBUG (1)
+#define RSA_DEBUG (0)
 #define GENE_D_DEBUG (0)
 
 #define ECC_DEBUG (0)
@@ -64,23 +63,26 @@ extern mpz_t G_BIG_INT_TWO;
 extern mpz_t G_BIG_INT_THREE;
 
 /* random */
-void InitRandom(int seed_size);
-void DoGetPositiveRandBigInt(const int if_fix_len, const int byteLen, mpz_t random);
-void DoGetPositiveOddRandBigInt(const int if_fix_len, const int byteLen, mpz_t random);
-void DoGetPositiveRand(mpz_t n, mpz_t result);
+extern void InitRandom(int seed_size);
+extern void DoGetPositiveRandBigInt(const int if_fix_len, const int byteLen, mpz_t random);
+extern void DoGetPositiveOddRandBigInt(const int if_fix_len, const int byteLen, mpz_t random);
+extern void DoGetPositiveRand(mpz_t n, mpz_t result);
 
 /* prime */
-void DoGenRandomPrime(const int if_fix_len, const int byteLen, mpz_t prime);
+extern void DoGenRandomPrime(const int if_fix_len, const int byteLen, mpz_t prime);
 
 /* ecc */
-void GenerateEccKey(const char *const key_pair_file);
-void EccSign(const unsigned char *const s_source, const char *const key_pair_file, unsigned char *s_r, int *s_r_size, unsigned char *s_s, int *s_s_size);
-int EccVerifySign(const unsigned char *const s_source, const char *const key_pair_file, const char *const s_r, const int s_r_size, const char *const s_s, const int s_s_size);
+extern void GenerateEccKey(const char *const key_pair_file);
+extern void EccSign(const unsigned char *const s_source, const char *const key_pair_file, unsigned char *s_r, int *s_r_size, unsigned char *s_s, int *s_s_size);
+extern int EccVerifySign(const unsigned char *const s_source, const char *const key_pair_file, const char *const s_r, const int s_r_size, const char *const s_s, const int s_s_size);
 
 /* rsa */
-void DoGenerateRsaKey(const int byteLen, const char *const key_pair_file);
-void RsaEncrypt(const unsigned char *const source, const int source_size, unsigned char *dest, int *dest_size, const char *const key_pair_file);
-void RsaDecrypt(const unsigned char *const source, const int source_size, unsigned char *dest, int *dest_size, const char *const key_pair_file);
-void RsaSign(const unsigned char *const source, int source_size, unsigned char *dest, int *dest_size, const char *const key_pair_file);
-void RsaVerifySign(const unsigned char *const source, const int source_size, unsigned char *dest, int *dest_size, const char *const key_pair_file);
+extern void DoGenerateRsaKey(const int byteLen, const char *const key_pair_file);
+extern void RsaEncrypt(const unsigned char *const source, const int source_size, unsigned char *dest, int *dest_size, const char *const key_pair_file);
+extern void RsaDecrypt(const unsigned char *const source, const int source_size, unsigned char *dest, int *dest_size, const char *const key_pair_file);
+extern void RsaSign(const unsigned char *const source, int source_size, unsigned char *dest, int *dest_size, const char *const key_pair_file);
+extern int RsaVerifySign(const unsigned char *const source, const int source_size, unsigned char *origin, int origin_size, const char *const key_pair_file);
+
+/*  */
+extern void GetBigIntFromFile(const FILE *const p_file, mpz_t big_int);
 #endif

@@ -1,5 +1,4 @@
 #include "../common.h"
-#include <stdio.h>
 
 static void GeneD(const mpz_t const e, mpz_t d, const mpz_t const l)
 {
@@ -22,9 +21,44 @@ static void GeneD(const mpz_t const e, mpz_t d, const mpz_t const l)
 	}
 }
 
+void GetBigIntFromFile(const FILE *const p_file, mpz_t big_int)
+{
+	/* get line */
+	char buffer[MAX_STR_SIZE];
+	fgets(buffer, MAX_STR_SIZE, p_file);
+	
+	/* check err */
+	if(ferror(p_file))
+	{
+		printf("GetBigIntFromFile, fgets err\n");
+		exit(1);
+	}
+
+	/* check if end */
+	if(!feof(p_file))
+	{
+		int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
+		buffer[real_size] = '\0';
+
+		mpz_init_set_str(big_int, buffer, 16);
+
+		if(DEBUG)
+		{
+			printf("GetBigIntFromFile, reach the end of file\n");
+		}
+	}
+	else
+	{
+		mpz_init_set_str(big_int, buffer, 16);
+	}
+}
+
 void DoGenerateRsaKey(const int byteLen, const char *const key_pair_file)
 {
-	printf("DoGenerateRsaKey, generating rsa key ...\n");
+	if(DEBUG)
+	{
+		printf("DoGenerateRsaKey, generating rsa key ...\n");
+	}
 
 	int fix_len = 1;
 	mpz_t p, q, e, d, n, pMinusOne, qMinusOne, l, gcd;
@@ -161,32 +195,11 @@ void RsaEncrypt(const unsigned char *const source, const int source_size, unsign
 	}
 
 	/*  */
-	char buffer[MAX_STR_SIZE];
 	mpz_t e, n;
-	char c;
-	int mark = 0;
-	
-	while((fgets(buffer, MAX_STR_SIZE, p_public_file)) != NULL)
-	{
-		if(mark == 0)
-		{
-			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
-			buffer[real_size] = '\0';
+	GetBigIntFromFile(p_public_file, e);
+	GetBigIntFromFile(p_public_file, n);
 
-			mpz_init_set_str(e, buffer, 16);
-		}
-		else
-		{
-			mpz_init_set_str(n, buffer, 16);
-		}
-
-		mark++;
-	}
-	if(!feof(p_public_file))
-	{
-		printf("RsaEncrypt, fgets err %s\n", public_file_name);
-		exit(1);
-	}
+	/*  */
 	fclose(p_public_file);
 
 	Crypt(source, source_size, dest, dest_size, e, n);
@@ -206,32 +219,11 @@ void RsaDecrypt(const unsigned char *const source, const int source_size, unsign
 	}
 
 	/*  */
-	char buffer[MAX_STR_SIZE];
 	mpz_t d, n;
-	char c;
-	int mark = 0;
-	
-	while((fgets(buffer, MAX_STR_SIZE, p_private_file)) != NULL)
-	{
-		if(mark == 0)
-		{
-			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
-			buffer[real_size] = '\0';
+	GetBigIntFromFile(p_private_file, d);
+	GetBigIntFromFile(p_private_file, n);
 
-			mpz_init_set_str(d, buffer, 16);
-		}
-		else
-		{
-			mpz_init_set_str(n, buffer, 16);
-		}
-
-		mark++;
-	}
-	if(!feof(p_private_file))
-	{
-		printf("RsaEncrypt, fgets err %s\n", private_file_name);
-		exit(1);
-	}
+	/*  */
 	fclose(p_private_file);
 
 	Crypt(source, source_size, dest, dest_size, d, n);
@@ -239,90 +231,29 @@ void RsaDecrypt(const unsigned char *const source, const int source_size, unsign
 
 void RsaSign(const unsigned char *const source, int source_size, unsigned char *dest, int *dest_size, const char *const key_pair_file)
 {
-	/*  */
-	char private_file_name[FILE_NAME_LEN];
-	snprintf(private_file_name, FILE_NAME_LEN, "keys/%s_private.rsa",  key_pair_file);
-	FILE *p_private_file;
-	p_private_file = fopen(private_file_name, "rt");
-	if(p_private_file == NULL)
-	{
-		printf("RsaEncrypt, open file %s err\n", private_file_name);
-		exit(1);
-	}
-
-	/*  */
-	char buffer[MAX_STR_SIZE];
-	mpz_t d, n;
-	char c;
-	int mark = 0;
-	
-	while((fgets(buffer, MAX_STR_SIZE, p_private_file)) != NULL)
-	{
-		if(mark == 0)
-		{
-			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
-			buffer[real_size] = '\0';
-
-			mpz_init_set_str(d, buffer, 16);
-		}
-		else
-		{
-			mpz_init_set_str(n, buffer, 16);
-		}
-
-		mark++;
-	}
-	if(!feof(p_private_file))
-	{
-		printf("RsaEncrypt, fgets err %s\n", private_file_name);
-		exit(1);
-	}
-	fclose(p_private_file);
-
-	Crypt(source, source_size, dest, dest_size, d, n);
+	RsaDecrypt(source, source_size, dest, dest_size, key_pair_file);
 }
 
-void RsaVerifySign(const unsigned char *const source, const int source_size, unsigned char *dest, int *dest_size, const char *const key_pair_file)
+int RsaVerifySign(const unsigned char *const source, const int source_size, unsigned char *origin, int origin_size, const char *const key_pair_file)
 {
-	/*  */
-	char public_file_name[FILE_NAME_LEN];
-	snprintf(public_file_name, FILE_NAME_LEN, "keys/%s_public.rsa",  key_pair_file);
-	FILE *p_public_file;
-	p_public_file = fopen(public_file_name, "rt");
-	if(p_public_file == NULL)
+	unsigned char dest[MAX_STR_SIZE];
+	int dest_size;
+
+	RsaEncrypt(source, source_size, dest, &dest_size, key_pair_file);
+
+	if(origin_size != dest_size)
 	{
-		printf("RsaEncrypt, open file %s err\n", public_file_name);
-		exit(1);
+		return 0;
 	}
 
-	/*  */
-	char buffer[MAX_STR_SIZE];
-	mpz_t e, n;
-	char c;
-	int mark = 0;
-	
-	while((fgets(buffer, MAX_STR_SIZE, p_public_file)) != NULL)
+	int i;
+	for(i = 0; i < origin_size; i++)
 	{
-		if(mark == 0)
+		if(origin[i] != dest[i])
 		{
-			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
-			buffer[real_size] = '\0';
-
-			mpz_init_set_str(e, buffer, 16);
+			return 0;
 		}
-		else
-		{
-			mpz_init_set_str(n, buffer, 16);
-		}
-
-		mark++;
 	}
-	if(!feof(p_public_file))
-	{
-		printf("RsaEncrypt, fgets err %s\n", public_file_name);
-		exit(1);
-	}
-	fclose(p_public_file);
 
-	Crypt(source, source_size, dest, dest_size, e, n);
+	return 1;
 }

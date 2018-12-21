@@ -52,6 +52,8 @@ void prime_test()
   DoGenRandomPrime(1, 64, prime);
 
   gmp_printf("%Zd\n", prime);
+
+  printf("\n\n\n\n");
 }
 
 void random_test()
@@ -71,40 +73,62 @@ void random_test()
 
   DoGetPositiveRand(limit, random);
   gmp_printf("%Zd\n", random);
+
+  printf("\n\n\n\n");
 }
 
 void sha256_test()
 {
   char *buf[] = {
-        "",
-        "e3b0c442 98fc1c14 9afbf4c8 996fb924 27ae41e4 649b934c a495991b 7852b855",
+      "",
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 
-        "abc",
-        "ba7816bf 8f01cfea 414140de 5dae2223 b00361a3 96177a9c b410ff61 f20015ad",
+      "abc",
+      "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
 
-        "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
-        "248d6a61 d20638b8 e5c02693 0c3e6039 a33ce459 64ff2167 f6ecedd4 19db06c1",
+      "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
+      "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1",
 
-        "The quick brown fox jumps over the lazy dog",
-        "d7a8fbb3 07d78094 69ca9abc b0082e4f 8d5651e4 6d3cdb76 2d02d0bf 37c9e592",
+      "The quick brown fox jumps over the lazy dog",
+      "d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592",
 
-        "The quick brown fox jumps over the lazy cog", /* avalanche effect test */
-        "e4c4d8f3 bf76b692 de791a17 3e053211 50f7a345 b46484fe 427f6acc 7ecc81be",
+      "The quick brown fox jumps over the lazy cog", /* avalanche effect test */
+      "e4c4d8f3bf76b692de791a173e05321150f7a345b46484fe427f6acc7ecc81be",
 
-        "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2sy",
-        "9085df2f 02e0cc45 5928d0f5 1b27b4bf 1d9cd260 a66ed1fd a11b0a3f f5756d99"
-    };
+      "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2sy",
+      "9085df2f02e0cc455928d0f51b27b4bf1d9cd260a66ed1fda11b0a3ff5756d99"
+  };
 
-    uint8_t hash[SHA256_BYTES];
-    size_t i, j;
-
-    for (i = 0; i < (sizeof(buf) / sizeof(buf[0])); i += 2) {
-        sha256(buf[i], strlen(buf[i]), hash);
-        printf("input = '%s'\ndigest: %s\nresult: ", buf[i], buf[i + 1]);
-        for (j = 0; j < SHA256_BYTES; j++)
-            printf("%02x%s", hash[j], ((j % 4) == 3) ? " " : "");
-        printf("\n\n");
+  uint8_t hash[SHA256_BYTES];
+  size_t i, j;
+  char hex_byte_sequence[SHA256_BYTES * 2];
+  for (i = 0; i < (sizeof(buf) / sizeof(buf[0])); i += 2) 
+  {
+    /*  */
+    sha256(buf[i], strlen(buf[i]), hash);
+    for(j = 0; j < SHA256_BYTES; j++)
+    {
+      snprintf(&hex_byte_sequence[j * 2], 3, "%02x", hash[j]);
     }
+    hex_byte_sequence[SHA256_BYTES * 2] = '\0';
+
+    /*  */
+    printf("verify: ", buf[i]);
+    for (j = 0; j < SHA256_BYTES; j++)
+    {
+      if(buf[i + 1][j] != hex_byte_sequence[j])
+      {
+        printf("0\n");
+        break;
+      }
+    } 
+    if(j == SHA256_BYTES)
+    {
+      printf("1\n");
+    }
+  }
+
+  printf("\n\n\n\n");
 }
 
 void rsa_test()
@@ -113,53 +137,26 @@ void rsa_test()
   
   DoGenerateRsaKey(512, "key_pair");
 
+  unsigned char origin[MAX_STR_SIZE];
   unsigned char dest[MAX_STR_SIZE];
   int dest_size, debug_tmp_size;
 
   for(i = 0; i < 256; i++)
   {
-    debug_tmp[i] = 0x15;
+    origin[i] = 0x15;
   }
-  
-  printf("origin text: ");
-  for(i = 0; i < 256; i++)
-  {
-    printf("%02x", debug_tmp[i]);
-  }
-  printf("\n");
 
-  RsaEncrypt(debug_tmp, 256, dest, &dest_size, "key_pair");
-  printf("RsaEncrypt text: ");
-  for(i = 0; i < dest_size; i++)
-  {
-   printf("%02x", dest[i]);
-  }
-  printf("\n");
-
-  RsaDecrypt(dest, dest_size, debug_tmp, &debug_tmp_size, "key_pair");
-  printf("RsaDecrypt text: ");
-  for(i = 0; i < debug_tmp_size; i++)
-  {
-   printf("%02x", debug_tmp[i]);
-  }
-  printf("\n");
-
-
-  RsaSign(debug_tmp, 256, dest, &dest_size, "key_pair");
+  RsaSign(origin, 256, dest, &dest_size, "key_pair");
   printf("RsaSign text: ");
   for(i = 0; i < dest_size; i++)
   {
     printf("%02x", dest[i]);
   }
   printf("\n");
+  
+  printf("RsaVerifySign: %d\n", RsaVerifySign(dest, dest_size, origin, 256, "key_pair"));
 
-  RsaVerifySign(dest, dest_size, debug_tmp, &debug_tmp_size, "key_pair");
-  printf("RsaVerifySign text: ");
-  for(i = 0; i < debug_tmp_size; i++)
-  {
-    printf("%02x", debug_tmp[i]);
-  }
-  printf("\n");
+  printf("\n\n\n\n");
 }
 
 void ecc_test()
@@ -173,7 +170,7 @@ void ecc_test()
   char text[MAX_STR_SIZE] = "bhn5bjmoniertqea40wro2upyflkydsibsk8ylkmgbvwi420t44cq034eou1szc1k0mk46oeb7ktzmlxqkbte2sy";
   unsigned char hash[SHA256_BYTES];
   sha256(text, strnlen(text, MAX_STR_SIZE), hash);
-  printf("sha256 result: ");
+  printf("EccVerifySign, sha256 result: ");
   for(i = 0; i < SHA256_BYTES; i++)
   {
     printf("%02x", hash[i]);
@@ -199,5 +196,7 @@ void ecc_test()
   printf("\n");
 
   /* verify */
-  printf("VerifySign: %d\n", EccVerifySign(hash, "key_pair", r, r_size, s, s_size));
+  printf("EccVerifySign: %d\n", EccVerifySign(hash, "key_pair", r, r_size, s, s_size));
+
+  printf("\n\n\n\n");
 }

@@ -6,8 +6,6 @@ y^2 = (x ^ 3 + a * x + b) mod p (p  is a prime)
 */
 
 #include "../common.h"
-#include <stdio.h>
-#include <string.h>
 #include "../hash/sha256.h"
 
 static mpz_t P;
@@ -306,7 +304,10 @@ static void ComputeMP(const mpz_t const private_key, const mpz_t const origin_x,
 
 void GenerateEccKey(const char *const key_pair_file)
 {
-	printf("begin to generate ecc key ...\n");
+	if(DEBUG)
+	{
+		printf("GenerateEccKey, begin to generate ecc key ...\n");
+	}
 
 	InitDomainParameters();
 
@@ -372,8 +373,6 @@ void GenerateEccKey(const char *const key_pair_file)
 
 void EccSign(const unsigned char *const s_source, const char *const key_pair_file, unsigned char *s_r, int *s_r_size, unsigned char *s_s, int *s_s_size)
 {
-	printf("begin to sign ...\n");
-
 	/*  */
 	InitDomainParameters();
 
@@ -389,39 +388,12 @@ void EccSign(const unsigned char *const s_source, const char *const key_pair_fil
 	}
 
 	/*  */
-	char buffer[MAX_STR_SIZE];
 	mpz_t private_key, public_p_x, public_p_y;
-	char c;
-	int mark = 0;
-	
-	while((fgets(buffer, MAX_STR_SIZE, p_private_file)) != NULL)
-	{
-		if(mark == 0)
-		{
-			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
-			buffer[real_size] = '\0';
+	GetBigIntFromFile(p_private_file, private_key);
+	GetBigIntFromFile(p_private_file, public_p_x);
+	GetBigIntFromFile(p_private_file, public_p_y);
 
-			mpz_init_set_str(private_key, buffer, 16);
-		}
-		else if(mark == 1)
-		{
-			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
-			buffer[real_size] = '\0';
-
-			mpz_init_set_str(public_p_x, buffer, 16);
-		}
-		else
-		{
-			mpz_init_set_str(public_p_y, buffer, 16);
-		}
-
-		mark++;
-	}
-	if(!feof(p_private_file))
-	{
-		printf("EccSign, fgets err %s\n", private_file_name);
-		exit(1);
-	}
+	/*  */
 	fclose(p_private_file);
 	if(ECC_SIGN_DEBUG)
 	{
@@ -512,32 +484,11 @@ int EccVerifySign(const unsigned char *const s_source, const char *const key_pai
 	}
 
 	/*  */
-	char buffer[MAX_STR_SIZE];
 	mpz_t public_p_x, public_p_y;
-	char c;
-	int mark = 0;
-	
-	while((fgets(buffer, MAX_STR_SIZE, p_public_file)) != NULL)
-	{
-		if(mark == 0)
-		{
-			int real_size = strnlen(buffer, MAX_STR_SIZE) - SLASH_N_SIZE;
-			buffer[real_size] = '\0';
+	GetBigIntFromFile(p_public_file, public_p_x);
+	GetBigIntFromFile(p_public_file, public_p_y);
 
-			mpz_init_set_str(public_p_x, buffer, 16);
-		}
-		else
-		{
-			mpz_init_set_str(public_p_y, buffer, 16);
-		}
-
-		mark++;
-	}
-	if(!feof(p_public_file))
-	{
-		printf("EccVerifySign, fgets err %s\n", public_file_name);
-		exit(1);
-	}
+	/*  */
 	fclose(p_public_file);
 	if(ECC_VERIFY_SIGN_DEBUG)
 	{
